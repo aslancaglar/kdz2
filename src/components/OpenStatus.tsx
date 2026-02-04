@@ -1,0 +1,85 @@
+import { useState, useEffect } from 'react';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { Clock } from 'lucide-react';
+import { isRestaurantOpen, getStatusMessage } from '../utils/isRestaurantOpen';
+
+interface OpenStatusProps {
+    isScrolled?: boolean;
+    variant?: 'desktop' | 'mobile';
+}
+
+export default function OpenStatus({ isScrolled = false, variant = 'desktop' }: OpenStatusProps) {
+    const restaurantInfo = useQuery(api.restaurantInfo.get);
+    const [currentStatus, setCurrentStatus] = useState({ isOpen: false });
+
+    // Update status every minute
+    useEffect(() => {
+        const updateStatus = () => {
+            if (restaurantInfo?.hours) {
+                const status = isRestaurantOpen(restaurantInfo.hours);
+                setCurrentStatus(status);
+            }
+        };
+
+        updateStatus();
+        const interval = setInterval(updateStatus, 60000); // Update every minute
+
+        return () => clearInterval(interval);
+    }, [restaurantInfo]);
+
+    if (!restaurantInfo) {
+        return null;
+    }
+
+    const statusMessage = getStatusMessage(currentStatus.isOpen);
+
+    // Mobile variant (for mobile menu)
+    if (variant === 'mobile') {
+        return (
+            <div className="flex items-center justify-center gap-2 py-2 mb-2">
+                {currentStatus.isOpen ? (
+                    <>
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        <span className="text-white font-semibold text-sm">
+                            {statusMessage}
+                        </span>
+                    </>
+                ) : (
+                    <>
+                        <Clock className="w-4 h-4 text-red-400" />
+                        <span className="text-white font-semibold text-sm">
+                            {statusMessage}
+                        </span>
+                    </>
+                )}
+            </div>
+        );
+    }
+
+    // Desktop variant
+    return (
+        <div
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full transition-all ${isScrolled
+                    ? 'bg-white/10 backdrop-blur-sm'
+                    : 'bg-white/20 backdrop-blur-sm'
+                }`}
+        >
+            {currentStatus.isOpen ? (
+                <>
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                    <span className="text-white font-semibold text-sm">
+                        {statusMessage}
+                    </span>
+                </>
+            ) : (
+                <>
+                    <Clock className="w-4 h-4 text-red-400" />
+                    <span className="text-white font-semibold text-sm">
+                        {statusMessage}
+                    </span>
+                </>
+            )}
+        </div>
+    );
+}

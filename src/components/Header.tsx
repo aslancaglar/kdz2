@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Phone, ShoppingBag } from 'lucide-react';
 import OrderList from './OrderList';
 import { useOrder } from '../context/OrderContext';
+import OpenStatus from './OpenStatus';
 
 const navLinks = [
   { href: '/', label: 'Accueil', type: 'route' as const },
@@ -92,6 +93,8 @@ export default function Header() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-4">
+            <OpenStatus isScrolled={isScrolled} variant="desktop" />
+
             <button
               onClick={() => setIsOrderListOpen(true)}
               className={`relative p-2.5 rounded-full transition-all ${isScrolled
@@ -118,6 +121,11 @@ export default function Header() {
               <Phone className="w-5 h-5" />
               03 82 58 13 39
             </a>
+          </div>
+
+          {/* Mobile Status - Always Visible */}
+          <div className="lg:hidden flex-1 flex justify-center px-2">
+            <OpenStatus isScrolled={isScrolled} variant="mobile" />
           </div>
 
           <div className="lg:hidden flex items-center gap-2">
@@ -175,6 +183,9 @@ export default function Header() {
                 </a>
               );
             })}
+
+            <OpenStatus variant="mobile" />
+
             <a
               href="tel:0382581339"
               onClick={() => setIsMenuOpen(false)}
