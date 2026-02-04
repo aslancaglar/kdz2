@@ -1,0 +1,197 @@
+import { useState, useEffect, useRef } from 'react';
+import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+
+export default function Reviews() {
+  const reviewsData = useQuery(api.reviews.listActive);
+  const reviews = reviewsData || [];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const extendedReviews = isMobile ? [...reviews, ...reviews] : [...reviews, ...reviews, ...reviews];
+
+  const startAutoSlide = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    intervalRef.current = window.setInterval(() => {
+      nextSlide();
+    }, 4000);
+  };
+
+  useEffect(() => {
+    startAutoSlide();
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (currentIndex === reviews.length) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndex(0);
+        setTimeout(() => {
+          setIsTransitioning(true);
+        }, 50);
+      }, 500);
+    }
+  }, [currentIndex]);
+
+  const nextSlide = () => {
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev + 1);
+  };
+
+  const prevSlide = () => {
+    if (currentIndex === 0) {
+      setIsTransitioning(false);
+      setCurrentIndex(reviews.length);
+      setTimeout(() => {
+        setIsTransitioning(true);
+        setCurrentIndex(reviews.length - 1);
+      }, 50);
+    } else {
+      setIsTransitioning(true);
+      setCurrentIndex((prev) => prev - 1);
+    }
+    startAutoSlide();
+  };
+
+  const goToSlide = (index: number) => {
+    setIsTransitioning(true);
+    setCurrentIndex(index);
+    startAutoSlide();
+  };
+
+  const handleNextClick = () => {
+    nextSlide();
+    startAutoSlide();
+  };
+
+  const ReviewCard = ({ review, index }: { review: typeof reviews[0]; index: number }) => (
+    <div
+      key={`${review._id}-${index}`}
+      className="flex-shrink-0 w-full md:w-auto"
+      style={{ width: isMobile ? '100%' : 'calc(33.333% - 1.33rem)' }}
+    >
+      <div className="bg-white rounded-3xl p-8 shadow-md hover:shadow-lg transition-all h-full">
+        <Quote className="w-10 h-10 text-primary-500/30 mb-4" />
+
+        <div className="flex gap-1 mb-4">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              className={`w-5 h-5 ${i < review.rating
+                ? 'text-secondary-500 fill-secondary-500'
+                : 'text-gray-300'
+                }`}
+            />
+          ))}
+        </div>
+
+        <p className="text-gray-600 mb-6 leading-relaxed">
+          "{review.comment}"
+        </p>
+
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+            <span className="text-primary-600 font-bold text-lg">
+              {review.name.charAt(0)}
+            </span>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900">{review.name}</p>
+            <p className="text-sm text-gray-500">{review.date}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <section id="avis" className="py-20 relative overflow-hidden" style={{ backgroundColor: '#f2eadc' }}>
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 right-20 w-72 h-72 bg-yellow-300 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-yellow-200 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <p className="text-primary-600 font-semibold mb-2">Temoignages</p>
+          <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
+            Ce Que Disent Nos Clients
+          </h2>
+        </div>
+
+        <div className="relative">
+          {!isMobile && (
+            <>
+              <button
+                onClick={prevSlide}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                aria-label="Previous reviews"
+              >
+                <ChevronLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <button
+                onClick={handleNextClick}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                aria-label="Next reviews"
+              >
+                <ChevronRight className="w-6 h-6 text-gray-700" />
+              </button>
+            </>
+          )}
+
+          <div className="overflow-hidden min-h-[400px]">
+            <div
+              className={`flex ${isMobile ? 'gap-0' : 'gap-8'}`}
+              style={{
+                transform: isMobile
+                  ? `translateX(-${currentIndex * 100}%)`
+                  : `translateX(-${currentIndex * (100 / 3)}%)`,
+                transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none',
+              }}
+            >
+              {extendedReviews.map((review, index) => (
+                <ReviewCard key={`${review._id}-${index}`} review={review} index={index} />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-2 mt-8">
+            {reviews.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`w-3 h-3 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${index === (currentIndex % reviews.length)
+                  ? 'bg-primary-600 w-8'
+                  : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

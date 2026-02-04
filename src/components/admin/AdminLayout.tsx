@@ -1,0 +1,130 @@
+import { ReactNode, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '../../context/AdminAuthContext';
+import {
+  LayoutDashboard,
+  Pizza,
+  Tag,
+  UtensilsCrossed,
+  Settings,
+  ShoppingCart,
+  Menu as MenuIcon,
+  X,
+  LogOut,
+  Layers,
+  Star,
+  Image,
+} from 'lucide-react';
+
+interface AdminLayoutProps {
+  children: ReactNode;
+}
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { admin, logout } = useAdminAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const menuItems = [
+    { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/categories', label: 'Categories', icon: Tag },
+    { path: '/admin/menu-items', label: 'Menu Items', icon: Pizza },
+    { path: '/admin/topping-categories', label: 'Topping Categories', icon: Layers },
+    { path: '/admin/toppings', label: 'Toppings', icon: UtensilsCrossed },
+    { path: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+    { path: '/admin/reviews', label: 'Reviews', icon: Star },
+    { path: '/admin/gallery', label: 'Gallery', icon: Image },
+    { path: '/admin/settings', label: 'Settings', icon: Settings },
+  ];
+
+  const handleLogout = () => {
+    logout();
+    navigate('/admin/login');
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0`}
+      >
+        <div className="flex items-center justify-between p-6 border-b border-slate-700">
+          <h1 className="text-xl font-bold">Admin Panel</h1>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden text-white hover:text-slate-300"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <nav className="p-4 space-y-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${isActive
+                  ? 'bg-slate-700 text-white'
+                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-sm font-medium text-white">{admin?.username}</p>
+              <p className="text-xs text-slate-400">Administrator</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <div className="lg:ml-64">
+        <header className="bg-white shadow-sm border-b border-slate-200">
+          <div className="flex items-center justify-between px-6 py-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-slate-600 hover:text-slate-900"
+            >
+              <MenuIcon className="w-6 h-6" />
+            </button>
+
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-slate-600">
+                Welcome back, <span className="font-semibold text-slate-900">{admin?.username}</span>
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <main className="p-6">{children}</main>
+      </div>
+
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+        />
+      )}
+    </div>
+  );
+}

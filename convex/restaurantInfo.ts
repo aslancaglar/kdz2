@@ -1,0 +1,57 @@
+import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    const info = await ctx.db
+      .query("restaurantInfo")
+      .withIndex("by_key", (q) => q.eq("key", "main"))
+      .first();
+    return info;
+  },
+});
+
+export const upsert = mutation({
+  args: {
+    address: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    email: v.optional(v.string()),
+    hours: v.optional(v.array(v.object({
+      day: v.string(),
+      time: v.string(),
+    }))),
+    socialLinks: v.optional(v.object({
+      facebook: v.optional(v.string()),
+      instagram: v.optional(v.string()),
+      twitter: v.optional(v.string()),
+    })),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("restaurantInfo")
+      .withIndex("by_key", (q) => q.eq("key", "main"))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        address: args.address,
+        phone: args.phone,
+        email: args.email,
+        hours: args.hours,
+        socialLinks: args.socialLinks,
+      });
+      return existing._id;
+    } else {
+      const id = await ctx.db.insert("restaurantInfo", {
+        key: "main",
+        address: args.address,
+        phone: args.phone,
+        email: args.email,
+        hours: args.hours,
+        socialLinks: args.socialLinks,
+      });
+      return id;
+    }
+  },
+});
