@@ -1,21 +1,32 @@
 import { ArrowRight, Phone } from 'lucide-react';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+
+const HERO_VIDEO_ID = "kg218cqrg7hzg0ghqj531aqpy180haz8" as any;
 
 export default function Hero() {
+  const videoUrl = useQuery(api.files.getUrl, { storageId: HERO_VIDEO_ID });
+
   return (
     <section
       id="hero"
       className="relative min-h-[45vh] flex items-center overflow-hidden pt-36 md:pt-32 pb-16"
     >
       <div className="absolute inset-0">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="hidden md:block w-full h-full object-cover"
-        >
-          <source src="https://www.karadeniz.fr/wp-content/uploads/2024/04/KdzVideo.mp4" type="video/mp4" />
-        </video>
+        {videoUrl ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="hidden md:block w-full h-full object-cover"
+            key={videoUrl}
+          >
+            <source src={videoUrl} type="video/mp4" />
+          </video>
+        ) : (
+          <div className="absolute inset-0 bg-dark-950" />
+        )}
         <img
           src="https://images.pexels.com/photos/2233729/pexels-photo-2233729.jpeg?auto=compress&cs=tinysrgb&w=1920"
           alt="Kebab background"
