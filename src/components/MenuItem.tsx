@@ -22,7 +22,13 @@ interface MenuItemProps {
 export default function MenuItem({ item }: MenuItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const toppings = useQuery(api.queries.getToppingsForMenuItem, { menuItemId: item._id });
+  // Defensive check: only query toppings if the ID is valid for the menuItems table
+  const isValidMenuItemId = item?._id && typeof item._id === 'string' && !item._id.startsWith('k57');
+
+  const toppings = useQuery(
+    (isValidMenuItemId ? api.queries.getToppingsForMenuItem : undefined) as any,
+    { menuItemId: item?._id }
+  );
   const hasCustomization = (toppings?.length || 0) > 0;
 
   return (
@@ -32,14 +38,15 @@ export default function MenuItem({ item }: MenuItemProps) {
         className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-all group cursor-pointer"
       >
         <div className="relative h-48 overflow-hidden bg-gray-100">
-          {item.image && (
+          {item?.image && (
             <img
               src={item.image}
-              alt={item.name}
+              alt={item?.name || ''}
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           )}
-          {item.popular && (
+          {item?.popular && (
             <span className="absolute top-4 right-4 bg-primary-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
               Populaire
             </span>
@@ -53,13 +60,13 @@ export default function MenuItem({ item }: MenuItemProps) {
         <div className="p-6">
           <div className="flex items-start justify-between mb-2">
             <h3 className="text-xl font-bold text-gray-900 font-display">
-              {item.name}
+              {item?.name || 'Article'}
             </h3>
             <span className="text-xl font-bold text-primary-500 ml-2 font-display">
-              {item.price.toFixed(2)}€
+              {(item?.price || 0).toFixed(2)}€
             </span>
           </div>
-          <p className="text-gray-600 mb-4">{item.description}</p>
+          <p className="text-gray-600 mb-4">{item?.description || ''}</p>
 
           <div className="text-sm text-gray-500 hover:text-primary-500 transition-colors font-medium">
             Cliquez pour personnaliser →

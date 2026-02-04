@@ -1,9 +1,9 @@
+import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { usePersistentQuery } from '../hooks/usePersistentQuery';
 import Skeleton from './Skeleton';
 
 export default function Gallery() {
-  const galleryImages = usePersistentQuery<any>(api.gallery.listActive, {});
+  const galleryImages = useQuery(api.gallery.listActive);
 
   return (
     <section id="gallery" className="py-20 bg-white">
@@ -26,7 +26,7 @@ export default function Gallery() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {galleryImages.map((image: any) => (
+            {galleryImages.map((image) => (
               <div
                 key={image._id}
                 className="group relative overflow-hidden rounded-2xl aspect-square shadow-md hover:shadow-lg transition-all duration-500"
@@ -34,6 +34,7 @@ export default function Gallery() {
                 <img
                   src={image.url || ''}
                   alt={image.title}
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">

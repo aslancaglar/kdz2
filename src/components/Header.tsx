@@ -59,6 +59,7 @@ export default function Header() {
             <img
               src="/logo_karadeniz.png.webp"
               alt="Karadeniz Logo"
+              loading="lazy"
               className={`w-auto transition-all duration-300 ${isScrolled ? 'h-12' : 'h-20'
                 }`}
             />
