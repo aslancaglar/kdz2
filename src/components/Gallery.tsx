@@ -26,7 +26,7 @@ export default function Gallery() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {galleryImages.map((image) => (
+            {galleryImages.map((image: any) => (
               <div
                 key={image._id}
                 className="group relative overflow-hidden rounded-2xl aspect-square shadow-md hover:shadow-lg transition-all duration-500"

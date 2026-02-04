@@ -212,7 +212,7 @@ export default function Reviews() {
               </div>
 
               <div className="flex justify-center gap-2 mt-8">
-                {reviews.map((_, index) => (
+                {reviews.map((_: any, index: number) => (
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
