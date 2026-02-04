@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { usePersistentQuery } from '../hooks/usePersistentQuery';
 import Skeleton from './Skeleton';
 import MenuItem from './MenuItem';
 
@@ -14,8 +14,8 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
   const categoryRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const hasUserInteracted = useRef(false);
 
-  const menuCategories = usePersistentQuery<any>(api.queries.getMenuCategories, {});
-  const allMenuItems = usePersistentQuery<any>(api.queries.getMenuItems, {});
+  const menuCategories = useQuery(api.queries.getMenuCategories);
+  const allMenuItems = useQuery(api.queries.getMenuItems);
 
   const [activeCategory, setActiveCategory] = useState<string>('');
 
@@ -25,7 +25,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
     }
   }, [menuCategories, activeCategory]);
 
-  const filteredItems = (allMenuItems || []).filter((item: any) => item.category === activeCategory && item.active);
+  const filteredItems = (allMenuItems || []).filter(item => item.category === activeCategory && item.active);
 
   useEffect(() => {
     if (!hasUserInteracted.current) {
@@ -73,7 +73,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
         ) : (
           <div className="overflow-x-auto mb-12 -mx-4 px-4 sm:mx-0 sm:px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <div className="flex gap-3 justify-start sm:justify-center min-w-max sm:min-w-0 sm:flex-wrap">
-              {menuCategories.map((category: any) => (
+              {menuCategories.map((category) => (
                 <button
                   key={category.slug}
                   ref={setCategoryRef(category.slug)}
@@ -115,7 +115,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredItems.map((item: any) => (
+            {filteredItems.map((item) => (
               <MenuItem
                 key={item._id}
                 item={{

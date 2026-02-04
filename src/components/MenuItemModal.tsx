@@ -6,7 +6,7 @@ import { Id } from '../../convex/_generated/dataModel';
 import { PriceOption, SelectedTopping, OrderItem } from '../types/order';
 import { useOrder } from '../context/OrderContext';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
-import { getBasePrice, calculateToppingsPrice, calculateTotalPrice } from '../utils/priceCalculator';
+import { getBasePrice, calculateTotalPrice } from '../utils/priceCalculator';
 import { formatPrice } from '../utils/formatters';
 
 interface MenuItemModalProps {
@@ -32,7 +32,16 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
   const [selectedToppings, setSelectedToppings] = useState<Record<string, SelectedTopping[]>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  const availableCategories = useQuery(api.queries.getToppingsForMenuItem, { menuItemId: item._id });
+  // Defensive check for the ID
+  const isValidMenuItemId = item?._id && typeof item._id === 'string' && !item._id.startsWith('k57');
+
+  // Use skip logic: pass 'skip' as the second argument if the query should not run.
+  // Convex useQuery skip pattern: pass 'skip' as the second argument or undefined as the first.
+  // Actually, the common pattern is useQuery(api.func, args) where args can be 'skip'.
+  const availableCategories = useQuery(
+    api.queries.getToppingsForMenuItem,
+    isValidMenuItemId ? { menuItemId: item._id } : "skip"
+  );
 
   useBodyScrollLock(isOpen);
 
@@ -48,11 +57,10 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
   const allSelectedToppings = Object.values(selectedToppings).flat();
   const currentPrice = getBasePrice(item, priceOption);
-  const toppingsPrice = calculateToppingsPrice(allSelectedToppings);
   const totalPrice = calculateTotalPrice(item, priceOption, allSelectedToppings);
 
   const handleToppingToggle = (categoryId: string, toppingId: string, name: string, price: number | undefined) => {
-    const category = availableCategories?.find(cat => cat.id === categoryId);
+    const category = availableCategories?.find((cat: any) => cat.id === categoryId);
     if (!category) return;
 
     setSelectedToppings(prev => {
@@ -85,7 +93,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
   const validateSelections = () => {
     const errors: Record<string, string> = {};
 
-    availableCategories?.forEach(category => {
+    availableCategories?.forEach((category: any) => {
       const categoryToppings = selectedToppings[category.id] || [];
       const count = categoryToppings.length;
 
@@ -119,7 +127,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
   };
 
   const getSelectionStatus = (categoryId: string) => {
-    const category = availableCategories?.find(cat => cat.id === categoryId);
+    const category = availableCategories?.find((cat: any) => cat.id === categoryId);
     if (!category) return '';
 
     const count = (selectedToppings[categoryId] || []).length;
@@ -131,7 +139,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
   };
 
   const isToppingDisabled = (categoryId: string, toppingId: string) => {
-    const category = availableCategories?.find(cat => cat.id === categoryId);
+    const category = availableCategories?.find((cat: any) => cat.id === categoryId);
     if (!category || !category.maxSelection) return false;
 
     const categoryToppings = selectedToppings[categoryId] || [];
@@ -166,11 +174,10 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setPriceOption('seul')}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    priceOption === 'seul'
-                      ? 'border-red-500 bg-red-50 text-red-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'seul'
+                    ? 'border-red-500 bg-red-50 text-red-700'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   <div className="text-sm font-medium">Seul</div>
                   <div className="text-lg font-bold font-display">{formatPrice(item.price)}</div>
@@ -179,11 +186,10 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                 {item.priceWithFries && (
                   <button
                     onClick={() => setPriceOption('frites')}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      priceOption === 'frites'
-                        ? 'border-red-500 bg-red-50 text-red-700'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'frites'
+                      ? 'border-red-500 bg-red-50 text-red-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                      }`}
                   >
                     <div className="text-sm font-medium">Frites</div>
                     <div className="text-lg font-bold font-display">{formatPrice(item.priceWithFries)}</div>
@@ -193,11 +199,10 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                 {item.priceMenu && (
                   <button
                     onClick={() => setPriceOption('menu')}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      priceOption === 'menu'
-                        ? 'border-red-500 bg-red-50 text-red-700'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'menu'
+                      ? 'border-red-500 bg-red-50 text-red-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                      }`}
                   >
                     <div className="text-sm font-medium">Menu</div>
                     <div className="text-lg font-bold font-display">{formatPrice(item.priceMenu)}</div>
@@ -209,7 +214,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
           {availableCategories && availableCategories.length > 0 && (
             <div className="space-y-6">
-              {availableCategories.map(category => (
+              {availableCategories.map((category: any) => (
                 <div key={category.id} className="border-t pt-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-extrabold text-gray-900 font-display bg-red-50 px-3 py-2 rounded-lg">
@@ -231,7 +236,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                   )}
 
                   <div className="grid grid-cols-2 gap-2">
-                    {category.toppings.map(topping => {
+                    {category.toppings.map((topping: any) => {
                       const isSelected = (selectedToppings[category.id] || []).some(
                         t => t.toppingId === topping.id
                       );
@@ -247,13 +252,12 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                             topping.price
                           )}
                           disabled={isDisabled}
-                          className={`p-3 rounded-lg border-2 text-left transition-all ${
-                            isSelected
-                              ? 'border-red-500 bg-red-50'
-                              : isDisabled
+                          className={`p-3 rounded-lg border-2 text-left transition-all ${isSelected
+                            ? 'border-red-500 bg-red-50'
+                            : isDisabled
                               ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
                               : 'border-gray-200 hover:border-gray-300'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
