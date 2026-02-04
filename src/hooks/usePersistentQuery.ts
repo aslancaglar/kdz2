@@ -6,7 +6,15 @@ import { useQuery } from 'convex/react';
  * This allows the UI to show data immediately on page refresh while Convex re-connects.
  */
 export function usePersistentQuery<T>(query: any, args: any): T | undefined {
-    const queryName = typeof query === 'string' ? query : query._queryName || 'unknown';
+    let queryName = 'unknown';
+
+    if (typeof query === 'string') {
+        queryName = query;
+    } else if (query && typeof query === 'object') {
+        // Try various ways Convex identifies queries
+        queryName = query._queryName || query.name || JSON.stringify(query);
+    }
+
     const cacheKey = `convex_cache_${queryName}_${JSON.stringify(args)}`;
 
     // Initialize state with data from localStorage if available
