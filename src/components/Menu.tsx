@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import Skeleton from './Skeleton';
 import MenuItem from './MenuItem';
 
 interface MenuProps {
@@ -24,7 +25,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
     }
   }, [menuCategories, activeCategory]);
 
-  const filteredItems = allMenuItems?.filter(item => item.category === activeCategory && item.active) || [];
+  const filteredItems = (allMenuItems || []).filter(item => item.category === activeCategory && item.active);
 
   useEffect(() => {
     if (!hasUserInteracted.current) {
@@ -64,8 +65,10 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
         )}
 
         {!menuCategories ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">Chargement des catégories...</p>
+          <div className="flex gap-3 justify-center mb-12 overflow-hidden">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-12 w-28 rounded-full flex-shrink-0" />
+            ))}
           </div>
         ) : (
           <div className="overflow-x-auto mb-12 -mx-4 px-4 sm:mx-0 sm:px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -78,11 +81,10 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
                     hasUserInteracted.current = true;
                     setActiveCategory(category.slug);
                   }}
-                  className={`font-display text-lg tracking-wide px-4 py-3 rounded-full transition-all uppercase whitespace-nowrap ${
-                    activeCategory === category.slug
-                      ? 'bg-red-500 text-white shadow-lg'
-                      : 'bg-red-100 text-gray-700 hover:bg-red-500 hover:text-white'
-                  }`}
+                  className={`font-display text-lg tracking-wide px-4 py-3 rounded-full transition-all uppercase whitespace-nowrap ${activeCategory === category.slug
+                    ? 'bg-red-500 text-white shadow-lg'
+                    : 'bg-red-100 text-gray-700 hover:bg-red-500 hover:text-white'
+                    }`}
                 >
                   {category.name}
                 </button>
@@ -92,8 +94,20 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
         )}
 
         {!allMenuItems ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">Chargement...</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-md">
+                <Skeleton className="h-48 w-full" />
+                <div className="p-6">
+                  <div className="flex justify-between mb-4">
+                    <Skeleton className="h-6 w-3/4 rounded" />
+                    <Skeleton className="h-6 w-1/4 rounded ml-2" />
+                  </div>
+                  <Skeleton className="h-4 w-full rounded mb-2" />
+                  <Skeleton className="h-4 w-2/3 rounded" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="text-center py-12">
@@ -102,7 +116,13 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredItems.map((item) => (
-              <MenuItem key={item._id} item={item} />
+              <MenuItem
+                key={item._id}
+                item={{
+                  ...item,
+                  description: item.description || ''
+                }}
+              />
             ))}
           </div>
         )}
