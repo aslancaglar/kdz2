@@ -25,7 +25,9 @@ export default function Hero() {
             <source src={videoUrl} type="video/mp4" />
           </video>
         ) : (
-          <div className="absolute inset-0 bg-dark-950" />
+          <div className="absolute inset-0 bg-dark-950">
+            <div className="absolute inset-0 animate-shimmer opacity-10" />
+          </div>
         )}
         <img
           src="https://images.pexels.com/photos/2233729/pexels-photo-2233729.jpeg?auto=compress&cs=tinysrgb&w=1920"
