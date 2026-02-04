@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Phone, ShoppingBag } from 'lucide-react';
-import logo from '../assets/images/logo_karadeniz.png.webp';
 import OrderList from './OrderList';
 import { useOrder } from '../context/OrderContext';
 
@@ -58,7 +57,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
             <img
-              src={logo}
+              src="/logo_karadeniz.png.webp"
               alt="Karadeniz Logo"
               className={`w-auto transition-all duration-300 ${isScrolled ? 'h-12' : 'h-20'
                 }`}
