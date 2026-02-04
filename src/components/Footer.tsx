@@ -2,6 +2,7 @@ import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { quickLinks } from '../data/footer';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
+import logo from '../assets/images/logo_karadeniz.png.webp';
 
 export default function Footer() {
   const restaurantInfo = useQuery(api.restaurantInfo.get);
@@ -19,7 +20,7 @@ export default function Footer() {
           <div>
             <a href="#accueil" className="flex items-center gap-3 mb-6">
               <img
-                src="/logo_karadeniz.png.webp"
+                src={logo}
                 alt="Karadeniz Logo"
                 className="w-12 h-12 object-contain"
               />
