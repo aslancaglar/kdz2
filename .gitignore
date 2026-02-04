@@ -37,7 +37,8 @@ lerna-debug.log*
 
 # Convex
 .convex/
-convex/_generated/
+# Note: convex/_generated/ is included for deployment compatibility
+# convex/_generated/
 
 # Misc
 *.log
