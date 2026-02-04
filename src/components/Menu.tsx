@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { usePersistentQuery } from '../hooks/usePersistentQuery';
 import Skeleton from './Skeleton';
 import MenuItem from './MenuItem';
 
@@ -14,8 +14,8 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
   const categoryRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const hasUserInteracted = useRef(false);
 
-  const menuCategories = useQuery(api.queries.getMenuCategories);
-  const allMenuItems = useQuery(api.queries.getMenuItems);
+  const menuCategories = usePersistentQuery<any>(api.queries.getMenuCategories, {});
+  const allMenuItems = usePersistentQuery<any>(api.queries.getMenuItems, {});
 
   const [activeCategory, setActiveCategory] = useState<string>('');
 

@@ -1,9 +1,9 @@
-import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { usePersistentQuery } from '../hooks/usePersistentQuery';
 import Skeleton from './Skeleton';
 
 export default function Gallery() {
-  const galleryImages = useQuery(api.gallery.listActive);
+  const galleryImages = usePersistentQuery<any>(api.gallery.listActive, {});
 
   return (
     <section id="gallery" className="py-20 bg-white">

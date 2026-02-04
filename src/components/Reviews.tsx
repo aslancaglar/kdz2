@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { usePersistentQuery } from '../hooks/usePersistentQuery';
 import Skeleton from './Skeleton';
 
 export default function Reviews() {
-  const reviewsData = useQuery(api.reviews.listActive);
+  const reviewsData = usePersistentQuery<any>(api.reviews.listActive, {});
   const reviews = reviewsData || [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
