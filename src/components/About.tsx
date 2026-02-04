@@ -1,5 +1,6 @@
 import { CheckCircle } from 'lucide-react';
 import { highlights } from '../data/about-data';
+import aboutImage from '../assets/images/happy-couple-eating-doner-kebab-shawarma-in-camd-2021-08-26-20-00-25-utc.png';
 
 export default function About() {
   return (
@@ -40,7 +41,7 @@ export default function About() {
           <div className="relative flex justify-center lg:justify-end">
             <div className="relative w-full max-w-md">
               <img
-                src="/src/assets/images/happy-couple-eating-doner-kebab-shawarma-in-camd-2021-08-26-20-00-25-utc.png"
+                src={aboutImage}
                 alt="Notre cuisine"
                 loading="lazy"
                 className="w-full h-full object-cover rounded-3xl"
