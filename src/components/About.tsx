@@ -1,5 +1,5 @@
 import { CheckCircle } from 'lucide-react';
-import { highlights } from '../data/about';
+import { highlights } from '../data/about-data';
 
 export default function About() {
   return (
@@ -26,7 +26,7 @@ export default function About() {
             </p>
 
             <ul className="space-y-4 mb-8">
-              {highlights.map((item, index) => (
+              {highlights.map((item: string, index: number) => (
                 <li key={index} className="flex items-center gap-3">
                   <CheckCircle className="w-6 h-6 text-primary-600 flex-shrink-0" />
                   <span className="text-gray-800 font-medium">{item}</span>
