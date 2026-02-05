@@ -34,9 +34,14 @@ export const listByCategory = query({
   handler: async (ctx, args) => {
     const items = await ctx.db
       .query("menuItems")
-      .withIndex("by_category", (q) => q.eq("category", args.category))
       .collect();
-    const sortedItems = items.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+    // Filter items that have the requested category in their categories array
+    const filteredItems = items.filter(item =>
+      item.active !== false && item.categories.includes(args.category)
+    );
+
+    const sortedItems = filteredItems.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
     return resolveItemsWithImages(ctx, sortedItems);
   },
 });
@@ -72,7 +77,7 @@ export const create = mutation({
     priceMenu: v.optional(v.number()),
     image: v.string(),
     imageStorageId: v.optional(v.id("_storage")),
-    category: v.string(),
+    categories: v.array(v.string()),
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
     active: v.optional(v.boolean()),
@@ -86,7 +91,7 @@ export const create = mutation({
       priceMenu: args.priceMenu,
       image: args.image,
       imageStorageId: args.imageStorageId,
-      category: args.category,
+      categories: args.categories,
       popular: args.popular ?? false,
       displayOrder: args.displayOrder ?? 0,
       active: args.active ?? true,
@@ -105,7 +110,7 @@ export const update = mutation({
     priceMenu: v.optional(v.number()),
     image: v.string(),
     imageStorageId: v.optional(v.id("_storage")),
-    category: v.string(),
+    categories: v.array(v.string()),
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
     active: v.optional(v.boolean()),
@@ -129,7 +134,7 @@ export const update = mutation({
       priceMenu: args.priceMenu,
       image: args.image,
       imageStorageId: args.imageStorageId,
-      category: args.category,
+      categories: args.categories,
       popular: args.popular,
       displayOrder: args.displayOrder,
       active: args.active,

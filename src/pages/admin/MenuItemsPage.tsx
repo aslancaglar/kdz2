@@ -14,7 +14,7 @@ interface MenuItemFormData {
   priceMenu?: number;
   image: string;
   imageStorageId?: Id<'_storage'>;
-  category: string;
+  categories: string[];
   popular: boolean;
   displayOrder: number;
   active: boolean;
@@ -39,7 +39,7 @@ export default function MenuItemsPage() {
     priceWithFries: 0,
     priceMenu: 0,
     image: '',
-    category: '',
+    categories: [],
     popular: false,
     displayOrder: 0,
     active: true,
@@ -65,7 +65,7 @@ export default function MenuItemsPage() {
 
   // Filter menu items by category
   const filteredMenuItems = menuItems?.filter((item) =>
-    categoryFilter === 'all' ? true : item.category === categoryFilter
+    categoryFilter === 'all' ? true : item.categories.includes(categoryFilter)
   );
 
   const handleCreate = () => {
@@ -77,7 +77,7 @@ export default function MenuItemsPage() {
       priceWithFries: 0,
       priceMenu: 0,
       image: '',
-      category: categories?.[0]?.slug || '',
+      categories: categories?.[0]?.slug ? [categories[0].slug] : [],
       popular: false,
       displayOrder: menuItems?.length || 0,
       active: true,
@@ -98,7 +98,7 @@ export default function MenuItemsPage() {
       priceMenu: item.priceMenu,
       image: item.image,
       imageStorageId: item.imageStorageId,
-      category: item.category,
+      categories: item.categories || [],
       popular: item.popular || false,
       displayOrder: item.displayOrder || 0,
       active: item.active !== false,
@@ -441,19 +441,30 @@ export default function MenuItemsPage() {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                    required
-                  >
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Categories</label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
                     {categories?.map((cat) => (
-                      <option key={cat._id} value={cat.slug}>
-                        {cat.name}
-                      </option>
+                      <label key={cat._id} className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={formData.categories.includes(cat.slug)}
+                          onChange={(e) => {
+                            const newCategories = e.target.checked
+                              ? [...formData.categories, cat.slug]
+                              : formData.categories.filter((c) => c !== cat.slug);
+                            setFormData({ ...formData, categories: newCategories });
+                          }}
+                          className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-500"
+                        />
+                        <span className="text-sm text-slate-600 group-hover:text-slate-900 transition">
+                          {cat.name}
+                        </span>
+                      </label>
                     ))}
-                  </select>
+                  </div>
+                  {formData.categories.length === 0 && (
+                    <p className="text-xs text-red-500 mt-1">Please select at least one category</p>
+                  )}
                 </div>
 
                 <div className="flex items-center">

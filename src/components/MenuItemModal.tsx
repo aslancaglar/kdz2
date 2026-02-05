@@ -19,7 +19,7 @@ interface MenuItemModalProps {
     priceWithFries?: number;
     priceMenu?: number;
     image: string;
-    category: string;
+    categories: string[];
     popular?: boolean;
   };
   isOpen: boolean;

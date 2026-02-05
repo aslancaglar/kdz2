@@ -14,7 +14,7 @@ interface MenuItemProps {
     priceWithFries?: number;
     priceMenu?: number;
     image: string;
-    category: string;
+    categories: string[];
     popular?: boolean;
   };
 }

@@ -24,12 +24,11 @@ export default defineSchema({
     priceMenu: v.optional(v.number()),
     image: v.string(),
     imageStorageId: v.optional(v.id("_storage")),
-    category: v.string(),
+    categories: v.array(v.string()),
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
     active: v.optional(v.boolean()),
-  }).index("by_category", ["category"])
-    .index("by_display_order", ["displayOrder"]),
+  }).index("by_display_order", ["displayOrder"]),
 
   toppingCategories: defineTable({
     categoryId: v.string(),
