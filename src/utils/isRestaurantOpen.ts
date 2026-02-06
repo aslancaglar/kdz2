@@ -3,17 +3,51 @@ interface RestaurantHours {
     time: string;
 }
 
+interface Holiday {
+    startDate: string;
+    endDate: string;
+    name?: string;
+    active: boolean;
+}
+
 interface RestaurantStatus {
     isOpen: boolean;
     nextChange?: string;
+    isHoliday?: boolean;
+    holidayName?: string;
 }
 
 /**
- * Checks if the restaurant is currently open based on working hours
+ * Checks if the restaurant is currently open based on working hours and holidays
  * @param hours - Array of restaurant hours from database
+ * @param holidays - Array of holidays from database
  * @returns Object with isOpen status and optional nextChange time
  */
-export function isRestaurantOpen(hours: RestaurantHours[] | undefined): RestaurantStatus {
+export function isRestaurantOpen(
+    hours: RestaurantHours[] | undefined,
+    holidays: Holiday[] | undefined
+): RestaurantStatus {
+    if (holidays && holidays.length > 0) {
+        const now = new Date();
+        // Reset time for date comparison to avoid time-of-day issues
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+        for (const holiday of holidays) {
+            if (!holiday.active) continue;
+
+            const start = new Date(holiday.startDate).getTime();
+            const end = new Date(holiday.endDate).getTime();
+
+            if (today >= start && today <= end) {
+                return {
+                    isOpen: false,
+                    isHoliday: true,
+                    holidayName: holiday.name
+                };
+            }
+        }
+    }
+
     if (!hours || hours.length === 0) {
         return { isOpen: false };
     }
@@ -68,6 +102,9 @@ export function isRestaurantOpen(hours: RestaurantHours[] | undefined): Restaura
 /**
  * Gets a human-readable status message
  */
-export function getStatusMessage(isOpen: boolean): string {
-    return isOpen ? 'Ouvert' : 'Fermé';
+export function getStatusMessage(status: RestaurantStatus): string {
+    if (status.isHoliday) {
+        return status.holidayName ? `Fermé (${status.holidayName})` : 'Fermé (Vacances)';
+    }
+    return status.isOpen ? 'Ouvert' : 'Fermé';
 }

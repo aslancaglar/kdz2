@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import { OrderProvider } from './context/OrderContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import ProtectedRoute from './components/admin/ProtectedRoute';
+import HolidayNotification from './components/HolidayNotification';
 
 // Lazy load pages
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -125,6 +126,7 @@ function App() {
                 element={
                   <div className="min-h-screen">
                     <Header />
+                    <HolidayNotification />
                     <main>
                       <Suspense fallback={<PageLoader />}>
                         <Routes>

@@ -25,6 +25,7 @@ export default defineSchema({
     image: v.string(),
     imageStorageId: v.optional(v.id("_storage")),
     categories: v.array(v.string()),
+    category: v.optional(v.string()),
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
     active: v.optional(v.boolean()),
@@ -69,6 +70,12 @@ export default defineSchema({
       instagram: v.optional(v.string()),
       twitter: v.optional(v.string()),
     })),
+    holidays: v.optional(v.array(v.object({
+      startDate: v.string(), // ISO date string YYYY-MM-DD
+      endDate: v.string(),   // ISO date string YYYY-MM-DD
+      name: v.optional(v.string()),
+      active: v.boolean(),
+    }))),
   }).index("by_key", ["key"]),
 
   orders: defineTable({

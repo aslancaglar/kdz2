@@ -25,13 +25,13 @@ export default function OrderList({ isOpen, onClose }: OrderListProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 lg:inset-auto lg:right-0 lg:top-0 lg:h-full lg:w-96">
+    <div className="fixed inset-0 z-50">
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm lg:hidden"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      <div className="absolute inset-x-4 top-4 bottom-4 lg:inset-0 bg-white rounded-2xl lg:rounded-none shadow-2xl flex flex-col">
+      <div className="absolute inset-x-4 top-4 bottom-4 lg:inset-y-0 lg:right-0 lg:left-auto lg:w-96 bg-white rounded-2xl lg:rounded-none shadow-2xl flex flex-col">
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-3">
             <ShoppingBag className="w-6 h-6 text-red-500" />
@@ -71,8 +71,16 @@ export default function OrderList({ isOpen, onClose }: OrderListProps) {
                   </button>
 
                   <div className="flex gap-3 pr-8">
-                    <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                      <Sandwich className="w-8 h-8 text-gray-400" />
+                    <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Sandwich className="w-8 h-8 text-gray-400" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 text-sm mb-1 font-display">
@@ -92,7 +100,7 @@ export default function OrderList({ isOpen, onClose }: OrderListProps) {
                               <span className="text-gray-600">
                                 • {topping.name}
                               </span>
-                              {topping.price !== null && topping.price > 0 && (
+                              {typeof topping.price === 'number' && topping.price > 0 && (
                                 <span className="text-gray-500 font-medium">
                                   +{topping.price.toFixed(2)}€
                                 </span>

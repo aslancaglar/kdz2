@@ -16,8 +16,8 @@ export default function OpenStatus({ isScrolled = false, variant = 'desktop' }: 
     // Update status every minute
     useEffect(() => {
         const updateStatus = () => {
-            if (restaurantInfo?.hours) {
-                const status = isRestaurantOpen(restaurantInfo.hours);
+            if (restaurantInfo) {
+                const status = isRestaurantOpen(restaurantInfo.hours, restaurantInfo.holidays);
                 setCurrentStatus(status);
             }
         };
@@ -32,7 +32,7 @@ export default function OpenStatus({ isScrolled = false, variant = 'desktop' }: 
         return null;
     }
 
-    const statusMessage = getStatusMessage(currentStatus.isOpen);
+    const statusMessage = getStatusMessage(currentStatus);
 
     // Mobile variant (for mobile menu)
     if (variant === 'mobile') {

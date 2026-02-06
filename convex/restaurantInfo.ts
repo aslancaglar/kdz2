@@ -26,6 +26,12 @@ export const upsert = mutation({
       instagram: v.optional(v.string()),
       twitter: v.optional(v.string()),
     })),
+    holidays: v.optional(v.array(v.object({
+      startDate: v.string(),
+      endDate: v.string(),
+      name: v.optional(v.string()),
+      active: v.boolean(),
+    }))),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -40,6 +46,7 @@ export const upsert = mutation({
         email: args.email,
         hours: args.hours,
         socialLinks: args.socialLinks,
+        holidays: args.holidays,
       });
       return existing._id;
     } else {
@@ -50,6 +57,7 @@ export const upsert = mutation({
         email: args.email,
         hours: args.hours,
         socialLinks: args.socialLinks,
+        holidays: args.holidays,
       });
       return id;
     }
