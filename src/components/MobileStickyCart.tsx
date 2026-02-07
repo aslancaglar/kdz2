@@ -12,6 +12,7 @@ export default function MobileStickyCart() {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [isSideCartOpen, setIsSideCartOpen] = useState(false);
+  const [canOpenCart, setCanOpenCart] = useState(true);
   const itemCount = getItemCount();
   const totalPrice = getTotalPrice();
 
@@ -19,6 +20,12 @@ export default function MobileStickyCart() {
     // Show cart when items are added
     if (itemCount > 0) {
       setIsVisible(true);
+      // Disable opening cart for 500ms to prevent accidental taps when modal closes
+      setCanOpenCart(false);
+      const timer = setTimeout(() => {
+        setCanOpenCart(true);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [itemCount]);
 
@@ -156,8 +163,9 @@ export default function MobileStickyCart() {
           }`}
         >
           <button 
-            onClick={() => setIsSideCartOpen(true)}
-            className="flex items-center gap-3 bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.15)] rounded-full px-4 py-3 hover:shadow-[0_6px_24px_rgba(0,0,0,0.2)] transition-all active:scale-95"
+            onClick={() => canOpenCart && setIsSideCartOpen(true)}
+            disabled={!canOpenCart}
+            className="flex items-center gap-3 bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.15)] rounded-full px-4 py-3 hover:shadow-[0_6px_24px_rgba(0,0,0,0.2)] transition-all active:scale-95 disabled:opacity-90"
           >
             {/* Cart Icon with Badge */}
             <div className="relative">
