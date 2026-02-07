@@ -24,7 +24,7 @@ export default defineSchema({
     priceMenu: v.optional(v.number()),
     image: v.string(),
     imageStorageId: v.optional(v.id("_storage")),
-    categories: v.array(v.string()),
+    categories: v.optional(v.array(v.string())),
     category: v.optional(v.string()),
     platformPrice: v.optional(v.number()),
     popular: v.optional(v.boolean()),

@@ -26,7 +26,8 @@ export const getToppingsForMenuItem = query({
       .collect();
 
     const sortedAssignments = assignments.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-    const categoryIds = sortedAssignments.map((a) => a.toppingCategoryId);
+    // Deduplicate category IDs to prevent duplicate categories from being displayed
+    const categoryIds = [...new Set(sortedAssignments.map((a) => a.toppingCategoryId))];
 
     const allCategories = await ctx.db.query("toppingCategories").collect();
 

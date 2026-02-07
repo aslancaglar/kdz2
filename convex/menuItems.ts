@@ -38,7 +38,7 @@ export const listByCategory = query({
 
     // Filter items that have the requested category in their categories array
     const filteredItems = items.filter(item =>
-      item.active !== false && item.categories.includes(args.category)
+      item.active !== false && item.categories?.includes(args.category)
     );
 
     const sortedItems = filteredItems.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));

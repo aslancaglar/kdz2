@@ -191,7 +191,7 @@ export const seedMenuItemToppings = mutation({
     let insertedCount = 0;
 
     for (const item of allMenuItems) {
-      const rule = toppingRules.find(r => r.categories.some(c => item.categories.includes(c)));
+      const rule = toppingRules.find(r => r.categories.some(c => item.categories?.includes(c)));
 
       if (rule) {
         for (const categoryId of rule.toppingCategories) {
@@ -201,7 +201,7 @@ export const seedMenuItemToppings = mutation({
           });
           insertedCount++;
         }
-      } else if (item.categories.includes('barquettes') && (item.name.includes('Frites') || item.name.includes('Viande') || item.name.includes('Blé'))) {
+      } else if (item.categories?.includes('barquettes') && (item.name.includes('Frites') || item.name.includes('Viande') || item.name.includes('Blé'))) {
         await ctx.db.insert("menuItemToppings", {
           menuItemId: item._id,
           toppingCategoryId: 'sauces',
