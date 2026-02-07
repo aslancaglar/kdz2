@@ -2,6 +2,7 @@ import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import MobileStickyCart from './components/MobileStickyCart';
 import { OrderProvider } from './context/OrderContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { AuthProvider } from './context/AuthContext';
@@ -166,6 +167,7 @@ function App() {
                         </Suspense>
                       </main>
                       <Footer />
+                      <MobileStickyCart />
                     </div>
                   }
                 />
