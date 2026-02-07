@@ -159,20 +159,8 @@ export default function Header() {
             <OpenStatus isScrolled={isScrolled} variant="mobile" />
           </div>
 
+          {/* Mobile Menu Button Only - Cart removed (handled by MobileStickyCart) */}
           <div className="lg:hidden flex items-center gap-2">
-            <button
-              onClick={() => setIsOrderListOpen(true)}
-              className="relative p-2 rounded-lg transition-colors text-white"
-              aria-label="Voir la commande"
-            >
-              <ShoppingBag className="w-6 h-6" />
-              {getItemCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {getItemCount()}
-                </span>
-              )}
-            </button>
-
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-lg transition-colors text-white"
