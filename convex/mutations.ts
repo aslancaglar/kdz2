@@ -3,13 +3,31 @@ import { v } from "convex/values";
 
 export const createOrder = mutation({
   args: {
+    userId: v.optional(v.id("users")),
+    customer: v.object({
+      firstName: v.string(),
+      lastName: v.string(),
+      email: v.string(),
+      phone: v.string(),
+    }),
+    type: v.union(v.literal("pickup"), v.literal("delivery")),
+    address: v.optional(v.object({
+      street: v.string(),
+      city: v.string(),
+      zipCode: v.string(),
+      instructions: v.optional(v.string()),
+    })),
+    scheduledTime: v.string(),
+    paymentMethod: v.union(v.literal("stripe"), v.literal("cash")),
+    paymentStatus: v.union(v.literal("unpaid"), v.literal("paid"), v.literal("failed")),
+    stripePaymentIntentId: v.optional(v.string()),
     items: v.array(v.object({
       menuItemId: v.string(),
       name: v.string(),
       price: v.number(),
       selectedSize: v.optional(v.union(
-        v.literal("normal"),
-        v.literal("avec-frites"),
+        v.literal("seul"),
+        v.literal("frites"),
         v.literal("menu")
       )),
       selectedToppings: v.optional(v.array(v.object({
@@ -22,6 +40,14 @@ export const createOrder = mutation({
   },
   handler: async (ctx, args) => {
     const orderId = await ctx.db.insert("orders", {
+      userId: args.userId,
+      customer: args.customer,
+      type: args.type,
+      address: args.address,
+      scheduledTime: args.scheduledTime,
+      paymentMethod: args.paymentMethod,
+      paymentStatus: args.paymentStatus,
+      stripePaymentIntentId: args.stripePaymentIntentId,
       items: args.items,
       totalPrice: args.totalPrice,
       status: "pending",
@@ -29,6 +55,22 @@ export const createOrder = mutation({
       updatedAt: Date.now(),
     });
     return orderId;
+  },
+});
+
+export const updatePaymentStatus = mutation({
+  args: {
+    orderId: v.id("orders"),
+    paymentStatus: v.union(v.literal("unpaid"), v.literal("paid"), v.literal("failed")),
+    stripePaymentIntentId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.orderId, {
+      paymentStatus: args.paymentStatus,
+      stripePaymentIntentId: args.stripePaymentIntentId,
+      updatedAt: Date.now(),
+    });
+    return args.orderId;
   },
 });
 
@@ -40,8 +82,8 @@ export const addItemToOrder = mutation({
       name: v.string(),
       price: v.number(),
       selectedSize: v.optional(v.union(
-        v.literal("normal"),
-        v.literal("avec-frites"),
+        v.literal("seul"),
+        v.literal("frites"),
         v.literal("menu")
       )),
       selectedToppings: v.optional(v.array(v.object({

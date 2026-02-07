@@ -14,6 +14,8 @@ import {
   Layers,
   Star,
   Image,
+  Globe,
+  User,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -28,10 +30,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const menuItems = [
     { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/users', label: 'Users', icon: User },
     { path: '/admin/categories', label: 'Categories', icon: Tag },
     { path: '/admin/menu-items', label: 'Menu Items', icon: Pizza },
     { path: '/admin/topping-categories', label: 'Topping Categories', icon: Layers },
     { path: '/admin/toppings', label: 'Toppings', icon: UtensilsCrossed },
+    { path: '/admin/platform-prices', label: 'Platform Prices', icon: Globe },
     { path: '/admin/orders', label: 'Orders', icon: ShoppingCart },
     { path: '/admin/reviews', label: 'Reviews', icon: Star },
     { path: '/admin/gallery', label: 'Gallery', icon: Image },
@@ -46,10 +50,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-slate-50">
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           } lg:translate-x-0`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-slate-700">
+        <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-slate-700">
           <h1 className="text-xl font-bold">Admin Panel</h1>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -59,7 +63,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </button>
         </div>
 
-        <nav className="p-4 space-y-2">
+        <nav className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -81,7 +85,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+        <div className="flex-shrink-0 p-4 border-t border-slate-700 bg-slate-900">
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-sm font-medium text-white">{admin?.username}</p>

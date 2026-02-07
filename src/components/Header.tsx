@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Phone, ShoppingBag } from 'lucide-react';
+import { Menu, X, Phone, ShoppingBag, User, LogOut } from 'lucide-react';
 import OrderList from './OrderList';
 import { useOrder } from '../context/OrderContext';
+import { useAuth } from '../context/AuthContext';
 import OpenStatus from './OpenStatus';
 
 const navLinks = [
@@ -19,6 +20,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOrderListOpen, setIsOrderListOpen] = useState(false);
   const { getItemCount } = useOrder();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -111,6 +113,35 @@ export default function Header() {
               )}
             </button>
 
+            {user ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={logout}
+                  className={`p-2.5 rounded-full transition-all ${isScrolled
+                    ? 'bg-white text-primary-600 hover:bg-gray-100'
+                    : 'bg-primary-500 text-white hover:bg-primary-600'
+                    }`}
+                  title="Se déconnecter"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+                <div className="flex flex-col">
+                  <Link to="/account" className="text-white text-xs font-bold leading-none opacity-80 uppercase tracking-tighter hover:opacity-100 transition-opacity">Mon Compte</Link>
+                  <Link to="/account" className="text-white text-sm font-display truncate max-w-[100px] hover:text-white/70 transition-colors">{user.firstName}</Link>
+                </div>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className={`p-2.5 rounded-full transition-all ${isScrolled
+                  ? 'bg-white text-primary-600 hover:bg-gray-100'
+                  : 'bg-primary-500 text-white hover:bg-primary-600'
+                  }`}
+              >
+                <User className="w-5 h-5" />
+              </Link>
+            )}
+
             <a
               href="tel:0382581339"
               className={`inline-flex items-center gap-2 px-6 py-2.5 font-display text-lg tracking-wide rounded-full transition-all shadow-lg hover:shadow-xl ${isScrolled
@@ -186,10 +217,51 @@ export default function Header() {
 
             <OpenStatus variant="mobile" />
 
+            {user ? (
+              <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-white/20">
+                <div className="flex items-center gap-3 px-2">
+                  <div className="bg-white/20 p-2 rounded-full">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white font-bold text-sm leading-tight">{user.firstName} {user.lastName}</p>
+                    <p className="text-white/60 text-xs">{user.email}</p>
+                  </div>
+                </div>
+                <Link
+                  to="/account"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-2 w-full py-3 px-4 text-white font-display text-lg tracking-wide hover:text-white/70 transition-colors uppercase border-b border-white/20"
+                >
+                  <User className="w-5 h-5 text-white" />
+                  Mon Compte
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    logout();
+                  }}
+                  className="flex items-center gap-2 w-full py-3 px-2 text-white font-display text-lg tracking-wide hover:text-white/70 transition-colors uppercase"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Se déconnecter
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-white/20 text-white font-display text-lg tracking-wide rounded-full hover:bg-white/30 transition-colors uppercase"
+              >
+                <User className="w-5 h-5" />
+                Se connecter
+              </Link>
+            )}
+
             <a
               href="tel:0382581339"
               onClick={() => setIsMenuOpen(false)}
-              className="mt-4 inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-primary-600 font-display text-lg tracking-wide rounded-full hover:bg-gray-100 transition-colors"
+              className="mt-2 inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-primary-600 font-display text-lg tracking-wide rounded-full hover:bg-gray-100 transition-colors uppercase"
             >
               <Phone className="w-5 h-5" />
               03 82 58 13 39

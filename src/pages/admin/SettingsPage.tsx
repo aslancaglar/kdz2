@@ -14,7 +14,7 @@ type DaySchedule = {
   slots: TimeSlot[];
 };
 
-type SectionId = 'contact' | 'hours' | 'holidays' | 'social';
+type SectionId = 'contact' | 'ordering' | 'hours' | 'holidays' | 'social';
 
 export default function SettingsPage() {
   const restaurantInfo = useQuery(api.restaurantInfo.get);
@@ -22,6 +22,7 @@ export default function SettingsPage() {
 
   const [expandedSections, setExpandedSections] = useState<Record<SectionId, boolean>>({
     contact: false,
+    ordering: false,
     hours: false,
     holidays: false,
     social: false,
@@ -42,6 +43,8 @@ export default function SettingsPage() {
       twitter: '',
     },
     holidays: [] as { startDate: string, endDate: string, name?: string, active: boolean }[],
+    pickupEnabled: true,
+    deliveryEnabled: true,
   });
 
   const [schedule, setSchedule] = useState<DaySchedule[]>([]);
@@ -80,6 +83,8 @@ export default function SettingsPage() {
           twitter: restaurantInfo.socialLinks.twitter || '',
         } : { facebook: '', instagram: '', twitter: '' },
         holidays: restaurantInfo.holidays || [],
+        pickupEnabled: restaurantInfo.pickupEnabled ?? true,
+        deliveryEnabled: restaurantInfo.deliveryEnabled ?? true,
       });
 
       setHolidays(restaurantInfo.holidays || []);
@@ -125,9 +130,14 @@ export default function SettingsPage() {
       const hoursToSave = serializeSchedule();
 
       await upsertRestaurantInfo({
-        ...formData,
+        address: formData.address,
+        phone: formData.phone,
+        email: formData.email,
         hours: hoursToSave,
+        socialLinks: formData.socialLinks,
         holidays: holidays,
+        pickupEnabled: formData.pickupEnabled,
+        deliveryEnabled: formData.deliveryEnabled,
       });
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
@@ -238,6 +248,63 @@ export default function SettingsPage() {
                       placeholder="contact@restaurant.com"
                     />
                   </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('ordering')}
+              className="w-full flex items-center justify-between p-6 hover:bg-slate-50 transition-colors"
+            >
+              <h2 className="text-xl font-bold text-slate-900">Ordering Options</h2>
+              {expandedSections.ordering ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
+            </button>
+
+            {expandedSections.ordering && (
+              <div className="p-6 pt-0 border-t border-slate-100 mt-0">
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                    <div>
+                      <h3 className="font-medium text-slate-900">Pickup Orders</h3>
+                      <p className="text-sm text-slate-500">Allow customers to order for pickup</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.pickupEnabled}
+                        onChange={(e) => setFormData({ ...formData, pickupEnabled: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                    <div>
+                      <h3 className="font-medium text-slate-900">Delivery Orders</h3>
+                      <p className="text-sm text-slate-500">Allow customers to order for delivery</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.deliveryEnabled}
+                        onChange={(e) => setFormData({ ...formData, deliveryEnabled: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                    </label>
+                  </div>
+
+                  {!formData.pickupEnabled && !formData.deliveryEnabled && (
+                    <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                      <p className="text-sm text-amber-800">
+                        <strong>⚠️ Warning:</strong> Both pickup and delivery are disabled. Customers will not be able to place orders.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
