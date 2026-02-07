@@ -35,3 +35,15 @@ export interface MenuItemToppingAssignment {
   menuItemId: string;
   categoryIds: string[];
 }
+
+export interface MenuItem {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  priceWithFries?: number;
+  priceMenu?: number;
+  image: string;
+  categories?: string[];
+  popular?: boolean;
+}

@@ -25,7 +25,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
     }
   }, [menuCategories, activeCategory]);
 
-  const filteredItems = (allMenuItems || []).filter(item => item.categories.includes(activeCategory) && item.active);
+  const filteredItems = (allMenuItems || []).filter(item => item.categories?.includes(activeCategory) && item.active);
 
   useEffect(() => {
     if (!hasUserInteracted.current) {

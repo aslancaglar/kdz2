@@ -65,7 +65,7 @@ export default function MenuItemsPage() {
 
   // Filter menu items by category
   const filteredMenuItems = menuItems?.filter((item) =>
-    categoryFilter === 'all' ? true : item.categories.includes(categoryFilter)
+    categoryFilter === 'all' ? true : item.categories?.includes(categoryFilter)
   );
 
   const handleCreate = () => {

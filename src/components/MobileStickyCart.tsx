@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, X } from 'lucide-react';
+import { ShoppingBag, X, ChevronUp, Trash2 } from 'lucide-react';
 import { useOrder } from '../context/OrderContext';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { formatPrice } from '../utils/formatters';
 
 export default function MobileStickyCart() {
-  const { getItemCount, getTotalPrice, orderItems, removeFromOrder } = useOrder();
+  const { getItemCount, getTotalPrice, orderItems, removeFromOrder, clearOrder } = useOrder();
   const restaurantInfo = useQuery(api.restaurantInfo.get);
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isSideCartOpen, setIsSideCartOpen] = useState(false);
   const itemCount = getItemCount();
   const totalPrice = getTotalPrice();
 
@@ -21,8 +22,8 @@ export default function MobileStickyCart() {
     }
   }, [itemCount]);
 
-  // Don't render if no items or on desktop
-  if (itemCount === 0 || typeof window !== 'undefined' && window.innerWidth >= 1024) {
+  // Don't render if no items
+  if (itemCount === 0) {
     return null;
   }
 
@@ -30,119 +31,155 @@ export default function MobileStickyCart() {
     if (restaurantInfo && !restaurantInfo.pickupEnabled && !restaurantInfo.deliveryEnabled) {
       return;
     }
+    setIsSideCartOpen(false);
     navigate('/checkout');
   };
 
   return (
     <>
-      {/* Expanded Mini Cart Overlay */}
-      {isExpanded && (
+      {/* Side Cart Overlay */}
+      {isSideCartOpen && (
         <div 
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setIsExpanded(false)}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+          onClick={() => setIsSideCartOpen(false)}
         />
       )}
 
-      {/* Expanded Mini Cart */}
-      {isExpanded && (
-        <div className="fixed bottom-24 left-4 right-4 bg-white rounded-2xl shadow-2xl z-50 lg:hidden max-h-[60vh] overflow-hidden flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h3 className="font-bold text-gray-900">Votre commande ({itemCount})</h3>
-            <button 
-              onClick={() => setIsExpanded(false)}
-              className="p-2 hover:bg-gray-100 rounded-full"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {orderItems.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-                {item.image && (
-                  <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-gray-900 truncate">{item.name}</p>
-                  <p className="text-xs text-gray-500">{item.priceOption}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm">{item.totalPrice.toFixed(2)}€</span>
-                  <button 
-                    onClick={() => removeFromOrder(item.id)}
-                    className="p-1.5 text-red-500 hover:bg-red-50 rounded-full"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="border-t p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-medium text-gray-600">Total</span>
-              <span className="text-xl font-bold text-red-500">{totalPrice.toFixed(2)}€</span>
-            </div>
-            
-            {restaurantInfo && !restaurantInfo.pickupEnabled && !restaurantInfo.deliveryEnabled ? (
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-center text-sm">
-                <p className="text-amber-800 font-medium">Commandes indisponibles</p>
-              </div>
-            ) : (
-              <button
-                onClick={handleCheckout}
-                className="w-full bg-red-500 text-white font-bold py-3 rounded-xl hover:bg-red-600 transition-all shadow-lg"
-              >
-                Commander
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Sticky Bottom Bar */}
+      {/* Side Cart Slide-out Panel */}
       <div 
-        className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden transition-transform duration-300 ${
-          isVisible ? 'translate-y-0' : 'translate-y-full'
+        className={`fixed bottom-0 left-0 right-0 bg-white z-50 lg:hidden transition-transform duration-300 ease-out shadow-[0_-8px_32px_rgba(0,0,0,0.15)] rounded-t-3xl ${
+          isSideCartOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
+        style={{ maxHeight: '80vh' }}
       >
-        <div className="bg-white border-t shadow-[0_-4px_20px_rgba(0,0,0,0.1)] px-4 py-3">
-          <div className="flex items-center justify-between">
-            {/* Left: Cart Icon + Count */}
-            <button 
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-3"
-            >
-              <div className="relative">
-                <ShoppingBag className="w-6 h-6 text-gray-700" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {itemCount}
-                </span>
-              </div>
-              <div className="text-left">
-                <p className="text-xs text-gray-500">{itemCount} article{itemCount > 1 ? 's' : ''}</p>
-                <p className="font-bold text-gray-900">{totalPrice.toFixed(2)}€</p>
-              </div>
-            </button>
+        {/* Drag Handle */}
+        <div className="flex justify-center pt-3 pb-2">
+          <button 
+            onClick={() => setIsSideCartOpen(false)}
+            className="w-12 h-1.5 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors"
+          />
+        </div>
 
-            {/* Right: Checkout Button */}
-            {restaurantInfo && !restaurantInfo.pickupEnabled && !restaurantInfo.deliveryEnabled ? (
-              <span className="text-xs text-amber-600 font-medium">Indisponible</span>
-            ) : (
-              <button
-                onClick={handleCheckout}
-                className="bg-red-500 text-white font-bold px-6 py-2.5 rounded-full hover:bg-red-600 transition-all shadow-lg text-sm"
-              >
-                Commander
-              </button>
-            )}
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100">
+          <div>
+            <h3 className="font-bold text-lg text-gray-900">Votre commande</h3>
+            <p className="text-sm text-gray-500">{itemCount} article{itemCount > 1 ? 's' : ''}</p>
           </div>
+          <button 
+            onClick={() => setIsSideCartOpen(false)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-600" />
+          </button>
         </div>
         
-        {/* Safe area padding for iOS */}
-        <div className="h-safe-area-inset-bottom bg-white" />
+        {/* Items List */}
+        <div className="overflow-y-auto px-5 py-4 space-y-3" style={{ maxHeight: '50vh' }}>
+          {orderItems.map((item) => (
+            <div key={item.id} className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
+              {item.image && (
+                <img 
+                  src={item.image} 
+                  alt={item.name} 
+                  className="w-14 h-14 rounded-lg object-cover flex-shrink-0" 
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-gray-900 truncate">{item.name}</p>
+                <p className="text-xs text-gray-500 capitalize">{item.priceOption}</p>
+                {item.selectedToppings && item.selectedToppings.length > 0 && (
+                  <p className="text-xs text-gray-400 truncate mt-0.5">
+                    {item.selectedToppings.map(t => t.name).join(', ')}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <span className="font-bold text-sm text-gray-900">{formatPrice(item.totalPrice)}</span>
+                <button 
+                  onClick={() => removeFromOrder(item.id)}
+                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-gray-100 px-5 py-4 space-y-4 bg-gray-50 rounded-b-3xl">
+          {/* Total */}
+          <div className="flex items-center justify-between">
+            <span className="text-gray-600 font-medium">Total</span>
+            <span className="text-2xl font-bold text-red-500">{formatPrice(totalPrice)}</span>
+          </div>
+
+          {/* Clear Cart */}
+          {orderItems.length > 0 && (
+            <button
+              onClick={() => {
+                if (confirm('Vider le panier ?')) {
+                  clearOrder();
+                  setIsSideCartOpen(false);
+                }
+              }}
+              className="w-full py-2 text-sm text-gray-500 hover:text-red-500 transition-colors flex items-center justify-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Vider le panier
+            </button>
+          )}
+          
+          {/* Checkout Button */}
+          {restaurantInfo && !restaurantInfo.pickupEnabled && !restaurantInfo.deliveryEnabled ? (
+            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 text-center">
+              <p className="text-amber-800 font-medium text-sm">Commandes indisponibles</p>
+              <p className="text-amber-600 text-xs mt-1">Le restaurant est actuellement fermé</p>
+            </div>
+          ) : (
+            <button
+              onClick={handleCheckout}
+              className="w-full bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/30 active:scale-[0.98]"
+            >
+              Commander • {formatPrice(totalPrice)}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Sticky Bottom Card - Compact version */}
+      {!isSideCartOpen && (
+        <div 
+          className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 lg:hidden transition-all duration-300 ${
+            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+          }`}
+        >
+          <button 
+            onClick={() => setIsSideCartOpen(true)}
+            className="flex items-center gap-3 bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.15)] rounded-full px-4 py-3 hover:shadow-[0_6px_24px_rgba(0,0,0,0.2)] transition-all active:scale-95"
+          >
+            {/* Cart Icon with Badge */}
+            <div className="relative">
+              <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                <ShoppingBag className="w-5 h-5 text-white" />
+              </div>
+              <span className="absolute -top-1 -right-1 bg-gray-900 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
+                {itemCount}
+              </span>
+            </div>
+
+            {/* Info */}
+            <div className="text-left pr-2">
+              <p className="text-xs text-gray-500 font-medium">{itemCount} article{itemCount > 1 ? 's' : ''}</p>
+              <p className="font-bold text-gray-900">{formatPrice(totalPrice)}</p>
+            </div>
+
+            {/* Chevron */}
+            <ChevronUp className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+      )}
     </>
   );
 }

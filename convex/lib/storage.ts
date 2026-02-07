@@ -1,6 +1,4 @@
 import { Id } from "../_generated/dataModel";
-import { GenericQueryCtx, GenericMutationCtx, GenericActionCtx } from "convex/server";
-import { DataModel } from "../_generated/dataModel";
 
 type StorageReader = {
     getUrl: (storageId: Id<"_storage">) => Promise<string | null>;

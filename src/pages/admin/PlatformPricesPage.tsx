@@ -21,7 +21,7 @@ export default function PlatformPricesPage() {
         if (!menuItems) return [];
         return menuItems.filter(item => {
             const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesCategory = selectedCategory === 'all' || item.categories.includes(selectedCategory);
+            const matchesCategory = selectedCategory === 'all' || item.categories?.includes(selectedCategory);
             return matchesSearch && matchesCategory;
         });
     }, [menuItems, searchQuery, selectedCategory]);
@@ -186,7 +186,7 @@ export default function PlatformPricesPage() {
                                                 <span className="font-medium text-slate-900">{item.name}</span>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-slate-600">
-                                                {item.categories.join(', ')}
+                                                {item.categories?.join(', ') || '-'}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-slate-900 text-right font-medium">
                                                 {item.price.toFixed(2)}€

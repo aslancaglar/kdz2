@@ -1,6 +1,5 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
-import { resolveItemsWithImages } from "./lib/storage";
 
 // Re-export menu item queries from menuItems.ts for backwards compatibility
 // Note: Prefer using api.menuItems.* directly in new code
