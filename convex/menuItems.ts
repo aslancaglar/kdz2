@@ -81,6 +81,7 @@ export const create = mutation({
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
     active: v.optional(v.boolean()),
+    platformPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const itemId = await ctx.db.insert("menuItems", {
@@ -95,6 +96,7 @@ export const create = mutation({
       popular: args.popular ?? false,
       displayOrder: args.displayOrder ?? 0,
       active: args.active ?? true,
+      platformPrice: args.platformPrice,
     });
     return itemId;
   },
@@ -114,6 +116,7 @@ export const update = mutation({
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
     active: v.optional(v.boolean()),
+    platformPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     // Get the existing item to check if we need to delete the old image
@@ -138,6 +141,7 @@ export const update = mutation({
       popular: args.popular,
       displayOrder: args.displayOrder,
       active: args.active,
+      platformPrice: args.platformPrice,
     });
     return args.id;
   },
@@ -165,5 +169,21 @@ export const updateDisplayOrder = mutation({
       displayOrder: args.displayOrder,
     });
     return args.id;
+  },
+});
+
+export const updatePlatformPrices = mutation({
+  args: {
+    updates: v.array(v.object({
+      id: v.id("menuItems"),
+      platformPrice: v.number(),
+    })),
+  },
+  handler: async (ctx, args) => {
+    for (const update of args.updates) {
+      await ctx.db.patch(update.id, {
+        platformPrice: update.platformPrice,
+      });
+    }
   },
 });

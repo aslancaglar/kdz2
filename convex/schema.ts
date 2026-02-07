@@ -26,6 +26,7 @@ export default defineSchema({
     imageStorageId: v.optional(v.id("_storage")),
     categories: v.array(v.string()),
     category: v.optional(v.string()),
+    platformPrice: v.optional(v.number()),
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
     active: v.optional(v.boolean()),
@@ -76,16 +77,48 @@ export default defineSchema({
       name: v.optional(v.string()),
       active: v.boolean(),
     }))),
+    pickupEnabled: v.optional(v.boolean()),
+    deliveryEnabled: v.optional(v.boolean()),
   }).index("by_key", ["key"]),
 
+  users: defineTable({
+    firstName: v.string(),
+    lastName: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    street: v.optional(v.string()),
+    city: v.optional(v.string()),
+    zipCode: v.optional(v.string()),
+    passwordHash: v.string(),
+    createdAt: v.number(),
+  }).index("by_email", ["email"]),
+
   orders: defineTable({
+    userId: v.optional(v.id("users")),
+    customer: v.object({
+      firstName: v.string(),
+      lastName: v.string(),
+      email: v.string(),
+      phone: v.string(),
+    }),
+    type: v.union(v.literal("pickup"), v.literal("delivery")),
+    address: v.optional(v.object({
+      street: v.string(),
+      city: v.string(),
+      zipCode: v.string(),
+      instructions: v.optional(v.string()),
+    })),
+    scheduledTime: v.string(),
+    paymentMethod: v.union(v.literal("stripe"), v.literal("cash")),
+    paymentStatus: v.union(v.literal("unpaid"), v.literal("paid"), v.literal("failed")),
+    stripePaymentIntentId: v.optional(v.string()),
     items: v.array(v.object({
       menuItemId: v.string(),
       name: v.string(),
       price: v.number(),
       selectedSize: v.optional(v.union(
-        v.literal("normal"),
-        v.literal("avec-frites"),
+        v.literal("seul"),
+        v.literal("frites"),
         v.literal("menu")
       )),
       selectedToppings: v.optional(v.array(v.object({
@@ -108,12 +141,15 @@ export default defineSchema({
     .index("by_created", ["createdAt"]),
 
   reviews: defineTable({
+    userId: v.optional(v.id("users")),
+    orderId: v.optional(v.id("orders")),
     name: v.string(),
     rating: v.number(),
     comment: v.string(),
     date: v.string(),
     active: v.boolean(),
-  }).index("by_active", ["active"]),
+  }).index("by_active", ["active"])
+    .index("by_order", ["orderId"]),
 
   gallery: defineTable({
     title: v.string(),

@@ -32,6 +32,8 @@ export const upsert = mutation({
       name: v.optional(v.string()),
       active: v.boolean(),
     }))),
+    pickupEnabled: v.optional(v.boolean()),
+    deliveryEnabled: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -47,6 +49,8 @@ export const upsert = mutation({
         hours: args.hours,
         socialLinks: args.socialLinks,
         holidays: args.holidays,
+        pickupEnabled: args.pickupEnabled,
+        deliveryEnabled: args.deliveryEnabled,
       });
       return existing._id;
     } else {
@@ -58,6 +62,8 @@ export const upsert = mutation({
         hours: args.hours,
         socialLinks: args.socialLinks,
         holidays: args.holidays,
+        pickupEnabled: args.pickupEnabled ?? true,
+        deliveryEnabled: args.deliveryEnabled ?? true,
       });
       return id;
     }

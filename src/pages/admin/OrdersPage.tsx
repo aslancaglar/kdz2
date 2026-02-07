@@ -7,6 +7,8 @@ import type { Id } from '../../../convex/_generated/dataModel';
 
 export default function OrdersPage() {
   const orders = useQuery(api.queries.getAllOrders);
+  const toppingCategories = useQuery(api.toppingsAdmin.listToppingCategories);
+  const toppings = useQuery(api.toppingsAdmin.listToppings);
   const updateOrderStatus = useMutation(api.mutations.updateOrderStatus);
 
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -17,7 +19,7 @@ export default function OrdersPage() {
 
   const handleStatusChange = async (orderId: Id<'orders'>, newStatus: string) => {
     try {
-      await updateOrderStatus({ orderId, status: newStatus });
+      await updateOrderStatus({ orderId, status: newStatus as any });
     } catch (error) {
       console.error('Error updating order status:', error);
     }
@@ -66,11 +68,10 @@ export default function OrdersPage() {
             <button
               key={status}
               onClick={() => setSelectedStatus(status)}
-              className={`px-4 py-2 rounded-lg font-medium transition ${
-                selectedStatus === status
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium transition ${selectedStatus === status
+                ? 'bg-slate-900 text-white'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                }`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </button>
@@ -84,24 +85,79 @@ export default function OrdersPage() {
                 key={order._id}
                 className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    {getStatusIcon(order.status)}
+                <div className="flex items-start justify-between mb-4 pb-4 border-b border-slate-100">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-full ${getStatusColor(order.status)}`}>
+                      {getStatusIcon(order.status)}
+                    </div>
                     <div>
-                      <h3 className="font-bold text-slate-900">Order #{order._id.slice(-8)}</h3>
-                      <p className="text-sm text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-slate-900 text-lg">Commande #{order._id.slice(-6).toUpperCase()}</h3>
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${order.type === 'delivery' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
+                          }`}>
+                          {order.type === 'delivery' ? 'Livraison' : 'Emporter'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-500 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
                         {new Date(order.createdAt).toLocaleString('fr-FR')}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1 text-sm rounded-full ${getStatusColor(order.status)}`}>
+                  <div className="text-right">
+                    <div className="text-2xl font-black text-slate-900 leading-tight">
+                      {order.totalPrice.toFixed(2)}€
+                    </div>
+                    <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full mt-1 ${getStatusColor(order.status)} uppercase tracking-tighter`}>
                       {order.status}
                     </span>
-                    <span className="text-xl font-bold text-slate-900">
-                      {order.totalPrice.toFixed(2)}€
-                    </span>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8 mb-6">
+                  {/* Customer Info */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Client</h4>
+                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                      <p className="font-bold text-slate-900">{order.customer.firstName} {order.customer.lastName}</p>
+                      <div className="mt-2 space-y-1">
+                        <p className="text-sm text-slate-600 flex items-center gap-2">
+                          <span className="opacity-50 text-xs">Email:</span> {order.customer.email}
+                        </p>
+                        <p className="text-sm text-slate-600 flex items-center gap-2">
+                          <span className="opacity-50 text-xs">Tél:</span>
+                          <a href={`tel:${order.customer.phone}`} className="text-blue-600 hover:underline">{order.customer.phone}</a>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Delivery / Pickup Details */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Détails Service</h4>
+                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-slate-500">Heure prévue:</span>
+                        <span className="font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-lg text-sm">
+                          {order.scheduledTime === 'asap' || !order.scheduledTime ? 'Dès que possible' : new Date(order.scheduledTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      {order.type === 'delivery' && order.address && (
+                        <div className="mt-3 pt-3 border-t border-slate-200">
+                          <p className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-tighter">Adresse:</p>
+                          <p className="text-sm text-slate-900 leading-snug">
+                            {order.address.street}<br />
+                            {order.address.zipCode} {order.address.city}
+                          </p>
+                          {order.address.instructions && (
+                            <div className="mt-2 p-2 bg-yellow-50 rounded-lg text-xs text-yellow-800 border border-yellow-100">
+                              <strong>Note:</strong> {order.address.instructions}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -110,18 +166,46 @@ export default function OrdersPage() {
                   <div className="space-y-2">
                     {order.items.map((item, index) => (
                       <div key={index} className="flex items-start justify-between p-3 bg-slate-50 rounded-lg">
-                        <div>
+                        <div className="flex-1">
                           <p className="font-medium text-slate-900">{item.name}</p>
                           {item.selectedSize && (
                             <p className="text-sm text-slate-600">Size: {item.selectedSize}</p>
                           )}
                           {item.selectedToppings && item.selectedToppings.length > 0 && (
-                            <p className="text-sm text-slate-600">
-                              Toppings: {item.selectedToppings.map((t) => t.toppingIds.length).reduce((a, b) => a + b, 0)} selected
-                            </p>
+                            <div className="mt-2">
+                              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Garnitures:</p>
+                              <div className="space-y-1">
+                                {(() => {
+                                  // Group toppings by their category
+                                  const toppingsByCategory: Record<string, string[]> = {};
+                                  
+                                  item.selectedToppings.forEach((toppingGroup) => {
+                                    toppingGroup.toppingIds.forEach((tId) => {
+                                      const topping = toppings?.find(t => t.toppingId === tId);
+                                      if (topping) {
+                                        const categoryId = topping.categoryId;
+                                        const categoryName = toppingCategories?.find(c => c.categoryId === categoryId)?.name || 'Options';
+                                        
+                                        if (!toppingsByCategory[categoryName]) {
+                                          toppingsByCategory[categoryName] = [];
+                                        }
+                                        toppingsByCategory[categoryName].push(topping.name);
+                                      }
+                                    });
+                                  });
+                                  
+                                  return Object.entries(toppingsByCategory).map(([categoryName, toppingNames]) => (
+                                    <div key={categoryName} className="text-sm flex">
+                                      <span className="font-medium text-slate-700 min-w-[100px]">{categoryName}:</span>
+                                      <span className="text-slate-600">{toppingNames.join(', ')}</span>
+                                    </div>
+                                  ));
+                                })()}
+                              </div>
+                            </div>
                           )}
                         </div>
-                        <p className="font-bold text-slate-900">{item.finalPrice.toFixed(2)}€</p>
+                        <p className="font-bold text-slate-900 ml-4">{item.finalPrice.toFixed(2)}€</p>
                       </div>
                     ))}
                   </div>

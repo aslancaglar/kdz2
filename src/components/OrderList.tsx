@@ -1,5 +1,7 @@
 import { X, ShoppingBag, Trash2, Sandwich } from 'lucide-react';
 import { useOrder } from '../context/OrderContext';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 
 interface OrderListProps {
   isOpen: boolean;
@@ -8,6 +10,7 @@ interface OrderListProps {
 
 export default function OrderList({ isOpen, onClose }: OrderListProps) {
   const { orderItems, removeFromOrder, clearOrder, getTotalPrice } = useOrder();
+  const restaurantInfo = useQuery(api.restaurantInfo.get);
 
   if (!isOpen) return null;
 
@@ -140,12 +143,27 @@ export default function OrderList({ isOpen, onClose }: OrderListProps) {
               </span>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                <strong>Note:</strong> Cette commande est à titre informatif.
-                Veuillez appeler le restaurant pour passer votre commande finale.
-              </p>
-            </div>
+            {restaurantInfo && !restaurantInfo.pickupEnabled && !restaurantInfo.deliveryEnabled ? (
+              <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 text-center">
+                <p className="text-amber-800 font-medium">
+                  Les commandes sont temporairement indisponibles
+                </p>
+                <p className="text-amber-600 text-sm mt-1">
+                  Veuillez nous appeler pour passer commande
+                </p>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  onClose();
+                  window.location.href = '/checkout';
+                }}
+                className="w-full bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 transition-all shadow-lg hover:shadow-red-200 active:scale-[0.98] flex items-center justify-center gap-2 group"
+              >
+                Commander
+                <Sandwich className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+              </button>
+            )}
           </div>
         )}
       </div>

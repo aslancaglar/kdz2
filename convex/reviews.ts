@@ -19,6 +19,16 @@ export const listActive = query({
     },
 });
 
+export const getByOrder = query({
+    args: { orderId: v.id("orders") },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("reviews")
+            .withIndex("by_order", (q) => q.eq("orderId", args.orderId))
+            .first();
+    },
+});
+
 export const create = mutation({
     args: {
         name: v.string(),
@@ -29,6 +39,32 @@ export const create = mutation({
     },
     handler: async (ctx, args) => {
         return await ctx.db.insert("reviews", args);
+    },
+});
+
+export const addOrderReview = mutation({
+    args: {
+        userId: v.id("users"),
+        orderId: v.id("orders"),
+        name: v.string(),
+        rating: v.number(),
+        comment: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const existing = await ctx.db
+            .query("reviews")
+            .withIndex("by_order", (q) => q.eq("orderId", args.orderId))
+            .first();
+
+        if (existing) {
+            throw new Error("Vous avez déjà laissé un avis pour cette commande.");
+        }
+
+        return await ctx.db.insert("reviews", {
+            ...args,
+            date: new Date().toLocaleDateString('fr-FR'),
+            active: true, // Default to true for user ratings, or false if you want moderation
+        });
     },
 });
 
