@@ -106,8 +106,10 @@ export default function MenuItemsPage() {
     setSelectedFile(null);
     setPreviewUrl(item.image);
 
-    // Load existing topping category assignments
-    setSelectedToppingCategories(item.toppingCategoryIds || []);
+    // Load existing topping category assignments (deduplicate to prevent rendering issues)
+    const toppingIds = (item.toppingCategoryIds as string[] | undefined) || [];
+    const uniqueCategoryIds = [...new Set(toppingIds)];
+    setSelectedToppingCategories(uniqueCategoryIds);
     setIsModalOpen(true);
   };
 
