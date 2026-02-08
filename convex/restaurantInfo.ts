@@ -34,6 +34,13 @@ export const upsert = mutation({
     }))),
     pickupEnabled: v.optional(v.boolean()),
     deliveryEnabled: v.optional(v.boolean()),
+    minimumAdvanceNotice: v.optional(v.number()),
+    deliveryFees: v.optional(v.array(v.object({
+      postalCode: v.string(),
+      price: v.number(),
+      name: v.optional(v.string()),
+    }))),
+    defaultDeliveryFee: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -51,6 +58,9 @@ export const upsert = mutation({
         holidays: args.holidays,
         pickupEnabled: args.pickupEnabled,
         deliveryEnabled: args.deliveryEnabled,
+        minimumAdvanceNotice: args.minimumAdvanceNotice,
+        deliveryFees: args.deliveryFees,
+        defaultDeliveryFee: args.defaultDeliveryFee,
       });
       return existing._id;
     } else {
@@ -64,6 +74,9 @@ export const upsert = mutation({
         holidays: args.holidays,
         pickupEnabled: args.pickupEnabled ?? true,
         deliveryEnabled: args.deliveryEnabled ?? true,
+        minimumAdvanceNotice: args.minimumAdvanceNotice ?? 30,
+        deliveryFees: args.deliveryFees,
+        defaultDeliveryFee: args.defaultDeliveryFee ?? 0,
       });
       return id;
     }

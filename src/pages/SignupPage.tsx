@@ -43,7 +43,9 @@ export default function SignupPage() {
         try {
             const { confirmPassword, ...signupData } = formData;
             await signup(signupData);
-            navigate(redirect);
+            // Ensure redirect is an absolute path
+            const redirectPath = redirect.startsWith('/') ? redirect : `/${redirect}`;
+            navigate(redirectPath);
         } catch (err: any) {
             setError(err?.message || 'Une erreur est survenue lors de l\'inscription');
         } finally {

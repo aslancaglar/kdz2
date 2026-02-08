@@ -79,6 +79,13 @@ export default defineSchema({
     }))),
     pickupEnabled: v.optional(v.boolean()),
     deliveryEnabled: v.optional(v.boolean()),
+    minimumAdvanceNotice: v.optional(v.number()), // Minimum minutes before pickup/delivery
+    deliveryFees: v.optional(v.array(v.object({
+      postalCode: v.string(), // Can be exact, wildcard (57*), or range (57190-57199)
+      price: v.number(),
+      name: v.optional(v.string()), // e.g., "Zone A", "Zone B"
+    }))),
+    defaultDeliveryFee: v.optional(v.number()), // Fallback price for unmatched postal codes
   }).index("by_key", ["key"]),
 
   users: defineTable({

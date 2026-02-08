@@ -27,7 +27,9 @@ export default function LoginPage() {
         try {
             const success = await login(email, password);
             if (success) {
-                navigate(redirect);
+                // Ensure redirect is an absolute path
+                const redirectPath = redirect.startsWith('/') ? redirect : `/${redirect}`;
+                navigate(redirectPath);
             } else {
                 setError('Email ou mot de passe incorrect');
             }

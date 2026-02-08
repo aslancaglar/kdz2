@@ -7,6 +7,7 @@ import { api } from '../../convex/_generated/api';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import StripePaymentForm from '../components/StripePaymentForm';
+import { calculateDeliveryFee, formatDeliveryFee } from '../utils/deliveryFeeCalculator';
 import {
     ChevronRight,
     MapPin,
@@ -20,12 +21,13 @@ import {
     Wallet,
     CheckCircle2,
     Edit,
-    Lock
+    Lock,
+    X
 } from 'lucide-react';
 
 
 
-type Step = 'details' | 'info' | 'payment';
+type Step = 'details' | 'payment';
 
 const HERO_VIDEO_ID = "kg218cqrg7hzg0ghqj531aqpy180haz8" as any;
 
@@ -61,6 +63,74 @@ export default function CheckoutPage() {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [stripeError, setStripeError] = useState<string | null>(null);
     const [showStripeForm, setShowStripeForm] = useState(false);
+
+    // Toast notification state
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error'; show: boolean } | null>(null);
+
+    // Update user mutation
+    const updateUser = useMutation(api.auth.updateUser);
+
+    // Calculate delivery fee based on current address
+    const deliveryFeeInfo = useMemo(() => {
+        if (orderType !== 'delivery' || !address.zipCode) {
+            return { price: 0, zoneName: undefined, matched: false };
+        }
+        return calculateDeliveryFee(
+            address.zipCode,
+            restaurantInfo?.deliveryFees,
+            restaurantInfo?.defaultDeliveryFee ?? 0
+        );
+    }, [orderType, address.zipCode, restaurantInfo?.deliveryFees, restaurantInfo?.defaultDeliveryFee]);
+
+    const deliveryFee = deliveryFeeInfo.price;
+    const totalWithDelivery = getTotalPrice() + deliveryFee;
+
+    // Check if delivery is supported for the postal code
+    const isDeliverySupported = useMemo(() => {
+        if (orderType !== 'delivery' || !address.zipCode) return true;
+        if (!restaurantInfo?.deliveryFees || restaurantInfo.deliveryFees.length === 0) return true;
+        return deliveryFeeInfo.matched;
+    }, [orderType, address.zipCode, restaurantInfo?.deliveryFees, deliveryFeeInfo.matched]);
+
+    // Check if user's default address is outside delivery zone
+    const isDefaultAddressOutsideZone = useMemo(() => {
+        if (!user?.zipCode || !restaurantInfo?.deliveryFees || restaurantInfo.deliveryFees.length === 0) return false;
+        const feeInfo = calculateDeliveryFee(
+            user.zipCode,
+            restaurantInfo.deliveryFees,
+            restaurantInfo.defaultDeliveryFee ?? 0
+        );
+        return !feeInfo.matched;
+    }, [user?.zipCode, restaurantInfo?.deliveryFees, restaurantInfo?.defaultDeliveryFee]);
+
+    // Show toast helper
+    const showToast = (message: string, type: 'success' | 'error') => {
+        setToast({ message, type, show: true });
+        setTimeout(() => setToast(null), 3000);
+    };
+
+    // Handle save user info
+    const handleSaveUserInfo = async () => {
+        if (!user?.id) return;
+
+        try {
+            await updateUser({
+                id: user.id as any,
+                firstName: customer.firstName,
+                lastName: customer.lastName,
+                email: customer.email,
+                phone: customer.phone,
+                street: orderType === 'delivery' ? address.street : undefined,
+                city: orderType === 'delivery' ? address.city : undefined,
+                zipCode: orderType === 'delivery' ? address.zipCode : undefined,
+            });
+            setIsEditingInfo(false);
+            showToast('Informations enregistrées avec succès', 'success');
+        } catch (error) {
+            console.error('Failed to update user:', error);
+            showToast('Erreur lors de l\'enregistrement', 'error');
+        }
+    };
 
     // Redirect if not logged in
     useEffect(() => {
@@ -105,6 +175,13 @@ export default function CheckoutPage() {
         }
     }, [restaurantInfo]);
 
+    // Auto-switch to pickup if delivery is selected but not supported for the postal code
+    useEffect(() => {
+        if (orderType === 'delivery' && !isDeliverySupported && address.zipCode) {
+            setOrderType('pickup');
+        }
+    }, [isDeliverySupported, address.zipCode, orderType]);
+
     const timeSlots = useMemo(() => {
         const slots = [{ label: 'Dès que possible', value: 'asap' }];
         const now = new Date();
@@ -131,14 +208,17 @@ export default function CheckoutPage() {
     }, [timeSlots, scheduledTime]);
 
     const handleNext = () => {
-        if (step === 'details') setStep('info');
-        else if (step === 'info') setStep('payment');
+        if (step === 'details') {
+            setStep('payment');
+        }
     };
 
     const handleBack = () => {
-        if (step === 'info') setStep('details');
-        else if (step === 'payment') setStep('info');
-        else navigate(-1);
+        if (step === 'payment') {
+            setStep('details');
+        } else {
+            navigate(-1);
+        }
     };
 
     const createPaymentIntent = async () => {
@@ -181,7 +261,7 @@ export default function CheckoutPage() {
                     })),
                     finalPrice: item.totalPrice
                 })),
-                totalPrice: getTotalPrice()
+                totalPrice: orderType === 'delivery' ? totalWithDelivery : getTotalPrice()
             });
 
             clearOrder();
@@ -226,7 +306,7 @@ export default function CheckoutPage() {
                         })),
                         finalPrice: item.totalPrice
                     })),
-                    totalPrice: getTotalPrice()
+                    totalPrice: orderType === 'delivery' ? totalWithDelivery : getTotalPrice()
                 });
 
                 clearOrder();
@@ -307,8 +387,7 @@ export default function CheckoutPage() {
                         {/* Stepper Header */}
                         <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm mb-8">
                             {[
-                                { id: 'details', icon: Clock, label: 'Mode' },
-                                { id: 'info', icon: UserIcon, label: 'Infos' },
+                                { id: 'details', icon: ShoppingBag, label: 'Ma Commande' },
                                 { id: 'payment', icon: CreditCard, label: 'Paiement' }
                             ].map((s, idx) => (
                                 <React.Fragment key={s.id}>
@@ -318,7 +397,7 @@ export default function CheckoutPage() {
                                         </div>
                                         <span className="text-sm font-bold hidden sm:block">{s.label}</span>
                                     </div>
-                                    {idx < 2 && <ChevronRight key={`sep-${idx}`} className="w-4 h-4 text-gray-200" />}
+                                    {idx < 1 && <ChevronRight key={`sep-${idx}`} className="w-4 h-4 text-gray-200" />}
                                 </React.Fragment>
                             ))}
                         </div>
@@ -354,15 +433,18 @@ export default function CheckoutPage() {
                                             </button>
                                             <button
                                                 onClick={() => setOrderType('delivery')}
-                                                disabled={restaurantInfo ? !restaurantInfo.deliveryEnabled : false}
+                                                disabled={restaurantInfo ? !restaurantInfo.deliveryEnabled || isDefaultAddressOutsideZone : false}
                                                 className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 ${
                                                     orderType === 'delivery' 
                                                         ? 'border-red-500 bg-red-50 text-red-600' 
                                                         : 'border-gray-100 text-gray-500 hover:border-gray-200'
-                                                } ${restaurantInfo && !restaurantInfo.deliveryEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                } ${(restaurantInfo && !restaurantInfo.deliveryEnabled) || isDefaultAddressOutsideZone ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <Truck className="w-8 h-8" />
                                                 <span className="font-bold">Livraison</span>
+                                                {isDefaultAddressOutsideZone && (
+                                                    <span className="text-xs text-red-500 font-medium">Hors zone de livraison</span>
+                                                )}
                                                 {restaurantInfo && !restaurantInfo.deliveryEnabled && (
                                                     <span className="text-xs text-red-500">Indisponible</span>
                                                 )}
@@ -399,177 +481,182 @@ export default function CheckoutPage() {
                                         </p>
                                     </div>
 
-                                    <button
-                                        onClick={handleNext}
-                                        disabled={restaurantInfo ? (!restaurantInfo.pickupEnabled && !restaurantInfo.deliveryEnabled) : false}
-                                        className="w-full bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        Suivant
-                                        <ChevronRight className="w-5 h-5" />
-                                    </button>
-                                </div>
-                            )}
+                                    {/* Customer Information Section */}
+                                    <div className="space-y-6 pt-6 border-t border-gray-100">
+                                        {!isEditingInfo && user ? (
+                                            <div className="space-y-6">
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                                        <UserIcon className="w-5 h-5 text-red-500" />
+                                                        Mes informations
+                                                    </h3>
+                                                    <button
+                                                        onClick={() => setIsEditingInfo(true)}
+                                                        className="text-sm font-bold text-red-500 hover:text-red-600 flex items-center gap-1 transition-colors"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                        Modifier
+                                                    </button>
+                                                </div>
 
-                            {step === 'info' && (
-                                <div className="animate-in fade-in slide-in-from-bottom-4">
-                                    {!isEditingInfo && user ? (
-                                        <div className="space-y-6">
-                                            <div className="flex items-center justify-between">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">Contact</p>
+                                                        <p className="font-bold text-gray-900">{customer.firstName} {customer.lastName}</p>
+                                                        <p className="text-sm text-gray-600">{customer.email}</p>
+                                                        <p className="text-sm text-gray-600">{customer.phone}</p>
+                                                    </div>
+
+                                                    {orderType === 'delivery' && (
+                                                        <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">Adresse de livraison</p>
+                                                            {address.street ? (
+                                                                <>
+                                                                    <p className="font-bold text-gray-900">{address.street}</p>
+                                                                    <p className="text-sm text-gray-600">{address.zipCode} {address.city}</p>
+                                                                    {address.instructions && (
+                                                                        <p className="text-xs text-gray-500 mt-2 italic">Note: {address.instructions}</p>
+                                                                    )}
+                                                                </>
+                                                            ) : (
+                                                                <p className="text-sm text-amber-600 font-medium">Adresse non renseignée</p>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-6">
                                                 <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                                     <UserIcon className="w-5 h-5 text-red-500" />
                                                     Mes informations
                                                 </h3>
-                                                <button
-                                                    onClick={() => setIsEditingInfo(true)}
-                                                    className="text-sm font-bold text-red-500 hover:text-red-600 flex items-center gap-1 transition-colors"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                    Modifier
-                                                </button>
-                                            </div>
+                                                
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-bold text-gray-700">Prénom</label>
+                                                        <input
+                                                            type="text"
+                                                            value={customer.firstName}
+                                                            onChange={e => setCustomer({ ...customer, firstName: e.target.value })}
+                                                            className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
+                                                            placeholder="Ex: Jean"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-bold text-gray-700">Nom</label>
+                                                        <input
+                                                            type="text"
+                                                            value={customer.lastName}
+                                                            onChange={e => setCustomer({ ...customer, lastName: e.target.value })}
+                                                            className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
+                                                            placeholder="Ex: Dupont"
+                                                        />
+                                                    </div>
+                                                </div>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">Contact</p>
-                                                    <p className="font-bold text-gray-900">{customer.firstName} {customer.lastName}</p>
-                                                    <p className="text-sm text-gray-600">{customer.email}</p>
-                                                    <p className="text-sm text-gray-600">{customer.phone}</p>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-bold text-gray-700">Email</label>
+                                                    <input
+                                                        type="email"
+                                                        value={customer.email}
+                                                        onChange={e => setCustomer({ ...customer, email: e.target.value })}
+                                                        className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
+                                                        placeholder="votre@email.com"
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-bold text-gray-700">Téléphone</label>
+                                                    <input
+                                                        type="tel"
+                                                        value={customer.phone}
+                                                        onChange={e => setCustomer({ ...customer, phone: e.target.value })}
+                                                        className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
+                                                        placeholder="06 12 34 56 78"
+                                                    />
                                                 </div>
 
                                                 {orderType === 'delivery' && (
-                                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">Adresse de livraison</p>
-                                                        {address.street ? (
-                                                            <>
-                                                                <p className="font-bold text-gray-900">{address.street}</p>
-                                                                <p className="text-sm text-gray-600">{address.zipCode} {address.city}</p>
-                                                                {address.instructions && (
-                                                                    <p className="text-xs text-gray-500 mt-2 italic">Note: {address.instructions}</p>
-                                                                )}
-                                                            </>
-                                                        ) : (
-                                                            <p className="text-sm text-amber-600 font-medium">Adresse non renseignée</p>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <button
-                                                onClick={handleNext}
-                                                disabled={!customer.firstName || !customer.lastName || !customer.phone || (orderType === 'delivery' && !address.street)}
-                                                className="w-full bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
-                                            >
-                                                Continuer vers le paiement
-                                                <ChevronRight className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-6">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-bold text-gray-700">Prénom</label>
-                                                    <input
-                                                        type="text"
-                                                        value={customer.firstName}
-                                                        onChange={e => setCustomer({ ...customer, firstName: e.target.value })}
-                                                        className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
-                                                        placeholder="Ex: Jean"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-bold text-gray-700">Nom</label>
-                                                    <input
-                                                        type="text"
-                                                        value={customer.lastName}
-                                                        onChange={e => setCustomer({ ...customer, lastName: e.target.value })}
-                                                        className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
-                                                        placeholder="Ex: Dupont"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-bold text-gray-700">Email</label>
-                                                <input
-                                                    type="email"
-                                                    value={customer.email}
-                                                    onChange={e => setCustomer({ ...customer, email: e.target.value })}
-                                                    className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
-                                                    placeholder="votre@email.com"
-                                                />
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-bold text-gray-700">Téléphone</label>
-                                                <input
-                                                    type="tel"
-                                                    value={customer.phone}
-                                                    onChange={e => setCustomer({ ...customer, phone: e.target.value })}
-                                                    className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
-                                                    placeholder="06 12 34 56 78"
-                                                />
-                                            </div>
-
-                                            {orderType === 'delivery' && (
-                                                <div className="space-y-4 pt-4 border-t border-gray-100">
-                                                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                                        <MapPin className="w-5 h-5 text-red-500" />
-                                                        Adresse de livraison
-                                                    </h3>
-                                                    <div className="space-y-4">
-                                                        <input
-                                                            type="text"
-                                                            value={address.street}
-                                                            onChange={e => setAddress({ ...address, street: e.target.value })}
-                                                            className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
-                                                            placeholder="Numéro et nom de rue"
-                                                        />
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-4 pt-4 border-t border-gray-100">
+                                                        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                                            <MapPin className="w-5 h-5 text-red-500" />
+                                                            Adresse de livraison
+                                                        </h3>
+                                                        <div className="space-y-4">
                                                             <input
                                                                 type="text"
-                                                                value={address.city}
-                                                                onChange={e => setAddress({ ...address, city: e.target.value })}
+                                                                value={address.street}
+                                                                onChange={e => setAddress({ ...address, street: e.target.value })}
                                                                 className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
-                                                                placeholder="Ville"
+                                                                placeholder="Numéro et nom de rue"
                                                             />
-                                                            <input
-                                                                type="text"
-                                                                value={address.zipCode}
-                                                                onChange={e => setAddress({ ...address, zipCode: e.target.value })}
-                                                                className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
-                                                                placeholder="Code Postal"
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <input
+                                                                    type="text"
+                                                                    value={address.city}
+                                                                    onChange={e => setAddress({ ...address, city: e.target.value })}
+                                                                    className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500"
+                                                                    placeholder="Ville"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    value={address.zipCode}
+                                                                    onChange={e => setAddress({ ...address, zipCode: e.target.value })}
+                                                                    className={`w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 ${!isDeliverySupported && address.zipCode ? 'focus:ring-red-500 bg-red-50' : 'focus:ring-red-500'}`}
+                                                                    placeholder="Code Postal"
+                                                                />
+                                                            </div>
+                                                            {!isDeliverySupported && address.zipCode && (
+                                                                <div className="p-4 bg-red-50 rounded-xl border border-red-200">
+                                                                    <p className="text-red-800 font-medium text-sm">
+                                                                        La livraison n'est pas disponible pour ce code postal ({address.zipCode}).
+                                                                    </p>
+                                                                    <p className="text-red-600 text-sm mt-1">
+                                                                        Veuillez choisir l'option "À emporter" ou entrer un autre code postal.
+                                                                    </p>
+                                                                </div>
+                                                            )}
+                                                            <textarea
+                                                                value={address.instructions}
+                                                                onChange={e => setAddress({ ...address, instructions: e.target.value })}
+                                                                className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500 min-h-[100px]"
+                                                                placeholder="Instructions (Digicode, étage...)"
                                                             />
                                                         </div>
-                                                        <textarea
-                                                            value={address.instructions}
-                                                            onChange={e => setAddress({ ...address, instructions: e.target.value })}
-                                                            className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-red-500 min-h-[100px]"
-                                                            placeholder="Instructions (Digicode, étage...)"
-                                                        />
                                                     </div>
-                                                </div>
-                                            )}
-
-                                            <div className="flex gap-3">
-                                                {user && (
-                                                    <button
-                                                        onClick={() => setIsEditingInfo(false)}
-                                                        className="flex-1 px-4 py-4 border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition"
-                                                    >
-                                                        Annuler
-                                                    </button>
                                                 )}
-                                                <button
-                                                    onClick={handleNext}
-                                                    disabled={!customer.firstName || !customer.lastName || !customer.phone}
-                                                    className="flex-[2] bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                                >
-                                                    {user ? 'Enregistrer' : 'Suivant'}
-                                                    <ChevronRight className="w-5 h-5" />
-                                                </button>
+
+                                                <div className="flex gap-3">
+                                                    {user && (
+                                                        <button
+                                                            onClick={() => setIsEditingInfo(false)}
+                                                            className="flex-1 px-4 py-4 border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition"
+                                                        >
+                                                            Annuler
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={handleSaveUserInfo}
+                                                        disabled={!customer.firstName || !customer.lastName || !customer.phone || (orderType === 'delivery' && (!address.street || !isDeliverySupported))}
+                                                        className="flex-[2] bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                    >
+                                                        Enregistrer
+                                                        <CheckCircle2 className="w-5 h-5" />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
+
+                                    <button
+                                        onClick={handleNext}
+                                        disabled={!customer.firstName || !customer.lastName || !customer.phone || (orderType === 'delivery' && (!address.street || !isDeliverySupported))}
+                                        className="w-full bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        Continuer vers le paiement
+                                        <ChevronRight className="w-5 h-5" />
+                                    </button>
                                 </div>
                             )}
 
@@ -629,7 +716,7 @@ export default function CheckoutPage() {
                                             <StripePaymentForm
                                                 onSuccess={handleStripeSuccess}
                                                 onError={handleStripeError}
-                                                amount={getTotalPrice()}
+                                                amount={orderType === 'delivery' ? totalWithDelivery : getTotalPrice()}
                                             />
                                         </div>
                                     )}
@@ -706,23 +793,54 @@ export default function CheckoutPage() {
                                 {orderType === 'delivery' && (
                                     <div className="flex justify-between text-gray-600">
                                         <span>Frais de livraison</span>
-                                        <span className="text-green-600 font-bold uppercase text-xs">Gratuit</span>
+                                        {address.zipCode ? (
+                                            <div className="text-right">
+                                                <span className={deliveryFee === 0 ? "text-green-600 font-bold" : "font-bold text-gray-900"}>
+                                                    {formatDeliveryFee(deliveryFee)}
+                                                </span>
+                                                {deliveryFeeInfo.zoneName && (
+                                                    <p className="text-xs text-gray-400">{deliveryFeeInfo.zoneName}</p>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-400 text-sm">Entrez votre code postal</span>
+                                        )}
                                     </div>
                                 )}
                                 <div className="flex justify-between text-lg font-bold text-gray-900 pt-3">
                                     <span>Total</span>
-                                    <span className="text-red-500">{getTotalPrice().toFixed(2)}€</span>
+                                    <span className="text-red-500">
+                                        {orderType === 'delivery' ? totalWithDelivery.toFixed(2) : getTotalPrice().toFixed(2)}€
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="p-6 rounded-3xl bg-gray-900 text-white">
                             <p className="text-xs text-gray-400 mb-1">Besoin d'aide ?</p>
-                            <p className="font-bold underline cursor-pointer hover:text-red-400 transition-colors">04 90 94 36 67</p>
+                            <a href={`tel:${restaurantInfo?.phone || ''}`} className="font-bold underline cursor-pointer hover:text-red-400 transition-colors">
+                                {restaurantInfo?.phone || 'Numéro non disponible'}
+                            </a>
                         </div>
                     </div>
                 </div>
             </main>
+
+            {/* Toast Notification */}
+            {toast && toast.show && (
+                <div className={`fixed bottom-4 right-4 px-6 py-4 rounded-xl shadow-lg z-50 animate-in slide-in-from-bottom-4 ${
+                    toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                    <div className="flex items-center gap-2">
+                        {toast.type === 'success' ? (
+                            <CheckCircle2 className="w-5 h-5" />
+                        ) : (
+                            <X className="w-5 h-5" />
+                        )}
+                        <span className="font-medium">{toast.message}</span>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </div>

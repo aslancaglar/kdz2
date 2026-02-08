@@ -14,7 +14,13 @@ type DaySchedule = {
   slots: TimeSlot[];
 };
 
-type SectionId = 'contact' | 'ordering' | 'hours' | 'holidays' | 'social';
+type SectionId = 'contact' | 'ordering' | 'hours' | 'holidays' | 'social' | 'delivery';
+
+type DeliveryZone = {
+  postalCode: string;
+  price: number;
+  name?: string;
+};
 
 export default function SettingsPage() {
   const restaurantInfo = useQuery(api.restaurantInfo.get);
@@ -26,6 +32,7 @@ export default function SettingsPage() {
     hours: false,
     holidays: false,
     social: false,
+    delivery: false,
   });
 
   const toggleSection = (id: SectionId) => {
@@ -45,10 +52,14 @@ export default function SettingsPage() {
     holidays: [] as { startDate: string, endDate: string, name?: string, active: boolean }[],
     pickupEnabled: true,
     deliveryEnabled: true,
+    minimumAdvanceNotice: 30,
+    deliveryFees: [] as DeliveryZone[],
+    defaultDeliveryFee: 0,
   });
 
   const [schedule, setSchedule] = useState<DaySchedule[]>([]);
   const [holidays, setHolidays] = useState<{ startDate: string, endDate: string, name?: string, active: boolean }[]>([]);
+  const [deliveryZones, setDeliveryZones] = useState<DeliveryZone[]>([]);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
   // Parse valid hours string into slots
@@ -85,9 +96,13 @@ export default function SettingsPage() {
         holidays: restaurantInfo.holidays || [],
         pickupEnabled: restaurantInfo.pickupEnabled ?? true,
         deliveryEnabled: restaurantInfo.deliveryEnabled ?? true,
+        minimumAdvanceNotice: restaurantInfo.minimumAdvanceNotice ?? 30,
+        deliveryFees: restaurantInfo.deliveryFees || [],
+        defaultDeliveryFee: restaurantInfo.defaultDeliveryFee ?? 0,
       });
 
       setHolidays(restaurantInfo.holidays || []);
+      setDeliveryZones(restaurantInfo.deliveryFees || []);
 
       // Initialize schedule from DB hours
       if (restaurantInfo.hours) {
@@ -138,6 +153,9 @@ export default function SettingsPage() {
         holidays: holidays,
         pickupEnabled: formData.pickupEnabled,
         deliveryEnabled: formData.deliveryEnabled,
+        minimumAdvanceNotice: formData.minimumAdvanceNotice,
+        deliveryFees: deliveryZones.filter(z => z.postalCode.trim() !== ''),
+        defaultDeliveryFee: formData.defaultDeliveryFee,
       });
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
@@ -192,6 +210,21 @@ export default function SettingsPage() {
     const newHolidays = [...holidays];
     newHolidays[index] = { ...newHolidays[index], [field]: value };
     setHolidays(newHolidays);
+  };
+
+  // Delivery zone management functions
+  const addDeliveryZone = () => {
+    setDeliveryZones([...deliveryZones, { postalCode: '', price: 0, name: '' }]);
+  };
+
+  const removeDeliveryZone = (index: number) => {
+    setDeliveryZones(deliveryZones.filter((_, i) => i !== index));
+  };
+
+  const updateDeliveryZone = (index: number, field: keyof DeliveryZone, value: string | number) => {
+    const newZones = [...deliveryZones];
+    newZones[index] = { ...newZones[index], [field]: value };
+    setDeliveryZones(newZones);
   };
 
   return (
@@ -305,6 +338,146 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   )}
+
+                  <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 mt-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-slate-900">Délai minimum de préparation</h3>
+                        <p className="text-sm text-slate-500">Temps minimum entre la commande et le retrait/livraison</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="15"
+                          max="120"
+                          step="5"
+                          value={formData.minimumAdvanceNotice}
+                          onChange={(e) => setFormData({ ...formData, minimumAdvanceNotice: parseInt(e.target.value) || 30 })}
+                          className="w-20 px-3 py-2 border border-slate-300 rounded-lg text-center focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                        <span className="text-sm text-slate-600">min</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Delivery Zones Section */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('delivery')}
+              className="w-full flex items-center justify-between p-6 hover:bg-slate-50 transition-colors"
+            >
+              <h2 className="text-xl font-bold text-slate-900">Zones de livraison</h2>
+              {expandedSections.delivery ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
+            </button>
+
+            {expandedSections.delivery && (
+              <div className="p-6 pt-0 border-t border-slate-100 mt-0">
+                <div className="mt-4 space-y-6">
+                  {/* Default Delivery Fee */}
+                  <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-slate-900">Frais de livraison par défaut</h3>
+                        <p className="text-sm text-slate-500">Appliqué quand le code postal ne correspond à aucune zone</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.5"
+                          value={formData.defaultDeliveryFee}
+                          onChange={(e) => setFormData({ ...formData, defaultDeliveryFee: parseFloat(e.target.value) || 0 })}
+                          className="w-24 px-3 py-2 border border-slate-300 rounded-lg text-center focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                        <span className="text-sm text-slate-600">€</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Delivery Zones List */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-medium text-slate-900">Zones de livraison</h3>
+                      <button
+                        type="button"
+                        onClick={addDeliveryZone}
+                        className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Ajouter une zone
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {deliveryZones.map((zone, index) => (
+                        <div key={index} className="p-4 bg-slate-50 rounded-lg border border-slate-200 relative group">
+                          <button
+                            type="button"
+                            onClick={() => removeDeliveryZone(index)}
+                            className="absolute top-2 right-2 p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                            title="Supprimer la zone"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                                Nom de la zone
+                              </label>
+                              <input
+                                type="text"
+                                value={zone.name || ''}
+                                onChange={(e) => updateDeliveryZone(index, 'name', e.target.value)}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Ex: Centre-ville"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                                Code postal
+                              </label>
+                              <input
+                                type="text"
+                                value={zone.postalCode}
+                                onChange={(e) => updateDeliveryZone(index, 'postalCode', e.target.value)}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Ex: 57190 ou 57* ou 57190-57199"
+                              />
+                              <p className="text-xs text-slate-400 mt-1">
+                                * = joker, 57190-57199 = plage
+                              </p>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                                Prix (€)
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.5"
+                                value={zone.price}
+                                onChange={(e) => updateDeliveryZone(index, 'price', parseFloat(e.target.value) || 0)}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="0.00"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                      {deliveryZones.length === 0 && (
+                        <div className="text-center py-8 text-slate-500 italic bg-slate-50 rounded-lg border border-dashed border-slate-300">
+                          Aucune zone de livraison configurée. Cliquez sur "Ajouter une zone" pour commencer.
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
