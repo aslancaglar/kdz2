@@ -41,8 +41,35 @@ export const listByCategory = query({
       item.active !== false && item.categories?.includes(args.category)
     );
 
-    const sortedItems = filteredItems.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    const sortedItems = filteredItems.sort((a, b) => {
+      const orderA = a.categoryOrders?.find(o => o.category === args.category)?.order ?? (a.displayOrder || 0);
+      const orderB = b.categoryOrders?.find(o => o.category === args.category)?.order ?? (b.displayOrder || 0);
+      return orderA - orderB;
+    });
     return resolveItemsWithImages(ctx, sortedItems);
+  },
+});
+
+export const updateCategoryOrder = mutation({
+  args: {
+    id: v.id("menuItems"),
+    category: v.string(),
+    order: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.id);
+    if (!item) throw new Error("Item not found");
+
+    const categoryOrders = item.categoryOrders || [];
+    const existingIndex = categoryOrders.findIndex((o) => o.category === args.category);
+
+    if (existingIndex >= 0) {
+      categoryOrders[existingIndex].order = args.order;
+    } else {
+      categoryOrders.push({ category: args.category, order: args.order });
+    }
+
+    await ctx.db.patch(args.id, { categoryOrders });
   },
 });
 
@@ -80,6 +107,10 @@ export const create = mutation({
     categories: v.array(v.string()),
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
+    categoryOrders: v.optional(v.array(v.object({
+      category: v.string(),
+      order: v.number(),
+    }))),
     active: v.optional(v.boolean()),
     platformPrice: v.optional(v.number()),
   },
@@ -95,6 +126,7 @@ export const create = mutation({
       categories: args.categories,
       popular: args.popular ?? false,
       displayOrder: args.displayOrder ?? 0,
+      categoryOrders: args.categoryOrders,
       active: args.active ?? true,
       platformPrice: args.platformPrice,
     });
@@ -115,6 +147,10 @@ export const update = mutation({
     categories: v.array(v.string()),
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
+    categoryOrders: v.optional(v.array(v.object({
+      category: v.string(),
+      order: v.number(),
+    }))),
     active: v.optional(v.boolean()),
     platformPrice: v.optional(v.number()),
   },
@@ -140,6 +176,7 @@ export const update = mutation({
       categories: args.categories,
       popular: args.popular,
       displayOrder: args.displayOrder,
+      categoryOrders: args.categoryOrders,
       active: args.active,
       platformPrice: args.platformPrice,
     });

@@ -25,7 +25,13 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
     }
   }, [menuCategories, activeCategory]);
 
-  const filteredItems = (allMenuItems || []).filter(item => item.categories?.includes(activeCategory) && item.active);
+  const filteredItems = (allMenuItems || [])
+    .filter(item => item.categories?.includes(activeCategory) && item.active)
+    .sort((a, b) => {
+      const orderA = a.categoryOrders?.find(o => o.category === activeCategory)?.order ?? (a.displayOrder || 0);
+      const orderB = b.categoryOrders?.find(o => o.category === activeCategory)?.order ?? (b.displayOrder || 0);
+      return orderA - orderB;
+    });
 
   useEffect(() => {
     if (!hasUserInteracted.current) {

@@ -29,6 +29,10 @@ export default defineSchema({
     platformPrice: v.optional(v.number()),
     popular: v.optional(v.boolean()),
     displayOrder: v.optional(v.number()),
+    categoryOrders: v.optional(v.array(v.object({
+      category: v.string(),
+      order: v.number(),
+    }))),
     active: v.optional(v.boolean()),
   }).index("by_display_order", ["displayOrder"]),
 
