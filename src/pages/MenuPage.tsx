@@ -18,6 +18,7 @@ export default function MenuPage() {
               loop
               muted
               playsInline
+              aria-label="Vidéo de préparation de kebab"
               className="hidden md:block w-full h-full object-cover"
               key={videoUrl}
             >

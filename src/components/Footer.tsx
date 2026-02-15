@@ -27,12 +27,14 @@ export default function Footer() {
               <span className="font-display text-3xl tracking-wider text-white">KARADENIZ</span>
             </a>
             <p className="text-gray-400 mb-6 leading-relaxed">
-              Le vrai gout du kebab turc. Des saveurs authentiques preparees avec passion depuis plus de 25 ans.
+              Le vrai goût du kebab turc. Des saveurs authentiques préparées avec passion depuis plus de 25 ans.
             </p>
             <div className="flex gap-3">
               {socialLinks.facebook && (
                 <a
                   href={socialLinks.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Facebook"
                   className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
                 >
@@ -42,6 +44,8 @@ export default function Footer() {
               {socialLinks.instagram && (
                 <a
                   href={socialLinks.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Instagram"
                   className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
                 >
@@ -51,6 +55,8 @@ export default function Footer() {
               {socialLinks.twitter && (
                 <a
                   href={socialLinks.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Twitter"
                   className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
                 >
@@ -130,7 +136,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-700 pt-8">
           <p className="text-center text-gray-500">
-            &copy; {new Date().getFullYear()} Karadeniz. Tous droits reserves.
+            &copy; {new Date().getFullYear()} Karadeniz. Tous droits réservés.
           </p>
         </div>
       </div>

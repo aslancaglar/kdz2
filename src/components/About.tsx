@@ -52,7 +52,7 @@ export default function About() {
 
             <div className="absolute bottom-8 left-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow">
               <p className="text-4xl font-bold text-primary-500 mb-1">25+</p>
-              <p className="text-gray-700 font-medium">Annees d'experience</p>
+              <p className="text-gray-700 font-medium">Années d'expérience</p>
             </div>
           </div>
         </div>

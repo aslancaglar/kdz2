@@ -23,7 +23,7 @@ export default function Contact() {
     },
     {
       icon: Phone,
-      title: 'Telephone',
+      title: 'Téléphone',
       content: restaurantInfo.phone || '',
       href: restaurantInfo.phone ? `tel:${restaurantInfo.phone.replace(/\s/g, '')}` : undefined,
     },
@@ -51,7 +51,7 @@ export default function Contact() {
             Nous Trouver
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Venez nous rendre visite ou passez commande par telephone. Nous serons ravis de vous accueillir!
+            Venez nous rendre visite ou passez commande par téléphone. Nous serons ravis de vous accueillir !
           </p>
         </div>
 

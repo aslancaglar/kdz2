@@ -9,12 +9,12 @@ export default function Gallery() {
     <section id="gallery" className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-primary-500 font-semibold mb-2">Nos Creations</p>
+          <p className="text-primary-500 font-semibold mb-2">Nos Créations</p>
           <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
             Galerie
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Decouvrez nos plats prepare avec passion et des ingredients frais de qualite.
+            Découvrez nos plats préparés avec passion et des ingrédients frais de qualité.
           </p>
         </div>
 

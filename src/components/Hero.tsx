@@ -19,6 +19,7 @@ export default function Hero() {
             loop
             muted
             playsInline
+            aria-label="Vidéo de préparation de kebab"
             className="hidden md:block w-full h-full object-cover"
             key={videoUrl}
           >
@@ -45,7 +46,7 @@ export default function Hero() {
               <span className="text-secondary-400">goût du kebab</span>
             </h1>
             <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg leading-relaxed">
-              Decouvrez le veritable gout du kebab turc. Viandes fraiches, ingredients de qualite et recettes traditionnelles transmises de generation en generation.
+              Découvrez le véritable goût du kebab turc. Viandes fraîches, ingrédients de qualité et recettes traditionnelles transmises de génération en génération.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
