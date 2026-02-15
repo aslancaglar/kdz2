@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -8,6 +8,7 @@ import { AdminAuthProvider } from './context/AdminAuthContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import HolidayNotification from './components/HolidayNotification';
+import Loader from './components/Loader';
 
 // Lazy load pages
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -50,8 +51,12 @@ function ScrollToTop() {
 }
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const handleLoaderFinished = useCallback(() => setIsLoading(false), []);
+
   return (
     <BrowserRouter>
+      {isLoading && <Loader onFinished={handleLoaderFinished} />}
       <AdminAuthProvider>
         <AuthProvider>
           <OrderProvider>

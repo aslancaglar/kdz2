@@ -2,6 +2,115 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Loader Styles ===== */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a0a0a;
+  transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+.loader-fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-bg-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: radial-gradient(circle at 25% 25%, #DC2626 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, #DC2626 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.loader-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loader-logo {
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.loader-logo-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.loader-logo-img {
+  width: 7rem;
+  height: auto;
+  filter: drop-shadow(0 0 30px rgba(220, 38, 38, 0.4));
+}
+
+.loader-tagline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s;
+}
+
+.loader-tagline-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.loader-progress-track {
+  width: 12rem;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.loader-progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #DC2626, #F87171, #DC2626);
+  background-size: 200% 100%;
+  animation: loaderShimmer 1.5s ease-in-out infinite;
+  transition: width 0.4s ease-out;
+}
+
+@keyframes loaderShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.loader-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+.loader-text-visible {
+  opacity: 1;
+}
+
+/* ===== Global Styles ===== */
 * {
   margin: 0;
   padding: 0;
