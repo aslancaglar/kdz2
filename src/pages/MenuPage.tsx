@@ -1,11 +1,8 @@
-import { useQuery } from 'convex/react';
-import { api } from '../../convex/_generated/api';
 import Menu from '../components/Menu';
-
-const HERO_VIDEO_ID = "kg218cqrg7hzg0ghqj531aqpy180haz8" as any;
+import { useHeroVideoUrl } from '../context/VideoContext';
 
 export default function MenuPage() {
-  const videoUrl = useQuery(api.files.getUrl, { storageId: HERO_VIDEO_ID });
+  const videoUrl = useHeroVideoUrl();
 
   return (
     <div className="min-h-screen">

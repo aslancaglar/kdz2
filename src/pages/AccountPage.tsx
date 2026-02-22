@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useAuth } from '../context/AuthContext';
+import { useHeroVideoUrl } from '../context/VideoContext';
 import {
     User as UserIcon,
     ShoppingBag,
@@ -22,8 +23,6 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const HERO_VIDEO_ID = "kg218cqrg7hzg0ghqj531aqpy180haz8" as any;
-
 type Tab = 'profile' | 'orders';
 
 export default function AccountPage() {
@@ -41,7 +40,7 @@ export default function AccountPage() {
     const orders = useQuery(api.auth.listUserOrders, user ? { userId: user.id as any } : 'skip');
     const addReview = useMutation(api.reviews.addOrderReview);
     const updateProfile = useMutation(api.auth.updateUser);
-    const videoUrl = useQuery(api.files.getUrl, { storageId: HERO_VIDEO_ID });
+    const videoUrl = useHeroVideoUrl();
 
     // Profile form state
     const [formData, setFormData] = useState({

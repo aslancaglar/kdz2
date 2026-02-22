@@ -6,6 +6,7 @@ import MobileStickyCart from './components/MobileStickyCart';
 import { OrderProvider } from './context/OrderContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { AuthProvider } from './context/AuthContext';
+import { VideoProvider } from './context/VideoContext';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import HolidayNotification from './components/HolidayNotification';
 import Loader from './components/Loader';
@@ -59,129 +60,131 @@ function App() {
       {isLoading && <Loader onFinished={handleLoaderFinished} />}
       <AdminAuthProvider>
         <AuthProvider>
-          <OrderProvider>
-            <ScrollToTop />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/admin/login" element={<AdminLoginPage />} />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute>
-                      <DashboardPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/users"
-                  element={
-                    <ProtectedRoute>
-                      <UsersPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/categories"
-                  element={
-                    <ProtectedRoute>
-                      <CategoriesPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/menu-items"
-                  element={
-                    <ProtectedRoute>
-                      <MenuItemsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/toppings"
-                  element={
-                    <ProtectedRoute>
-                      <ToppingsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/topping-categories"
-                  element={
-                    <ProtectedRoute>
-                      <ToppingCategoriesPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/orders"
-                  element={
-                    <ProtectedRoute>
-                      <OrdersPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/reviews"
-                  element={
-                    <ProtectedRoute>
-                      <ReviewsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/gallery"
-                  element={
-                    <ProtectedRoute>
-                      <GalleryPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/settings"
-                  element={
-                    <ProtectedRoute>
-                      <SettingsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/platform-prices"
-                  element={
-                    <ProtectedRoute>
-                      <PlatformPricesPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
-                <Route
-                  path="*"
-                  element={
-                    <div className="min-h-screen">
-                      <Header />
-                      <HolidayNotification />
-                      <main>
-                        <Suspense fallback={<PageLoader />}>
-                          <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/menu" element={<MenuPage />} />
-                            <Route path="/login" element={<LoginPage />} />
-                            <Route path="/signup" element={<SignupPage />} />
-                            <Route path="/checkout" element={<CheckoutPage />} />
-                            <Route path="/account" element={<AccountPage />} />
-                            <Route path="/checkout" element={<CheckoutPage />} />
-                            <Route path="/account" element={<AccountPage />} />
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                          </Routes>
-                        </Suspense>
-                      </main>
-                      <Footer />
-                      <MobileStickyCart />
-                    </div>
-                  }
-                />
-              </Routes>
-            </Suspense>
-          </OrderProvider>
+          <VideoProvider>
+            <OrderProvider>
+              <ScrollToTop />
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/admin/login" element={<AdminLoginPage />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/users"
+                    element={
+                      <ProtectedRoute>
+                        <UsersPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/categories"
+                    element={
+                      <ProtectedRoute>
+                        <CategoriesPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/menu-items"
+                    element={
+                      <ProtectedRoute>
+                        <MenuItemsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/toppings"
+                    element={
+                      <ProtectedRoute>
+                        <ToppingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/topping-categories"
+                    element={
+                      <ProtectedRoute>
+                        <ToppingCategoriesPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/orders"
+                    element={
+                      <ProtectedRoute>
+                        <OrdersPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/reviews"
+                    element={
+                      <ProtectedRoute>
+                        <ReviewsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/gallery"
+                    element={
+                      <ProtectedRoute>
+                        <GalleryPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/settings"
+                    element={
+                      <ProtectedRoute>
+                        <SettingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/platform-prices"
+                    element={
+                      <ProtectedRoute>
+                        <PlatformPricesPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
+                  <Route
+                    path="*"
+                    element={
+                      <div className="min-h-screen">
+                        <Header />
+                        <HolidayNotification />
+                        <main>
+                          <Suspense fallback={<PageLoader />}>
+                            <Routes>
+                              <Route path="/" element={<HomePage />} />
+                              <Route path="/menu" element={<MenuPage />} />
+                              <Route path="/login" element={<LoginPage />} />
+                              <Route path="/signup" element={<SignupPage />} />
+                              <Route path="/checkout" element={<CheckoutPage />} />
+                              <Route path="/account" element={<AccountPage />} />
+                              <Route path="/checkout" element={<CheckoutPage />} />
+                              <Route path="/account" element={<AccountPage />} />
+                              <Route path="*" element={<Navigate to="/" replace />} />
+                            </Routes>
+                          </Suspense>
+                        </main>
+                        <Footer />
+                        <MobileStickyCart />
+                      </div>
+                    }
+                  />
+                </Routes>
+              </Suspense>
+            </OrderProvider>
+          </VideoProvider>
         </AuthProvider>
       </AdminAuthProvider>
     </BrowserRouter>

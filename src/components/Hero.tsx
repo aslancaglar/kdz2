@@ -1,11 +1,8 @@
 import { ArrowRight, Phone } from 'lucide-react';
-import { useQuery } from 'convex/react';
-import { api } from '../../convex/_generated/api';
-
-const HERO_VIDEO_ID = "kg218cqrg7hzg0ghqj531aqpy180haz8" as any;
+import { useHeroVideoUrl } from '../context/VideoContext';
 
 export default function Hero() {
-  const videoUrl = useQuery(api.files.getUrl, { storageId: HERO_VIDEO_ID });
+  const videoUrl = useHeroVideoUrl();
 
   return (
     <section

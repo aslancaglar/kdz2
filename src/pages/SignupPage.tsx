@@ -2,10 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User, Mail, Phone, Lock, UserPlus, ArrowRight, LogIn, MapPin } from 'lucide-react';
-import { useQuery } from 'convex/react';
-import { api } from '../../convex/_generated/api';
-
-const HERO_VIDEO_ID = "kg218cqrg7hzg0ghqj531aqpy180haz8" as any;
+import { useHeroVideoUrl } from '../context/VideoContext';
 
 export default function SignupPage() {
     const [formData, setFormData] = useState({
@@ -27,7 +24,7 @@ export default function SignupPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const redirect = searchParams.get('redirect') || '/';
-    const videoUrl = useQuery(api.files.getUrl, { storageId: HERO_VIDEO_ID });
+    const videoUrl = useHeroVideoUrl();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

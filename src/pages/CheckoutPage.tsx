@@ -4,6 +4,7 @@ import { useOrder } from '../context/OrderContext';
 import { useAuth } from '../context/AuthContext';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { useHeroVideoUrl } from '../context/VideoContext';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import StripePaymentForm from '../components/StripePaymentForm';
@@ -29,15 +30,13 @@ import {
 
 type Step = 'details' | 'payment';
 
-const HERO_VIDEO_ID = "kg218cqrg7hzg0ghqj531aqpy180haz8" as any;
-
 export default function CheckoutPage() {
     const navigate = useNavigate();
     const { orderItems, getTotalPrice, clearOrder } = useOrder();
     const { user, isLoading: authLoading } = useAuth();
     const restaurantInfo = useQuery(api.restaurantInfo.get);
     const createOrder = useMutation(api.mutations.createOrder);
-    const videoUrl = useQuery(api.files.getUrl, { storageId: HERO_VIDEO_ID });
+    const videoUrl = useHeroVideoUrl();
 
     const [step, setStep] = useState<Step>('details');
     const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup');
@@ -165,7 +164,7 @@ export default function CheckoutPage() {
         if (restaurantInfo) {
             const pickupEnabled = restaurantInfo.pickupEnabled ?? true;
             const deliveryEnabled = restaurantInfo.deliveryEnabled ?? true;
-            
+
             // If only one option is enabled, auto-select it
             if (pickupEnabled && !deliveryEnabled) {
                 setOrderType('pickup');
@@ -241,13 +240,13 @@ export default function CheckoutPage() {
     const handleStripeSuccess = async (paymentIntentId: string) => {
         setIsSubmitting(true);
         try {
-                const orderId = await createOrder({
-                    userId: user?.id as any,
-                    customer,
-                    type: orderType,
-                    address: orderType === 'delivery' ? address : undefined,
-                    scheduledTime: scheduledTime || 'asap',
-                    paymentMethod: 'stripe',
+            const orderId = await createOrder({
+                userId: user?.id as any,
+                customer,
+                type: orderType,
+                address: orderType === 'delivery' ? address : undefined,
+                scheduledTime: scheduledTime || 'asap',
+                paymentMethod: 'stripe',
                 paymentStatus: 'paid',
                 stripePaymentIntentId: paymentIntentId,
                 items: orderItems.map(item => ({
@@ -419,11 +418,10 @@ export default function CheckoutPage() {
                                             <button
                                                 onClick={() => setOrderType('pickup')}
                                                 disabled={restaurantInfo ? !restaurantInfo.pickupEnabled : false}
-                                                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 ${
-                                                    orderType === 'pickup' 
-                                                        ? 'border-red-500 bg-red-50 text-red-600' 
+                                                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 ${orderType === 'pickup'
+                                                        ? 'border-red-500 bg-red-50 text-red-600'
                                                         : 'border-gray-100 text-gray-500 hover:border-gray-200'
-                                                } ${restaurantInfo && !restaurantInfo.pickupEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    } ${restaurantInfo && !restaurantInfo.pickupEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <Store className="w-8 h-8" />
                                                 <span className="font-bold">À emporter</span>
@@ -434,11 +432,10 @@ export default function CheckoutPage() {
                                             <button
                                                 onClick={() => setOrderType('delivery')}
                                                 disabled={restaurantInfo ? !restaurantInfo.deliveryEnabled || isDefaultAddressOutsideZone : false}
-                                                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 ${
-                                                    orderType === 'delivery' 
-                                                        ? 'border-red-500 bg-red-50 text-red-600' 
+                                                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 ${orderType === 'delivery'
+                                                        ? 'border-red-500 bg-red-50 text-red-600'
                                                         : 'border-gray-100 text-gray-500 hover:border-gray-200'
-                                                } ${(restaurantInfo && !restaurantInfo.deliveryEnabled) || isDefaultAddressOutsideZone ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    } ${(restaurantInfo && !restaurantInfo.deliveryEnabled) || isDefaultAddressOutsideZone ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <Truck className="w-8 h-8" />
                                                 <span className="font-bold">Livraison</span>
@@ -531,7 +528,7 @@ export default function CheckoutPage() {
                                                     <UserIcon className="w-5 h-5 text-red-500" />
                                                     Mes informations
                                                 </h3>
-                                                
+
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
                                                         <label className="text-sm font-bold text-gray-700">Prénom</label>
@@ -828,9 +825,8 @@ export default function CheckoutPage() {
 
             {/* Toast Notification */}
             {toast && toast.show && (
-                <div className={`fixed bottom-4 right-4 px-6 py-4 rounded-xl shadow-lg z-50 animate-in slide-in-from-bottom-4 ${
-                    toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                }`}>
+                <div className={`fixed bottom-4 right-4 px-6 py-4 rounded-xl shadow-lg z-50 animate-in slide-in-from-bottom-4 ${toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                    }`}>
                     <div className="flex items-center gap-2">
                         {toast.type === 'success' ? (
                             <CheckCircle2 className="w-5 h-5" />
