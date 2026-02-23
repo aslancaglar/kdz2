@@ -39,13 +39,23 @@ export const seedToppingCategories = mutation({
       },
     ];
 
+    let inserted = 0;
+    let skipped = 0;
     for (const category of toppingCategories) {
+      // Skip if a category with this categoryId already exists
+      const existing = await ctx.db
+        .query("toppingCategories")
+        .filter((q) => q.eq(q.field("categoryId"), category.categoryId))
+        .first();
+      if (existing) { skipped++; continue; }
       await ctx.db.insert("toppingCategories", category);
+      inserted++;
     }
 
-    return { success: true, count: toppingCategories.length };
+    return { success: true, inserted, skipped };
   },
 });
+
 
 export const seedToppings = mutation({
   args: {},
@@ -75,13 +85,23 @@ export const seedToppings = mutation({
       { toppingId: 'cordon-bleu', name: 'Cordon Bleu', price: undefined, categoryId: 'viandes', displayOrder: 4, active: true },
     ];
 
+    let inserted = 0;
+    let skipped = 0;
     for (const topping of toppings) {
+      // Skip if a topping with this toppingId already exists
+      const existing = await ctx.db
+        .query("toppings")
+        .filter((q) => q.eq(q.field("toppingId"), topping.toppingId))
+        .first();
+      if (existing) { skipped++; continue; }
       await ctx.db.insert("toppings", topping);
+      inserted++;
     }
 
-    return { success: true, count: toppings.length };
+    return { success: true, inserted, skipped };
   },
 });
+
 
 export const seedMenuItems = mutation({
   args: {},
@@ -160,21 +180,29 @@ export const seedMenuItems = mutation({
       { name: 'Cafe', description: 'Cafe expresso', price: 1.50, image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['boissons'] },
     ];
 
-    const insertedIds: string[] = [];
+    let inserted = 0;
+    let skipped = 0;
     for (let i = 0; i < menuItems.length; i++) {
       const item = menuItems[i];
-      const id = await ctx.db.insert("menuItems", {
+      // Skip if a menu item with this name already exists
+      const existing = await ctx.db
+        .query("menuItems")
+        .filter((q) => q.eq(q.field("name"), item.name))
+        .first();
+      if (existing) { skipped++; continue; }
+      await ctx.db.insert("menuItems", {
         // @ts-ignore
         ...item,
         displayOrder: i,
         active: true,
       });
-      insertedIds.push(id);
+      inserted++;
     }
 
-    return { success: true, count: menuItems.length, ids: insertedIds };
+    return { success: true, inserted, skipped };
   },
 });
+
 
 export const seedMenuItemToppings = mutation({
   args: {},
@@ -189,8 +217,16 @@ export const seedMenuItemToppings = mutation({
     ];
 
     let insertedCount = 0;
+    let skippedCount = 0;
 
     for (const item of allMenuItems) {
+      // Skip items that already have topping assignments
+      const existingAssignment = await ctx.db
+        .query("menuItemToppings")
+        .withIndex("by_menu_item", (q) => q.eq("menuItemId", item._id))
+        .first();
+      if (existingAssignment) { skippedCount++; continue; }
+
       const rule = toppingRules.find(r => r.categories.some(c => item.categories?.includes(c)));
 
       if (rule) {
@@ -210,9 +246,10 @@ export const seedMenuItemToppings = mutation({
       }
     }
 
-    return { success: true, count: insertedCount };
+    return { success: true, inserted: insertedCount, skipped: skippedCount };
   },
 });
+
 
 export const seedMenuCategories = mutation({
   args: {},
@@ -233,17 +270,34 @@ export const seedMenuCategories = mutation({
       { name: 'Boissons', slug: 'boissons', displayOrder: 12, active: true },
     ];
 
+    let inserted = 0;
+    let skipped = 0;
     for (const category of categories) {
+      // Skip if a category with this slug already exists
+      const existing = await ctx.db
+        .query("menuCategories")
+        .withIndex("by_slug", (q) => q.eq("slug", category.slug))
+        .first();
+      if (existing) { skipped++; continue; }
       await ctx.db.insert("menuCategories", category);
+      inserted++;
     }
 
-    return { success: true, count: categories.length };
+    return { success: true, inserted, skipped };
   },
 });
+
 
 export const seedRestaurantInfo = mutation({
   args: {},
   handler: async (ctx) => {
+    // Skip if restaurant info already exists
+    const existing = await ctx.db
+      .query("restaurantInfo")
+      .withIndex("by_key", (q) => q.eq("key", "main"))
+      .first();
+    if (existing) return { success: true, skipped: true };
+
     await ctx.db.insert("restaurantInfo", {
       key: "main",
       address: "11 Rue nationale, 57190 Florange",
@@ -259,9 +313,10 @@ export const seedRestaurantInfo = mutation({
         twitter: "https://twitter.com/karadeniz",
       },
     });
-    return { success: true };
+    return { success: true, skipped: false };
   },
 });
+
 
 export const seedReviews = mutation({
   args: {},
@@ -297,13 +352,26 @@ export const seedReviews = mutation({
       },
     ];
 
+    let inserted = 0;
+    let skipped = 0;
     for (const review of reviews) {
+      // Skip if a review by this person on this date already exists
+      const existing = await ctx.db
+        .query("reviews")
+        .filter((q) => q.and(
+          q.eq(q.field("name"), review.name),
+          q.eq(q.field("date"), review.date)
+        ))
+        .first();
+      if (existing) { skipped++; continue; }
       await ctx.db.insert("reviews", review);
+      inserted++;
     }
 
-    return { success: true, count: reviews.length };
+    return { success: true, inserted, skipped };
   },
 });
+
 
 export const seedGallery = mutation({
   args: {},
@@ -347,10 +415,20 @@ export const seedGallery = mutation({
       },
     ];
 
+    let inserted = 0;
+    let skipped = 0;
     for (const image of images) {
+      // Skip if a gallery item with this title already exists
+      const existing = await ctx.db
+        .query("gallery")
+        .filter((q) => q.eq(q.field("title"), image.title))
+        .first();
+      if (existing) { skipped++; continue; }
       await ctx.db.insert("gallery", image);
+      inserted++;
     }
-    return { success: true, count: images.length };
+    return { success: true, inserted, skipped };
+
   },
 });
 
