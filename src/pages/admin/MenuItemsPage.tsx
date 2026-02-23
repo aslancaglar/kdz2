@@ -156,8 +156,8 @@ export default function MenuItemsPage() {
 
         const { storageId } = await result.json();
         imageStorageId = storageId;
-        // Keep a placeholder image URL for fallback
-        imageUrl = imageUrl || 'uploaded-image';
+        // Clear the external URL so the backend resolves the image from storage
+        imageUrl = '';
       }
 
       let menuItemId: Id<'menuItems'>;
