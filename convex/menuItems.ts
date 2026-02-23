@@ -155,7 +155,6 @@ export const update = mutation({
     platformPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    // Get the existing item to check if we need to delete the old image
     const existingItem = await ctx.db.get(args.id);
 
     // If there's a new storage ID and it's different from the old one, delete the old image
@@ -187,12 +186,30 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("menuItems") },
   handler: async (ctx, args) => {
-    // Get the item first to clean up its image
     const item = await ctx.db.get(args.id);
     if (item?.imageStorageId) {
       await ctx.storage.delete(item.imageStorageId);
     }
     await ctx.db.delete(args.id);
+  },
+});
+
+export const removeImage = mutation({
+  args: { id: v.id("menuItems") },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.id);
+    if (!item) throw new Error("Item not found");
+
+    if (item.imageStorageId) {
+      await ctx.storage.delete(item.imageStorageId);
+    }
+
+    await ctx.db.patch(args.id, {
+      imageStorageId: undefined,
+      image: "",
+    });
+
+    return { success: true };
   },
 });
 

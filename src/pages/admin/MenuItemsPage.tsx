@@ -28,6 +28,7 @@ export default function MenuItemsPage() {
   const createMenuItem = useMutation(api.menuItems.create);
   const updateMenuItem = useMutation(api.menuItems.update);
   const deleteMenuItem = useMutation(api.menuItems.remove);
+  const removeMenuItemImage = useMutation(api.menuItems.removeImage);
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
   const setMenuItemToppingCategories = useMutation(api.toppingsAdmin.setMenuItemToppingCategories);
 
@@ -51,6 +52,7 @@ export default function MenuItemsPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeletingImage, setIsDeletingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Topping categories state
@@ -428,6 +430,30 @@ export default function MenuItemsPage() {
                             e.currentTarget.src = 'https://via.placeholder.com/400x300?text=No+Image';
                           }}
                         />
+                        {/* Delete Image button — only shown when editing an existing item with an image */}
+                        {editingId && (
+                          <button
+                            type="button"
+                            disabled={isDeletingImage}
+                            onClick={async () => {
+                              if (!editingId) return;
+                              setIsDeletingImage(true);
+                              try {
+                                await removeMenuItemImage({ id: editingId });
+                                setPreviewUrl(null);
+                                setSelectedFile(null);
+                                setFormData((prev) => ({ ...prev, image: '', imageStorageId: undefined }));
+                                if (fileInputRef.current) fileInputRef.current.value = '';
+                              } finally {
+                                setIsDeletingImage(false);
+                              }
+                            }}
+                            className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            {isDeletingImage ? 'Deleting...' : 'Delete Image'}
+                          </button>
+                        )}
                       </div>
                     )}
 
