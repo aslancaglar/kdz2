@@ -17,19 +17,25 @@ try {
         cwd: PROJECT_ROOT,
     });
 
+    // Function to strip ANSI escape codes
+    const stripAnsi = (str) => str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+
+    const cleanResult = stripAnsi(resultString);
+
     // Convex CLI output might contain some logs or checkmarks before/after the actual JSON
     let data;
     try {
-        const firstBrace = resultString.indexOf('{');
-        const lastBrace = resultString.lastIndexOf('}');
+        const firstBrace = cleanResult.indexOf('{');
+        const lastBrace = cleanResult.lastIndexOf('}');
         if (firstBrace !== -1 && lastBrace !== -1) {
-            const jsonStr = resultString.substring(firstBrace, lastBrace + 1);
+            const jsonStr = cleanResult.substring(firstBrace, lastBrace + 1);
             data = JSON.parse(jsonStr);
         } else {
-            data = JSON.parse(resultString);
+            data = JSON.parse(cleanResult);
         }
     } catch (e) {
-        console.error('Debug: Raw output starting with:', resultString.substring(0, 100));
+        console.error('Debug: Cleaned raw output starting with:', cleanResult.substring(0, 500));
+        // Try to find the largest valid JSON block if simple extraction fails
         throw new Error('Failed to parse JSON from Convex output. ' + e.message);
     }
 
