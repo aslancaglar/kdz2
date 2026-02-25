@@ -1,10 +1,11 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { snapshot } from "./data/snapshot";
 
 export const seedToppingCategories = mutation({
   args: {},
   handler: async (ctx) => {
-    const toppingCategories = [
+    const toppingCategories = snapshot?.toppingCategories || [
       {
         categoryId: 'sauces',
         name: 'Sauces',
@@ -60,7 +61,7 @@ export const seedToppingCategories = mutation({
 export const seedToppings = mutation({
   args: {},
   handler: async (ctx) => {
-    const toppings = [
+    const toppings = snapshot?.toppings || [
       { toppingId: 'sauce-blanche', name: 'Sauce Blanche', price: undefined, categoryId: 'sauces', displayOrder: 0, active: true },
       { toppingId: 'sauce-andalouse', name: 'Sauce Andalouse', price: undefined, categoryId: 'sauces', displayOrder: 1, active: true },
       { toppingId: 'sauce-barbecue', name: 'Sauce Barbecue', price: undefined, categoryId: 'sauces', displayOrder: 2, active: true },
@@ -106,7 +107,7 @@ export const seedToppings = mutation({
 export const seedMenuItems = mutation({
   args: {},
   handler: async (ctx) => {
-    const menuItems = [
+    const menuItems = snapshot?.menuItems || [
       { name: 'Sandwich Kebab', description: 'Pain frais, viande kebab, crudites et sauce au choix', price: 7.00, priceWithFries: 9.00, image: 'https://images.pexels.com/photos/6941010/pexels-photo-6941010.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['sandwiches'], popular: true },
       { name: 'Maxi Kebab', description: 'Version XXL de notre kebab classique avec double viande', price: 10.00, priceWithFries: 12.00, image: 'https://images.pexels.com/photos/5779367/pexels-photo-5779367.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['sandwiches'], popular: true },
       { name: 'Merguez', description: 'Sandwich merguez grillees, salade, tomates, oignons', price: 7.00, priceWithFries: 9.00, image: 'https://images.pexels.com/photos/12842118/pexels-photo-12842118.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['sandwiches'] },
@@ -133,15 +134,15 @@ export const seedMenuItems = mutation({
       { name: 'Assiette Cheese', description: 'Assortiment special du chef avec accompagnements', price: 17.00, image: 'https://images.pexels.com/photos/2641886/pexels-photo-2641886.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'], popular: true },
       { name: 'Assiette Falafels', description: 'Tenders croustillants avec accompagnement', price: 14.00, image: 'https://images.pexels.com/photos/60616/fried-chicken-chicken-fried-crunchy-60616.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
       { name: 'Assiette Tenders', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette Cordon Bleu', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette Merguez', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette du Chef', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette Adana', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette Saucisse Turque', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette Kofte', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette Agneau', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette Veau', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
-      { name: 'Assiette Poulet', description: 'Falafels maison sans viande avec accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette Cordon Bleu', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette Merguez', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette du Chef', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette Adana', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette Saucisse Turque', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette Kofte', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette Agneau', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette Veau', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
+      { name: 'Assiette Poulet', description: 'Falafels maison sans viande with accompagnement', price: 13.00, image: 'https://images.pexels.com/photos/6275166/pexels-photo-6275166.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['assiettes'] },
       { name: 'Tacos 1 Viande', description: 'Viande au choix, frites, fromage et sauce', price: 8.00, image: 'https://images.pexels.com/photos/4958641/pexels-photo-4958641.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['tacos'] },
       { name: 'Tacos 2 Viandes', description: '2 viandes au choix, frites, fromage et sauce', price: 10.00, image: 'https://images.pexels.com/photos/5410400/pexels-photo-5410400.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['tacos'], popular: true },
       { name: 'Tacos 3 Viandes', description: '3 viandes au choix, frites, fromage et sauce', price: 12.00, image: 'https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['tacos'] },
@@ -160,11 +161,11 @@ export const seedMenuItems = mutation({
       { name: 'Mozza Sticks', description: 'Tenders de poulet panes (4.50, 6.50, 10.00, 13.50)', price: 4.50, image: 'https://images.pexels.com/photos/60616/fried-chicken-chicken-fried-crunchy-60616.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['barquettes'] },
       { name: 'Box Poulet', description: 'Tenders de poulet panes (4.50, 6.50, 10.00, 13.50)', price: 4.50, image: 'https://images.pexels.com/photos/60616/fried-chicken-chicken-fried-crunchy-60616.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['barquettes'] },
       { name: 'Box Kebab', description: 'Box avec viande kebab', price: 7.50, image: 'https://images.pexels.com/photos/5410400/pexels-photo-5410400.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['box'] },
-      { name: 'Box Poulet', description: 'Box avec poulet grille', price: 8.50, image: 'https://images.pexels.com/photos/2673353/pexels-photo-2673353.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['box'] },
-      { name: 'Salade Feta', description: 'Salade fraiche avec fromage feta', price: 7.50, image: 'https://images.pexels.com/photos/1059905/pexels-photo-1059905.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['salades'] },
+      { name: 'Box Poulet', description: 'Box with poulet grille', price: 8.50, image: 'https://images.pexels.com/photos/2673353/pexels-photo-2673353.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['box'] },
+      { name: 'Salade Feta', description: 'Salade fraiche with fromage feta', price: 7.50, image: 'https://images.pexels.com/photos/1059905/pexels-photo-1059905.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['salades'] },
       { name: 'Salade Thon', description: 'Salade composee au thon', price: 9.00, image: 'https://images.pexels.com/photos/1213710/pexels-photo-1213710.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['salades'] },
-      { name: 'Salade Poulet', description: 'Salade fraiche avec poulet grille', price: 9.00, image: 'https://images.pexels.com/photos/2097090/pexels-photo-2097090.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['salades'] },
-      { name: 'Salade Tenders', description: 'Salade fraiche avec poulet grille', price: 9.00, image: 'https://images.pexels.com/photos/2097090/pexels-photo-2097090.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['salades'] },
+      { name: 'Salade Poulet', description: 'Salade fraiche with poulet grille', price: 9.00, image: 'https://images.pexels.com/photos/2097090/pexels-photo-2097090.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['salades'] },
+      { name: 'Salade Tenders', description: 'Salade fraiche with poulet grille', price: 9.00, image: 'https://images.pexels.com/photos/2097090/pexels-photo-2097090.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['salades'] },
       { name: 'Bowl Riz', description: 'Viandes au choix: kebab, brochettes, steak, kofte', price: 9.50, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['bowls'], popular: true },
       { name: 'Bowl Pates', description: 'Viandes au choix: kebab, brochettes, steak, kofte', price: 9.50, image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['bowls'], popular: true },
       { name: 'Kapsalon 1 Viande', description: 'Frites, fromage, salade et viande au choix', price: 10.00, image: 'https://images.pexels.com/photos/2641886/pexels-photo-2641886.jpeg?auto=compress&cs=tinysrgb&w=600', categories: ['kapsalon'], popular: true },
@@ -254,7 +255,7 @@ export const seedMenuItemToppings = mutation({
 export const seedMenuCategories = mutation({
   args: {},
   handler: async (ctx) => {
-    const categories = [
+    const categories = snapshot?.menuCategories || [
       { name: 'Sandwichs', slug: 'sandwiches', displayOrder: 0, active: true },
       { name: 'Sandwichs Végétarien', slug: 'sandwiches-vegetarien', displayOrder: 1, active: true },
       { name: 'Assiettes', slug: 'assiettes', displayOrder: 2, active: true },
@@ -502,3 +503,132 @@ export const clearAllData = mutation({
     return { success: true };
   },
 });
+
+export const seedFromSnapshot = mutation({
+  args: {
+    data: v.any(),
+    clearFirst: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    if (args.clearFirst) {
+      const tables = [
+        "menuItems", "toppings", "toppingCategories",
+        "menuItemToppings", "menuCategories", "restaurantInfo",
+        "reviews", "gallery"
+      ] as const;
+
+      for (const table of tables) {
+        const items = await ctx.db.query(table).collect();
+        for (const item of items) {
+          await ctx.db.delete(item._id);
+        }
+      }
+    }
+
+    const { data } = args;
+
+    const insertItems = async (table: any, items: any[]) => {
+      if (!items) return;
+      for (const item of items) {
+        const { _id, _creationTime, ...rest } = item;
+        // Check if item already exists by name/slug to avoid duplicates if not clearing
+        if (table === "menuItems") {
+          const existing = await ctx.db.query("menuItems").filter(q => q.eq(q.field("name"), rest.name)).first();
+          if (existing) continue;
+        } else if (table === "menuCategories") {
+          const existing = await ctx.db.query("menuCategories").withIndex("by_slug", q => q.eq("slug", rest.slug)).first();
+          if (existing) continue;
+        }
+
+        await ctx.db.insert(table, rest);
+      }
+    };
+
+    await insertItems("menuCategories", data.menuCategories);
+    await insertItems("toppingCategories", data.toppingCategories);
+    await insertItems("toppings", data.toppings);
+    await insertItems("menuItems", data.menuItems);
+    await insertItems("menuItemToppings", data.menuItemToppings);
+    await insertItems("restaurantInfo", data.restaurantInfo);
+    await insertItems("reviews", data.reviews);
+    await insertItems("gallery", data.gallery);
+
+    return { success: true };
+  },
+});
+
+/**
+ * Exports all relevant menu data from the database.
+ */
+export const exportData = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const menuCategories = await ctx.db.query("menuCategories").collect();
+    const menuItems = await ctx.db.query("menuItems").collect();
+    const toppingCategories = await ctx.db.query("toppingCategories").collect();
+    const toppings = await ctx.db.query("toppings").collect();
+    const menuItemToppings = await ctx.db.query("menuItemToppings").collect();
+    const restaurantInfo = await ctx.db.query("restaurantInfo").collect();
+    const reviews = await ctx.db.query("reviews").collect();
+    const gallery = await ctx.db.query("gallery").collect();
+
+    return {
+      menuCategories,
+      menuItems,
+      toppingCategories,
+      toppings,
+      menuItemToppings,
+      restaurantInfo,
+      reviews,
+      gallery,
+    };
+  },
+});
+
+/**
+ * Imports data into the database, optionally clearing existing data.
+ */
+export const importData = mutation({
+  args: {
+    data: v.any(), // The result from exportData
+    clearFirst: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    if (args.clearFirst) {
+      const tables = [
+        "menuItems", "toppings", "toppingCategories",
+        "menuItemToppings", "menuCategories", "restaurantInfo",
+        "reviews", "gallery"
+      ] as const;
+
+      for (const table of tables) {
+        const items = await ctx.db.query(table).collect();
+        for (const item of items) {
+          await ctx.db.delete(item._id);
+        }
+      }
+    }
+
+    const { data } = args;
+
+    const insertItems = async (table: any, items: any[]) => {
+      if (!items) return;
+      for (const item of items) {
+        const { _id, _creationTime, ...rest } = item;
+        await ctx.db.insert(table, rest);
+      }
+    };
+
+    await insertItems("menuCategories", data.menuCategories);
+    await insertItems("toppingCategories", data.toppingCategories);
+    await insertItems("toppings", data.toppings);
+    await insertItems("menuItems", data.menuItems);
+    await insertItems("menuItemToppings", data.menuItemToppings);
+    await insertItems("restaurantInfo", data.restaurantInfo);
+    await insertItems("reviews", data.reviews);
+    await insertItems("gallery", data.gallery);
+
+    return { success: true };
+  },
+});
+

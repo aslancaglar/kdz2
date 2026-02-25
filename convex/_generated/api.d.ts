@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as categories from "../categories.js";
+import type * as data_snapshot from "../data/snapshot.js";
 import type * as debug from "../debug.js";
 import type * as files from "../files.js";
 import type * as gallery from "../gallery.js";
@@ -32,6 +33,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   categories: typeof categories;
+  "data/snapshot": typeof data_snapshot;
   debug: typeof debug;
   files: typeof files;
   gallery: typeof gallery;
