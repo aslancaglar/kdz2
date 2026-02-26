@@ -1,32 +1,22 @@
 import { ArrowRight, Phone } from 'lucide-react';
-import { useHeroVideoUrl } from '../context/VideoContext';
 
 export default function Hero() {
-  const videoUrl = useHeroVideoUrl();
-
   return (
     <section
       id="hero"
       className="relative min-h-[45vh] flex items-center overflow-hidden pt-36 md:pt-32 pb-16"
     >
       <div className="absolute inset-0">
-        {videoUrl ? (
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            aria-label="Vidéo de préparation de kebab"
-            className="hidden md:block w-full h-full object-cover"
-            key={videoUrl}
-          >
-            <source src={videoUrl} type="video/mp4" />
-          </video>
-        ) : (
-          <div className="absolute inset-0 bg-dark-950">
-            <div className="absolute inset-0 animate-shimmer opacity-10" />
-          </div>
-        )}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-label="Vidéo de préparation de kebab"
+          className="hidden md:block w-full h-full object-cover"
+        >
+          <source src="/kebab-video.mp4" type="video/mp4" />
+        </video>
         <img
           src="https://images.pexels.com/photos/2233729/pexels-photo-2233729.jpeg?auto=compress&cs=tinysrgb&w=1920"
           alt="Kebab background"
