@@ -52,7 +52,10 @@ function ScrollToTop() {
 }
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    const noLoaderPaths = ['/checkout', '/login', '/signup', '/register'];
+    return !noLoaderPaths.some(path => window.location.pathname.startsWith(path));
+  });
   const handleLoaderFinished = useCallback(() => setIsLoading(false), []);
 
   return (
