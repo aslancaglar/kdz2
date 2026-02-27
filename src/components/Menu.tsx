@@ -4,6 +4,8 @@ import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import Skeleton from './Skeleton';
 import MenuItem from './MenuItem';
+import MenuItemModal from './MenuItemModal';
+import FadeIn from './FadeIn';
 
 interface MenuProps {
   showHeader?: boolean;
@@ -20,7 +22,20 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
 
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [showRightGradient, setShowRightGradient] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleOpenModal = (item: any) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    // Optional delay to wipe state so it animates gracefully
+    setTimeout(() => setSelectedItem(null), 300);
+  };
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
@@ -76,14 +91,16 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
     <section id="menu" className={`pb-20 bg-white ${reducedTopPadding ? 'pt-[42px]' : 'pt-20'}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {showHeader && (
-          <div className={`text-center ${reducedHeaderSpacing ? 'mb-8' : 'mb-16'}`}>
-            <h2 className="text-primary-600 font-extrabold uppercase tracking-wider mb-2 text-sm sm:text-base">
-              Découvrez
-            </h2>
-            <h2 className="font-display font-bold text-4xl md:text-5xl text-dark-900 uppercase tracking-wide">
-              Notre Carte
-            </h2>
-          </div>
+          <FadeIn direction="up">
+            <div className={`text-center ${reducedHeaderSpacing ? 'mb-8' : 'mb-16'}`}>
+              <h2 className="text-primary-600 font-extrabold uppercase tracking-wider mb-2 text-sm sm:text-base">
+                Découvrez
+              </h2>
+              <h2 className="font-display font-bold text-4xl md:text-5xl text-dark-900 uppercase tracking-wide">
+                Notre Carte
+              </h2>
+            </div>
+          </FadeIn>
         )}
 
         {!menuCategories ? (
@@ -93,7 +110,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
             ))}
           </div>
         ) : (
-          <div className="relative mb-12 -mx-4 px-4 sm:mx-0 sm:px-4">
+          <FadeIn delay={200} direction="up" className="relative mb-12 -mx-4 px-4 sm:mx-0 sm:px-4">
             <div
               ref={scrollContainerRef}
               onScroll={checkScroll}
@@ -122,7 +139,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
             {showRightGradient && (
               <div className="absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden z-10" />
             )}
-          </div>
+          </FadeIn>
         )}
 
         {!allMenuItems ? (
@@ -158,6 +175,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
                     ...item,
                     description: item.description || ''
                   }}
+                  onOpenModal={handleOpenModal}
                 />
               </div>
             ))}
@@ -173,6 +191,14 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
           </Link>
         </div>
       </div>
+
+      {selectedItem && (
+        <MenuItemModal
+          item={selectedItem}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </section>
   );
 }

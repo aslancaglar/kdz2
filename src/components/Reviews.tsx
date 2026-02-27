@@ -3,6 +3,7 @@ import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import Skeleton from './Skeleton';
+import FadeIn from './FadeIn';
 
 export default function Reviews() {
   const reviewsData = useQuery(api.reviews.listActive);
@@ -170,14 +171,16 @@ export default function Reviews() {
       </div>
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <p className="text-primary-600 font-extrabold mb-2">Témoignages</p>
-          <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
-            Ce Que Disent Nos Clients
-          </h2>
-        </div>
+        <FadeIn direction="up">
+          <div className="text-center mb-16">
+            <p className="text-primary-600 font-extrabold mb-2">Témoignages</p>
+            <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
+              Ce Que Disent Nos Clients
+            </h2>
+          </div>
+        </FadeIn>
 
-        <div className="relative">
+        <FadeIn delay={200} direction="up" className="relative">
           {!reviewsData ? (
             <div className="flex gap-8 overflow-hidden">
               {[1, 2, 3].map((i) => (
@@ -262,7 +265,7 @@ export default function Reviews() {
               </div>
             </>
           )}
-        </div>
+        </FadeIn>
       </div>
     </section>
   );

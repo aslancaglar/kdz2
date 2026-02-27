@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import MenuItemModal from './MenuItemModal';
 import { Id } from '../../convex/_generated/dataModel';
 
 interface MenuItemProps {
@@ -17,10 +15,10 @@ interface MenuItemProps {
     categories?: string[];
     popular?: boolean;
   };
+  onOpenModal?: (item: any) => void;
 }
 
-export default function MenuItem({ item }: MenuItemProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function MenuItem({ item, onOpenModal }: MenuItemProps) {
 
   // Defensive check: only query toppings if the ID is valid for the menuItems table
   const isValidMenuItemId = item?._id && typeof item._id === 'string' && !item._id.startsWith('k57');
@@ -36,11 +34,11 @@ export default function MenuItem({ item }: MenuItemProps) {
       <div
         role="button"
         tabIndex={0}
-        onClick={() => setIsModalOpen(true)}
+        onClick={() => onOpenModal && onOpenModal(item)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            setIsModalOpen(true);
+            if (onOpenModal) onOpenModal(item);
           }
         }}
         className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-all group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -81,12 +79,6 @@ export default function MenuItem({ item }: MenuItemProps) {
           </div>
         </div>
       </div>
-
-      <MenuItemModal
-        item={item}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
     </>
   );
 }

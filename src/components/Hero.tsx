@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[45vh] flex items-center overflow-hidden pt-36 md:pt-32 pb-16"
+      className="relative min-h-[45vh] flex items-center overflow-hidden pt-28 md:pt-28 pb-24"
     >
       <div className="absolute inset-0">
         <video
