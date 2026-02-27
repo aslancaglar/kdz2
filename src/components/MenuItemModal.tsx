@@ -154,17 +154,17 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] md:max-h-[85vh] flex flex-col mx-4 overflow-hidden">
         {/* Absolute Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
+          className="absolute top-4 right-4 z-20 p-2 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-6 pt-6 pb-6">
+        <div className="flex-1 overflow-y-auto px-6 py-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2 font-display">{item.name}</h2>
           <p className="text-gray-600 mb-6">{item.description}</p>
 
@@ -175,7 +175,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                 <button
                   onClick={() => setPriceOption('seul')}
                   className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'seul'
-                    ? 'border-red-500 bg-red-50 text-red-700'
+                    ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-gray-200 hover:border-gray-300'
                     }`}
                 >
@@ -187,7 +187,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                   <button
                     onClick={() => setPriceOption('frites')}
                     className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'frites'
-                      ? 'border-red-500 bg-red-50 text-red-700'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
                       : 'border-gray-200 hover:border-gray-300'
                       }`}
                   >
@@ -200,7 +200,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                   <button
                     onClick={() => setPriceOption('menu')}
                     className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'menu'
-                      ? 'border-red-500 bg-red-50 text-red-700'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
                       : 'border-gray-200 hover:border-gray-300'
                       }`}
                   >
@@ -217,10 +217,10 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
               {availableCategories.map((category: any) => (
                 <div key={category.id} className="border-t pt-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-extrabold text-gray-900 font-display bg-red-50 px-3 py-2 rounded-lg">
+                    <h3 className="text-lg font-extrabold text-gray-900 font-display bg-primary-50 px-3 py-2 rounded-lg">
                       {category.name}
                       {category.minSelection > 0 && (
-                        <span className="text-red-500 ml-1">*</span>
+                        <span className="text-primary-500 ml-1">*</span>
                       )}
                     </h3>
                     <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -230,7 +230,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                   </div>
 
                   {validationErrors[category.id] && (
-                    <div className="mb-3 text-sm text-red-600 bg-red-50 p-2 rounded">
+                    <div className="mb-3 text-sm text-primary-600 bg-primary-50 p-2 rounded">
                       {validationErrors[category.id]}
                     </div>
                   )}
@@ -253,7 +253,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                           )}
                           disabled={isDisabled}
                           className={`p-3 rounded-lg border-2 text-left transition-all ${isSelected
-                            ? 'border-red-500 bg-red-50'
+                            ? 'border-primary-500 bg-primary-50'
                             : isDisabled
                               ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
                               : 'border-gray-200 hover:border-gray-300'
@@ -271,7 +271,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                               </div>
                             </div>
                             {isSelected && (
-                              <Check className="w-5 h-5 text-red-500 flex-shrink-0" />
+                              <Check className="w-5 h-5 text-primary-500 flex-shrink-0" />
                             )}
                           </div>
                         </button>
@@ -285,17 +285,17 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
         </div>
 
         {/* Fixed Footer */}
-        <div className="border-t bg-white p-4 rounded-b-2xl">
+        <div className="border-t bg-gray-50 p-6 flex-shrink-0 rounded-b-2xl">
           <div className="flex items-center justify-between mb-4">
             <span className="text-lg font-semibold text-gray-900 font-display">Total</span>
-            <span className="text-2xl font-bold text-red-500 font-display">
+            <span className="text-2xl font-bold text-primary-600 font-display">
               {formatPrice(totalPrice)}
             </span>
           </div>
 
           <button
             onClick={handleAddToOrder}
-            className="w-full bg-red-500 text-white py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors"
+            className="w-full bg-primary-600 text-white py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors uppercase tracking-wide"
           >
             Ajouter à la commande
           </button>
