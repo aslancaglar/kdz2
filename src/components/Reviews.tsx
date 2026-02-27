@@ -11,6 +11,8 @@ export default function Reviews() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(true);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -89,6 +91,35 @@ export default function Reviews() {
   const handleNextClick = () => {
     nextSlide();
     startAutoSlide();
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      nextSlide();
+      startAutoSlide();
+    }
+    if (isRightSwipe) {
+      prevSlide();
+      startAutoSlide();
+    }
+
+    // reset
+    setTouchStart(0);
+    setTouchEnd(0);
   };
 
   const ReviewCard = ({ review, index }: { review: typeof reviews[0]; index: number }) => (
@@ -195,7 +226,12 @@ export default function Reviews() {
                 </button>
               )}
 
-              <div className="overflow-hidden min-h-[400px]">
+              <div
+                className="overflow-hidden min-h-[400px]"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
                 <div
                   className={`flex ${isMobile ? 'gap-0' : 'gap-8'}`}
                   style={{

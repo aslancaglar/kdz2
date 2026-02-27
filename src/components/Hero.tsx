@@ -1,5 +1,6 @@
 import { ArrowRight, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import FadeIn from './FadeIn';
 
 export default function Hero() {
   return (
@@ -28,7 +29,7 @@ export default function Hero() {
 
       <div className="relative w-full px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="max-w-2xl text-left">
+          <FadeIn delay={200} className="max-w-2xl text-left">
             <h1 className="font-display font-extrabold text-5xl md:text-6xl lg:text-7xl tracking-wide leading-tight mb-3 text-white uppercase">
               Découvrez le vrai<br />
               <span className="text-secondary-400">goût du kebab</span>
@@ -52,7 +53,7 @@ export default function Hero() {
                 03 82 58 13 39
               </a>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </section>

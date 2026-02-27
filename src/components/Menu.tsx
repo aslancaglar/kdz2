@@ -19,6 +19,21 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
   const allMenuItems = useQuery(api.queries.getMenuItems);
 
   const [activeCategory, setActiveCategory] = useState<string>('');
+  const [showRightGradient, setShowRightGradient] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setShowRightGradient(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, [menuCategories]);
 
   useEffect(() => {
     if (menuCategories && menuCategories.length > 0 && !activeCategory) {
@@ -78,25 +93,35 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
             ))}
           </div>
         ) : (
-          <div className="overflow-x-auto mb-12 -mx-4 px-4 sm:mx-0 sm:px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            <div className="flex gap-3 justify-start sm:justify-center min-w-max sm:min-w-0 sm:flex-wrap">
-              {menuCategories.map((category) => (
-                <button
-                  key={category.slug}
-                  ref={setCategoryRef(category.slug)}
-                  onClick={() => {
-                    hasUserInteracted.current = true;
-                    setActiveCategory(category.slug);
-                  }}
-                  className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm ${activeCategory === category.slug
-                    ? 'bg-primary-600 text-white shadow-md scale-105'
-                    : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-primary-600'
-                    }`}
-                >
-                  {category.name}
-                </button>
-              ))}
+          <div className="relative mb-12 -mx-4 px-4 sm:mx-0 sm:px-4">
+            <div
+              ref={scrollContainerRef}
+              onScroll={checkScroll}
+              className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+            >
+              <div className="flex gap-3 justify-start sm:justify-center min-w-max sm:min-w-0 sm:flex-wrap">
+                {menuCategories.map((category) => (
+                  <button
+                    key={category.slug}
+                    ref={setCategoryRef(category.slug)}
+                    onClick={() => {
+                      hasUserInteracted.current = true;
+                      setActiveCategory(category.slug);
+                    }}
+                    className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm ${activeCategory === category.slug
+                      ? 'bg-primary-600 text-white shadow-md scale-105'
+                      : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-primary-600'
+                      }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {showRightGradient && (
+              <div className="absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden z-10" />
+            )}
           </div>
         )}
 
@@ -122,14 +147,19 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredItems.map((item) => (
-              <MenuItem
-                key={item._id}
-                item={{
-                  ...item,
-                  description: item.description || ''
-                }}
-              />
+            {filteredItems.map((item, index) => (
+              <div
+                key={`${item._id}-${activeCategory}`}
+                className="opacity-0 animate-fade-in-up"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <MenuItem
+                  item={{
+                    ...item,
+                    description: item.description || ''
+                  }}
+                />
+              </div>
             ))}
           </div>
         )}

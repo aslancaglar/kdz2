@@ -1,6 +1,7 @@
 import { CheckCircle } from 'lucide-react';
 import { highlights } from '../data/about-data';
 import aboutImage from '../assets/images/happy-couple-eating-doner-kebab-shawarma-in-camd-2021-08-26-20-00-25-utc.png';
+import FadeIn from './FadeIn';
 
 export default function About() {
   return (
@@ -12,7 +13,7 @@ export default function About() {
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div>
+          <FadeIn delay={100} direction="up">
             <p className="text-primary-600 font-extrabold mb-2">À Propos</p>
             <h2 className="font-display font-extrabold text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6 leading-none tracking-wide uppercase">
               Frais, Chaud<br />
@@ -34,11 +35,9 @@ export default function About() {
                 </li>
               ))}
             </ul>
+          </FadeIn>
 
-
-          </div>
-
-          <div className="relative flex justify-center lg:justify-end">
+          <FadeIn delay={300} direction="up" className="relative flex justify-center lg:justify-end">
             <div className="relative w-full max-w-md">
               <img
                 src={aboutImage}
@@ -54,7 +53,7 @@ export default function About() {
               <p className="text-4xl font-bold text-primary-500 mb-1">25+</p>
               <p className="text-gray-700 font-medium">Années d'expérience</p>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </section>

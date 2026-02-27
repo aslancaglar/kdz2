@@ -1,6 +1,7 @@
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import Skeleton from './Skeleton';
+import FadeIn from './FadeIn';
 
 export default function Gallery() {
   const galleryImages = useQuery(api.gallery.listActive);
@@ -8,24 +9,26 @@ export default function Gallery() {
   return (
     <section id="gallery" className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="text-primary-600 font-extrabold mb-2">Nos Créations</p>
-          <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
-            Galerie
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Découvrez nos plats préparés avec passion et des ingrédients frais de qualité.
-          </p>
-        </div>
+        <FadeIn direction="up">
+          <div className="text-center mb-12">
+            <p className="text-primary-600 font-extrabold mb-2">Nos Créations</p>
+            <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
+              Galerie
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Découvrez nos plats préparés avec passion et des ingrédients frais de qualité.
+            </p>
+          </div>
+        </FadeIn>
 
         {!galleryImages ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <FadeIn delay={200} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <Skeleton key={i} className="aspect-square rounded-2xl" />
             ))}
-          </div>
+          </FadeIn>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <FadeIn delay={200} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleryImages.map((image) => (
               <div
                 key={image._id}
@@ -44,7 +47,7 @@ export default function Gallery() {
                 </div>
               </div>
             ))}
-          </div>
+          </FadeIn>
         )}
       </div>
     </section>

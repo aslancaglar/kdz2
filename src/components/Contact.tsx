@@ -1,6 +1,7 @@
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import FadeIn from './FadeIn';
 
 export default function Contact() {
   const restaurantInfo = useQuery(api.restaurantInfo.get);
@@ -45,18 +46,20 @@ export default function Contact() {
   return (
     <section id="contact" className="py-20 bg-warm-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <p className="text-primary-700 font-semibold mb-2">Contactez-nous</p>
-          <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
-            Nous Trouver
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Venez nous rendre visite ou passez commande par téléphone. Nous serons ravis de vous accueillir !
-          </p>
-        </div>
+        <FadeIn>
+          <div className="text-center mb-16">
+            <p className="text-primary-700 font-semibold mb-2">Contactez-nous</p>
+            <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
+              Nous Trouver
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Venez nous rendre visite ou passez commande par téléphone. Nous serons ravis de vous accueillir !
+            </p>
+          </div>
+        </FadeIn>
 
         <div className="grid lg:grid-cols-2 gap-12 items-stretch">
-          <div className="grid sm:grid-cols-2 gap-6">
+          <FadeIn delay={200} className="grid sm:grid-cols-2 gap-6">
             {contactInfo.map((item, index) => (
               <div
                 key={index}
@@ -80,9 +83,9 @@ export default function Contact() {
                 )}
               </div>
             ))}
-          </div>
+          </FadeIn>
 
-          <div className="relative h-full min-h-[400px] lg:min-h-[500px]">
+          <FadeIn delay={400} className="relative h-full min-h-[400px] lg:min-h-[500px]">
             <div className="absolute inset-0 bg-gray-200 rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-shadow">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2600.8052602173807!2d6.1141143!3d49.317971500000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4795258664a86ccf%3A0x8db9ac174343560f!2sSnack%20Karadeniz%20Florange!5e0!3m2!1sfr!2sfr!4v1770294381690!5m2!1sfr!2sfr"
@@ -95,7 +98,7 @@ export default function Contact() {
                 title="Karadeniz Restaurant Location"
               />
             </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </section>
