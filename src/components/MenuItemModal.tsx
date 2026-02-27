@@ -295,7 +295,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
           <button
             onClick={handleAddToOrder}
-            className="w-full bg-primary-600 text-white py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors uppercase tracking-wide"
+            className="w-full bg-primary-600 text-white py-4 rounded-xl font-display text-2xl hover:bg-primary-700 transition-colors tracking-wide"
           >
             Ajouter à la commande
           </button>
