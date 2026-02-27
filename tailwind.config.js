@@ -41,6 +41,9 @@ export default {
           900: '#111827',
           950: '#030712',
         },
+        warm: {
+          50: '#f2eadc',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

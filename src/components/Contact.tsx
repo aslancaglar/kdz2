@@ -7,7 +7,7 @@ export default function Contact() {
 
   if (!restaurantInfo) {
     return (
-      <section id="contact" className="py-20" style={{ backgroundColor: '#f2eadc' }}>
+      <section id="contact" className="py-20 bg-warm-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-gray-600">Chargement...</p>
         </div>
@@ -43,10 +43,10 @@ export default function Contact() {
   ];
 
   return (
-    <section id="contact" className="py-20" style={{ backgroundColor: '#f2eadc' }}>
+    <section id="contact" className="py-20 bg-warm-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <p className="text-primary-500 font-semibold mb-2">Contactez-nous</p>
+          <p className="text-primary-700 font-semibold mb-2">Contactez-nous</p>
           <h2 className="font-display font-extrabold text-4xl md:text-5xl text-gray-900 mb-6 tracking-wide uppercase">
             Nous Trouver
           </h2>

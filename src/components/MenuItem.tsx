@@ -34,8 +34,16 @@ export default function MenuItem({ item }: MenuItemProps) {
   return (
     <>
       <div
+        role="button"
+        tabIndex={0}
         onClick={() => setIsModalOpen(true)}
-        className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-all group cursor-pointer"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsModalOpen(true);
+          }
+        }}
+        className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-all group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
       >
         <div className="relative h-48 overflow-hidden bg-gray-100">
           {item?.image && (

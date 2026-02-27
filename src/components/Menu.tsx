@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import Skeleton from './Skeleton';
@@ -61,9 +62,9 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {showHeader && (
           <div className={`text-center ${reducedHeaderSpacing ? 'mb-8' : 'mb-16'}`}>
-            <p className="text-red-500 font-display text-lg tracking-wide uppercase mb-2">
+            <h2 className="text-primary-600 font-extrabold uppercase tracking-wider mb-2 text-sm sm:text-base">
               Découvrez
-            </p>
+            </h2>
             <h2 className="font-display font-bold text-4xl md:text-5xl text-dark-900 uppercase tracking-wide">
               Notre Carte
             </h2>
@@ -87,9 +88,9 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
                     hasUserInteracted.current = true;
                     setActiveCategory(category.slug);
                   }}
-                  className={`font-display text-lg tracking-wide px-4 py-3 rounded-full transition-all uppercase whitespace-nowrap ${activeCategory === category.slug
-                    ? 'bg-red-500 text-white shadow-lg'
-                    : 'bg-red-100 text-gray-700 hover:bg-red-500 hover:text-white'
+                  className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm ${activeCategory === category.slug
+                    ? 'bg-primary-600 text-white shadow-md scale-105'
+                    : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-primary-600'
                     }`}
                 >
                   {category.name}
@@ -134,12 +135,12 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
         )}
 
         <div className="text-center mt-12">
-          <a
-            href="#contact"
+          <Link
+            to="/checkout"
             className="font-display text-xl tracking-wide inline-flex items-center px-8 py-4 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-105 uppercase"
           >
             Commander Maintenant
-          </a>
+          </Link>
         </div>
       </div>
     </section>

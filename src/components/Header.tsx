@@ -70,12 +70,17 @@ export default function Header() {
 
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => {
+              const isActive = link.type === 'route'
+                ? location.pathname === link.href && location.hash === ''
+                : location.pathname === '/' && location.hash === link.href;
+
               if (link.type === 'route') {
                 return (
                   <Link
                     key={link.href}
                     to={link.href}
-                    className="font-display text-lg tracking-wide transition-colors text-white hover:text-white/70 uppercase"
+                    className={`font-display text-lg tracking-wide transition-colors uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
+                      }`}
                   >
                     {link.label}
                   </Link>
@@ -86,7 +91,8 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => handleHashNavigation(e, link.href)}
-                  className="font-display text-lg tracking-wide transition-colors text-white hover:text-white/70 uppercase"
+                  className={`font-display text-lg tracking-wide transition-colors uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
+                    }`}
                 >
                   {link.label}
                 </a>
@@ -133,6 +139,7 @@ export default function Header() {
             ) : (
               <Link
                 to="/login"
+                aria-label="Se connecter"
                 className={`p-2.5 rounded-full transition-all ${isScrolled
                   ? 'bg-white text-primary-600 hover:bg-gray-100'
                   : 'bg-primary-500 text-white hover:bg-primary-600'
@@ -176,13 +183,18 @@ export default function Header() {
         <div className="lg:hidden mt-2 bg-primary-600 rounded-2xl shadow-xl">
           <nav className="flex flex-col px-4 py-4">
             {navLinks.map((link) => {
+              const isActive = link.type === 'route'
+                ? location.pathname === link.href && location.hash === ''
+                : location.pathname === '/' && location.hash === link.href;
+
               if (link.type === 'route') {
                 return (
                   <Link
                     key={link.href}
                     to={link.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="py-3 text-white font-display text-lg tracking-wide hover:text-white/70 transition-colors border-b border-white/20 last:border-0 uppercase"
+                    className={`py-3 font-display text-lg tracking-wide transition-colors border-b border-white/20 last:border-0 uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
+                      }`}
                   >
                     {link.label}
                   </Link>
@@ -196,7 +208,8 @@ export default function Header() {
                     setIsMenuOpen(false);
                     handleHashNavigation(e, link.href);
                   }}
-                  className="py-3 text-white font-display text-lg tracking-wide hover:text-white/70 transition-colors border-b border-white/20 last:border-0 uppercase"
+                  className={`py-3 font-display text-lg tracking-wide transition-colors border-b border-white/20 last:border-0 uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
+                    }`}
                 >
                   {link.label}
                 </a>

@@ -170,8 +170,6 @@ function App() {
                               <Route path="/signup" element={<SignupPage />} />
                               <Route path="/checkout" element={<CheckoutPage />} />
                               <Route path="/account" element={<AccountPage />} />
-                              <Route path="/checkout" element={<CheckoutPage />} />
-                              <Route path="/account" element={<AccountPage />} />
                               <Route path="*" element={<Navigate to="/" replace />} />
                             </Routes>
                           </Suspense>

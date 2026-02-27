@@ -135,7 +135,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-700 pt-8">
-          <p className="text-center text-gray-500">
+          <p className="text-center text-gray-400">
             &copy; {new Date().getFullYear()} Karadeniz. Tous droits réservés.
           </p>
         </div>

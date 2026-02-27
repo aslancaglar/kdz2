@@ -1,4 +1,5 @@
 import { ArrowRight, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Hero() {
   return (
@@ -36,13 +37,13 @@ export default function Hero() {
               Découvrez le véritable goût du kebab turc. Viandes fraîches, ingrédients de qualité et recettes traditionnelles transmises de génération en génération.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="/menu"
+              <Link
+                to="/menu"
                 className="font-display text-xl tracking-wide inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all shadow-xl hover:shadow-2xl hover:scale-105 uppercase"
               >
                 Voir Notre Menu
                 <ArrowRight className="w-5 h-5" />
-              </a>
+              </Link>
               <a
                 href="tel:0382581339"
                 className="font-display text-xl tracking-wide inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-white text-white rounded-full hover:bg-white hover:text-dark-900 transition-all"
