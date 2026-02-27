@@ -116,7 +116,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
               onScroll={checkScroll}
               className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
             >
-              <div className="flex gap-3 justify-start sm:justify-center min-w-max sm:min-w-0 sm:flex-wrap">
+              <div className="flex gap-3 justify-start sm:justify-center min-w-max sm:min-w-0 sm:flex-wrap p-2">
                 {menuCategories.map((category) => (
                   <button
                     key={category.slug}
