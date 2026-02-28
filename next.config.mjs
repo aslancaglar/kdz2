@@ -2,6 +2,26 @@ const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.VITE_CONVEX_
 const convexSiteUrl =
     process.env.NEXT_PUBLIC_CONVEX_SITE_URL || process.env.VITE_CONVEX_SITE_URL;
 
+function extractHostname(url) {
+    if (!url) return null;
+    try {
+        return new URL(url).hostname;
+    } catch {
+        return null;
+    }
+}
+
+const imageHostnames = Array.from(
+    new Set([
+        '**.convex.cloud',
+        '**.convex.site',
+        extractHostname(convexUrl),
+        extractHostname(convexSiteUrl),
+        'images.pexels.com',
+        'via.placeholder.com',
+    ].filter(Boolean)),
+);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
@@ -11,20 +31,10 @@ const nextConfig = {
         ...(convexSiteUrl ? { NEXT_PUBLIC_CONVEX_SITE_URL: convexSiteUrl } : {}),
     },
     images: {
-        remotePatterns: [
-            {
-                protocol: 'https',
-                hostname: 'friendly-swan-312.convex.cloud',
-            },
-            {
-                protocol: 'https',
-                hostname: 'images.pexels.com',
-            },
-            {
-                protocol: 'https',
-                hostname: 'via.placeholder.com',
-            },
-        ],
+        remotePatterns: imageHostnames.map((hostname) => ({
+            protocol: 'https',
+            hostname,
+        })),
     },
 };
 
