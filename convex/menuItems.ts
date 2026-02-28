@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { resolveImageUrl, resolveItemsWithImages } from "./lib/storage";
+import { requireAdminSession } from "./lib/auth";
 
 export const list = query({
   args: {},
@@ -52,11 +53,13 @@ export const listByCategory = query({
 
 export const updateCategoryOrder = mutation({
   args: {
+    adminToken: v.string(),
     id: v.id("menuItems"),
     category: v.string(),
     order: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const item = await ctx.db.get(args.id);
     if (!item) throw new Error("Item not found");
 
@@ -97,6 +100,7 @@ export const getPopularItems = query({
 
 export const create = mutation({
   args: {
+    adminToken: v.string(),
     name: v.string(),
     description: v.optional(v.string()),
     price: v.number(),
@@ -115,6 +119,7 @@ export const create = mutation({
     platformPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const itemId = await ctx.db.insert("menuItems", {
       name: args.name,
       description: args.description,
@@ -136,6 +141,7 @@ export const create = mutation({
 
 export const update = mutation({
   args: {
+    adminToken: v.string(),
     id: v.id("menuItems"),
     name: v.string(),
     description: v.optional(v.string()),
@@ -155,6 +161,7 @@ export const update = mutation({
     platformPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const existingItem = await ctx.db.get(args.id);
 
     // If there's a new storage ID and it's different from the old one, delete the old image
@@ -184,8 +191,12 @@ export const update = mutation({
 });
 
 export const remove = mutation({
-  args: { id: v.id("menuItems") },
+  args: {
+    id: v.id("menuItems"),
+    adminToken: v.string(),
+  },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const item = await ctx.db.get(args.id);
     if (item?.imageStorageId) {
       await ctx.storage.delete(item.imageStorageId);
@@ -195,8 +206,12 @@ export const remove = mutation({
 });
 
 export const removeImage = mutation({
-  args: { id: v.id("menuItems") },
+  args: {
+    id: v.id("menuItems"),
+    adminToken: v.string(),
+  },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const item = await ctx.db.get(args.id);
     if (!item) throw new Error("Item not found");
 
@@ -215,10 +230,12 @@ export const removeImage = mutation({
 
 export const updateDisplayOrder = mutation({
   args: {
+    adminToken: v.string(),
     id: v.id("menuItems"),
     displayOrder: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.patch(args.id, {
       displayOrder: args.displayOrder,
     });
@@ -228,12 +245,14 @@ export const updateDisplayOrder = mutation({
 
 export const updatePlatformPrices = mutation({
   args: {
+    adminToken: v.string(),
     updates: v.array(v.object({
       id: v.id("menuItems"),
       platformPrice: v.number(),
     })),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     for (const update of args.updates) {
       await ctx.db.patch(update.id, {
         platformPrice: update.platformPrice,

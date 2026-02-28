@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+"use client";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { useConvex } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
@@ -15,31 +16,73 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
+    sessionToken: string | null;
     login: (email: string, password: string) => Promise<boolean>;
     signup: (data: any) => Promise<boolean>;
-    logout: () => void;
+    logout: () => Promise<void>;
     updateUser: (data: Partial<User>) => void;
     isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const USER_STORAGE_KEY = 'user_session';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [sessionToken, setSessionToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const convex = useConvex();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-        setIsLoading(false);
-    }, []);
+        const hydrate = async () => {
+            localStorage.removeItem('user');
+            const storedSession = localStorage.getItem(USER_STORAGE_KEY);
+            if (!storedSession) {
+                setIsLoading(false);
+                return;
+            }
 
-    const login = async (email: string, password: string): Promise<boolean> => {
+            try {
+                const parsed = JSON.parse(storedSession);
+                const storedToken: string | undefined = parsed?.sessionToken;
+                if (!storedToken) {
+                    localStorage.removeItem(USER_STORAGE_KEY);
+                    setIsLoading(false);
+                    return;
+                }
+
+                const currentUser = await convex.query(api.auth.getCurrentUser, { sessionToken: storedToken });
+                if (!currentUser) {
+                    localStorage.removeItem(USER_STORAGE_KEY);
+                    setIsLoading(false);
+                    return;
+                }
+
+                setUser({
+                    id: currentUser.id,
+                    firstName: currentUser.firstName,
+                    lastName: currentUser.lastName,
+                    email: currentUser.email,
+                    phone: currentUser.phone,
+                    street: currentUser.street,
+                    city: currentUser.city,
+                    zipCode: currentUser.zipCode,
+                });
+                setSessionToken(storedToken);
+            } catch (error) {
+                console.error('Failed to restore user session:', error);
+                localStorage.removeItem(USER_STORAGE_KEY);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        hydrate();
+    }, [convex]);
+
+    const login = useCallback(async (email: string, password: string): Promise<boolean> => {
         try {
-            const result = await convex.query(api.auth.verifyUser, { email, password });
+            const result = await convex.mutation(api.auth.verifyUser, { email, password });
             if (result) {
                 const userSession: User = {
                     id: result.id,
@@ -52,7 +95,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     zipCode: result.zipCode
                 };
                 setUser(userSession);
-                localStorage.setItem('user', JSON.stringify(userSession));
+                setSessionToken(result.sessionToken);
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify({
+                    user: userSession,
+                    sessionToken: result.sessionToken,
+                }));
                 return true;
             }
             return false;
@@ -60,9 +107,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Login error:', error);
             return false;
         }
-    };
+    }, [convex]);
 
-    const signup = async (data: any): Promise<boolean> => {
+    const signup = useCallback(async (data: any): Promise<boolean> => {
         try {
             const result = await convex.mutation(api.auth.signupUser, data);
             if (result) {
@@ -78,7 +125,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     zipCode: result.zipCode
                 };
                 setUser(userSession);
-                localStorage.setItem('user', JSON.stringify(userSession));
+                setSessionToken(result.sessionToken);
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify({
+                    user: userSession,
+                    sessionToken: result.sessionToken,
+                }));
                 return true;
             }
             return false;
@@ -86,23 +137,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Signup error:', error);
             throw error;
         }
-    };
+    }, [convex]);
 
-    const logout = () => {
+    const logout = useCallback(async () => {
+        if (sessionToken) {
+            try {
+                await convex.mutation(api.auth.logoutUser, { sessionToken });
+            } catch (error) {
+                console.error('Failed to revoke user session:', error);
+            }
+        }
+
         setUser(null);
-        localStorage.removeItem('user');
-    };
+        setSessionToken(null);
+        localStorage.removeItem(USER_STORAGE_KEY);
+    }, [sessionToken, convex]);
 
-    const updateUser = (data: Partial<User>) => {
+    const updateUser = useCallback((data: Partial<User>) => {
         if (user) {
             const updatedUser = { ...user, ...data };
             setUser(updatedUser);
-            localStorage.setItem('user', JSON.stringify(updatedUser));
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify({
+                user: updatedUser,
+                sessionToken,
+            }));
         }
-    };
+    }, [user, sessionToken]);
+
+    // MEMOIZATION: Prevent all components consuming useAuth() from re-rendering just because the parent re-rendered
+    const contextValue = useMemo(() => ({
+        user,
+        sessionToken,
+        login,
+        signup,
+        logout,
+        updateUser,
+        isLoading
+    }), [user, sessionToken, login, signup, logout, updateUser, isLoading]);
 
     return (
-        <AuthContext.Provider value={{ user, login, signup, logout, updateUser, isLoading }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );

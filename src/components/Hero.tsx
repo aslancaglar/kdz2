@@ -1,5 +1,6 @@
 import { ArrowRight, Phone } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+import Image from 'next/image';
 import FadeIn from './FadeIn';
 
 export default function Hero() {
@@ -19,10 +20,13 @@ export default function Hero() {
         >
           <source src="/kebab-video.mp4" type="video/mp4" />
         </video>
-        <img
+        <Image
           src="https://images.pexels.com/photos/2233729/pexels-photo-2233729.jpeg?auto=compress&cs=tinysrgb&w=1920"
           alt="Kebab background"
-          className="md:hidden w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="md:hidden object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-dark-950/65 via-dark-900/65 to-dark-900/65" />
       </div>
@@ -39,7 +43,7 @@ export default function Hero() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                to="/menu"
+                href="/menu"
                 className="font-display text-xl tracking-wide inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all shadow-xl hover:shadow-2xl hover:scale-105 uppercase"
               >
                 Voir Notre Menu

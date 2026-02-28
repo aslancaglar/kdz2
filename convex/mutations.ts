@@ -1,9 +1,10 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdminSession, requireUserSession } from "./lib/auth";
 
 export const createOrder = mutation({
   args: {
-    userId: v.optional(v.id("users")),
+    sessionToken: v.optional(v.string()),
     customer: v.object({
       firstName: v.string(),
       lastName: v.string(),
@@ -39,8 +40,12 @@ export const createOrder = mutation({
     totalPrice: v.number(),
   },
   handler: async (ctx, args) => {
+    const sessionUser = args.sessionToken
+      ? await requireUserSession(ctx, args.sessionToken)
+      : null;
+
     const orderId = await ctx.db.insert("orders", {
-      userId: args.userId,
+      userId: sessionUser?.user._id,
       customer: args.customer,
       type: args.type,
       address: args.address,
@@ -63,8 +68,10 @@ export const updatePaymentStatus = mutation({
     orderId: v.id("orders"),
     paymentStatus: v.union(v.literal("unpaid"), v.literal("paid"), v.literal("failed")),
     stripePaymentIntentId: v.optional(v.string()),
+    adminToken: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.patch(args.orderId, {
       paymentStatus: args.paymentStatus,
       stripePaymentIntentId: args.stripePaymentIntentId,
@@ -77,6 +84,7 @@ export const updatePaymentStatus = mutation({
 export const addItemToOrder = mutation({
   args: {
     orderId: v.id("orders"),
+    adminToken: v.string(),
     item: v.object({
       menuItemId: v.string(),
       name: v.string(),
@@ -94,6 +102,7 @@ export const addItemToOrder = mutation({
     }),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const order = await ctx.db.get(args.orderId);
     if (!order) {
       throw new Error("Order not found");
@@ -116,8 +125,10 @@ export const removeItemFromOrder = mutation({
   args: {
     orderId: v.id("orders"),
     itemIndex: v.number(),
+    adminToken: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const order = await ctx.db.get(args.orderId);
     if (!order) {
       throw new Error("Order not found");
@@ -139,6 +150,7 @@ export const removeItemFromOrder = mutation({
 export const updateOrderStatus = mutation({
   args: {
     orderId: v.id("orders"),
+    adminToken: v.string(),
     status: v.union(
       v.literal("pending"),
       v.literal("preparing"),
@@ -148,6 +160,7 @@ export const updateOrderStatus = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.patch(args.orderId, {
       status: args.status,
       updatedAt: Date.now(),
@@ -159,8 +172,10 @@ export const updateOrderStatus = mutation({
 export const clearOrder = mutation({
   args: {
     orderId: v.id("orders"),
+    adminToken: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.patch(args.orderId, {
       items: [],
       totalPrice: 0,
@@ -173,8 +188,10 @@ export const clearOrder = mutation({
 export const deleteOrder = mutation({
   args: {
     orderId: v.id("orders"),
+    adminToken: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.delete(args.orderId);
   },
 });

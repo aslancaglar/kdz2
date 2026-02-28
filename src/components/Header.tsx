@@ -1,9 +1,13 @@
+"use client";
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, Phone, ShoppingBag, User, LogOut } from 'lucide-react';
 import OrderList from './OrderList';
 import { useOrder } from '../context/OrderContext';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
+import Image from 'next/image';
 import OpenStatus from './OpenStatus';
 
 const navLinks = [
@@ -19,10 +23,11 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOrderListOpen, setIsOrderListOpen] = useState(false);
-  const { getItemCount } = useOrder();
+  const { getItemCount, isInitialized } = useOrder();
   const { user, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { openLoginModal } = useAuthModal();
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,8 +40,8 @@ export default function Header() {
   const handleHashNavigation = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
     e.preventDefault();
 
-    if (location.pathname !== '/') {
-      navigate('/');
+    if (pathname !== '/') {
+      router.push('/');
       setTimeout(() => {
         const element = document.querySelector(hash);
         if (element) {
@@ -53,32 +58,31 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-6 sm:py-3 px-4 sm:px-6 lg:px-8">
-      <div
-        className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${isScrolled ? 'bg-primary-600 rounded-full shadow-xl' : ''
-          }`}
-      >
+      <div className="max-w-6xl mx-auto px-4 lg:px-6 bg-primary-600 rounded-full shadow-2xl border border-white/5 transition-all duration-300">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center">
-            <img
-              src="/logo_karadeniz.png.webp"
-              alt="Karadeniz Logo"
-              loading="lazy"
-              className={`w-auto transition-all duration-300 ${isScrolled ? 'h-12' : 'h-20'
-                }`}
-            />
+          <Link href="/" className="flex items-center shrink-0">
+            <div className="flex-shrink-0 flex items-center relative w-[120px] sm:w-[130px] h-[44px]">
+              <Image
+                src="/logo_karadeniz.png.webp"
+                alt="Snack Karadeniz"
+                fill
+                priority
+                className="object-contain object-left"
+              />
+            </div>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => {
               const isActive = link.type === 'route'
-                ? location.pathname === link.href && location.hash === ''
-                : location.pathname === '/' && location.hash === link.href;
+                ? pathname === link.href
+                : pathname === '/' && typeof window !== 'undefined' && window.location.hash === link.href;
 
               if (link.type === 'route') {
                 return (
                   <Link
                     key={link.href}
-                    to={link.href}
+                    href={link.href}
                     className={`font-display text-lg tracking-wide transition-colors uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
                       }`}
                   >
@@ -100,63 +104,57 @@ export default function Header() {
             })}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-5">
             <OpenStatus isScrolled={isScrolled} variant="desktop" />
 
-            <button
-              onClick={() => setIsOrderListOpen(true)}
-              className={`relative p-2.5 rounded-full transition-all ${isScrolled
-                ? 'bg-white text-primary-600 hover:bg-gray-100'
-                : 'bg-primary-500 text-white hover:bg-primary-600'
-                }`}
-              aria-label="Voir la commande"
-            >
-              <ShoppingBag className="w-5 h-5" />
-              {getItemCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {getItemCount()}
-                </span>
-              )}
-            </button>
-
-            {user ? (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={logout}
-                  className={`p-2.5 rounded-full transition-all ${isScrolled
-                    ? 'bg-white text-primary-600 hover:bg-gray-100'
-                    : 'bg-primary-500 text-white hover:bg-primary-600'
-                    }`}
-                  title="Se déconnecter"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
-                <div className="flex flex-col">
-                  <Link to="/account" className="text-white text-xs font-bold leading-none opacity-80 uppercase tracking-tighter hover:opacity-100 transition-opacity">Mon Compte</Link>
-                  <Link to="/account" className="text-white text-sm font-display truncate max-w-[100px] hover:text-white/70 transition-colors">{user.firstName}</Link>
-                </div>
-              </div>
-            ) : (
-              <Link
-                to="/login"
-                aria-label="Se connecter"
-                className={`p-2.5 rounded-full transition-all ${isScrolled
-                  ? 'bg-white text-primary-600 hover:bg-gray-100'
-                  : 'bg-primary-500 text-white hover:bg-primary-600'
-                  }`}
+            <div className="flex items-center gap-3 pr-2 border-r border-white/10">
+              <button
+                onClick={() => setIsOrderListOpen(true)}
+                className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary-600 hover:bg-gray-50 transition-all shadow-md active:scale-95"
+                aria-label="Voir la commande"
               >
-                <User className="w-5 h-5" />
-              </Link>
-            )}
+                <ShoppingBag className="w-5 h-5" />
+                {isInitialized && getItemCount() > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center border-2 border-primary-600">
+                    {getItemCount()}
+                  </span>
+                )}
+              </button>
+
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/account"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary-600 hover:bg-gray-50 transition-all shadow-md active:scale-95"
+                    title="Mon Compte"
+                  >
+                    <User className="w-5 h-5" />
+                  </Link>
+                  <button
+                    onClick={() => void logout()}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all active:scale-95"
+                    title="Se déconnecter"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openLoginModal(pathname || '/')}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary-600 hover:bg-gray-50 transition-all shadow-md active:scale-95"
+                  aria-label="Se connecter"
+                >
+                  <User className="w-5 h-5" />
+                </button>
+              )}
+            </div>
 
             <a
               href="tel:0382581339"
-              className={`inline-flex items-center gap-2 px-6 py-2.5 font-display text-lg tracking-wide rounded-full transition-all shadow-lg hover:shadow-xl ${isScrolled
-                ? 'bg-white text-primary-600 hover:bg-gray-100'
-                : 'bg-primary-500 text-white hover:bg-primary-600'
-                }`}
+              className="inline-flex items-center gap-3 px-6 py-2.5 bg-white text-primary-700 font-display text-lg tracking-widest rounded-full transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 uppercase"
             >
-              <Phone className="w-5 h-5" />
+              <Phone className="w-4 h-4 text-primary-600" />
               03 82 58 13 39
             </a>
           </div>
@@ -184,14 +182,14 @@ export default function Header() {
           <nav className="flex flex-col px-4 py-4">
             {navLinks.map((link) => {
               const isActive = link.type === 'route'
-                ? location.pathname === link.href && location.hash === ''
-                : location.pathname === '/' && location.hash === link.href;
+                ? pathname === link.href
+                : pathname === '/' && typeof window !== 'undefined' && window.location.hash === link.href;
 
               if (link.type === 'route') {
                 return (
                   <Link
                     key={link.href}
-                    to={link.href}
+                    href={link.href}
                     onClick={() => setIsMenuOpen(false)}
                     className={`py-3 font-display text-lg tracking-wide transition-colors border-b border-white/20 last:border-0 uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
                       }`}
@@ -230,7 +228,7 @@ export default function Header() {
                   </div>
                 </div>
                 <Link
-                  to="/account"
+                  href="/account"
                   onClick={() => setIsMenuOpen(false)}
                   className="flex items-center gap-2 w-full py-3 px-4 text-white font-display text-lg tracking-wide hover:text-white/70 transition-colors uppercase border-b border-white/20"
                 >
@@ -240,7 +238,7 @@ export default function Header() {
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
-                    logout();
+                    void logout();
                   }}
                   className="flex items-center gap-2 w-full py-3 px-2 text-white font-display text-lg tracking-wide hover:text-white/70 transition-colors uppercase"
                 >
@@ -249,14 +247,17 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  openLoginModal(pathname || '/');
+                }}
                 className="mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-white/20 text-white font-display text-lg tracking-wide rounded-full hover:bg-white/30 transition-colors uppercase"
               >
                 <User className="w-5 h-5" />
                 Se connecter
-              </Link>
+              </button>
             )}
 
             <a

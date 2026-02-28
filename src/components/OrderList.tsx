@@ -1,4 +1,6 @@
+"use client";
 import { X, ShoppingBag, Trash2, Sandwich } from 'lucide-react';
+import Image from 'next/image';
 import { useOrder } from '../context/OrderContext';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -74,17 +76,21 @@ export default function OrderList({ isOpen, onClose }: OrderListProps) {
                   </button>
 
                   <div className="flex gap-3 pr-8">
-                    <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {item.image ? (
-                        <img
+                    {item.image ? (
+                      <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                        <Image
                           src={item.image}
                           alt={item.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="64px"
+                          className="object-cover"
                         />
-                      ) : (
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
                         <Sandwich className="w-8 h-8 text-gray-400" />
-                      )}
-                    </div>
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 text-sm mb-1 font-display">
                         {item.name}

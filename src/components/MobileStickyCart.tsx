@@ -1,15 +1,17 @@
+"use client";
 import { useState, useEffect } from 'react';
 import { ShoppingBag, X, ChevronUp, Trash2 } from 'lucide-react';
 import { useOrder } from '../context/OrderContext';
-import { useNavigate } from 'react-router-dom';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { formatPrice } from '../utils/formatters';
 
 export default function MobileStickyCart() {
-  const { getItemCount, getTotalPrice, orderItems, removeFromOrder, clearOrder } = useOrder();
+  const { getItemCount, getTotalPrice, orderItems, removeFromOrder, clearOrder, isInitialized } = useOrder();
   const restaurantInfo = useQuery(api.restaurantInfo.get);
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
   const [isSideCartOpen, setIsSideCartOpen] = useState(false);
   const [canOpenCart, setCanOpenCart] = useState(true);
@@ -29,6 +31,11 @@ export default function MobileStickyCart() {
     }
   }, [itemCount]);
 
+  // Don't render until localized state is loaded
+  if (!isInitialized) {
+    return null;
+  }
+
   // Don't render if no items
   if (itemCount === 0) {
     return null;
@@ -39,7 +46,7 @@ export default function MobileStickyCart() {
       return;
     }
     setIsSideCartOpen(false);
-    navigate('/checkout');
+    router.push('/checkout');
   };
 
   return (
@@ -85,11 +92,15 @@ export default function MobileStickyCart() {
           {orderItems.map((item) => (
             <div key={item.id} className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
               {item.image && (
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
-                />
+                <div className="relative w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    sizes="48px"
+                    className="object-cover"
+                  />
+                </div>
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm text-gray-900 truncate">{item.name}</p>

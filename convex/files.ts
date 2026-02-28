@@ -1,10 +1,14 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdminSession } from "./lib/auth";
 
 // Generate a short-lived upload URL for file uploads
 export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    adminToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     return await ctx.storage.generateUploadUrl();
   },
 });

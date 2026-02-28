@@ -14,6 +14,7 @@ import type * as data_snapshot from "../data/snapshot.js";
 import type * as debug from "../debug.js";
 import type * as files from "../files.js";
 import type * as gallery from "../gallery.js";
+import type * as lib_auth from "../lib/auth.js";
 import type * as lib_constants from "../lib/constants.js";
 import type * as lib_storage from "../lib/storage.js";
 import type * as menuItems from "../menuItems.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   debug: typeof debug;
   files: typeof files;
   gallery: typeof gallery;
+  "lib/auth": typeof lib_auth;
   "lib/constants": typeof lib_constants;
   "lib/storage": typeof lib_storage;
   menuItems: typeof menuItems;

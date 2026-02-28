@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdminSession } from "./lib/auth";
 
 export const list = query({
   args: {},
@@ -32,12 +33,14 @@ export const get = query({
 
 export const create = mutation({
   args: {
+    adminToken: v.string(),
     name: v.string(),
     slug: v.string(),
     displayOrder: v.number(),
     active: v.boolean(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const categoryId = await ctx.db.insert("menuCategories", {
       name: args.name,
       slug: args.slug,
@@ -50,6 +53,7 @@ export const create = mutation({
 
 export const update = mutation({
   args: {
+    adminToken: v.string(),
     id: v.id("menuCategories"),
     name: v.string(),
     slug: v.string(),
@@ -57,6 +61,7 @@ export const update = mutation({
     active: v.boolean(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.patch(args.id, {
       name: args.name,
       slug: args.slug,
@@ -68,18 +73,24 @@ export const update = mutation({
 });
 
 export const remove = mutation({
-  args: { id: v.id("menuCategories") },
+  args: {
+    id: v.id("menuCategories"),
+    adminToken: v.string(),
+  },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.delete(args.id);
   },
 });
 
 export const updateDisplayOrder = mutation({
   args: {
+    adminToken: v.string(),
     id: v.id("menuCategories"),
     displayOrder: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.patch(args.id, {
       displayOrder: args.displayOrder,
     });

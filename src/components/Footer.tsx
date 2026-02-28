@@ -1,8 +1,9 @@
+"use client";
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { quickLinks } from '../data/footer';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
-import logo from '../assets/images/logo_karadeniz.png.webp';
+import Image from 'next/image'; // Added this import
 
 export default function Footer() {
   const restaurantInfo = useQuery(api.restaurantInfo.get);
@@ -19,11 +20,15 @@ export default function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div>
             <a href="#accueil" className="flex items-center gap-3 mb-6">
-              <img
-                src={logo}
-                alt="Karadeniz Logo"
-                className="w-12 h-12 object-contain"
-              />
+              {/* Replaced img with next/image component */}
+              <div className="relative w-12 h-12">
+                <Image
+                  src="/logo_karadeniz.png.webp" // Assuming the image is in the public directory
+                  alt="Karadeniz Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
               <span className="font-display text-3xl tracking-wider text-white">KARADENIZ</span>
             </a>
             <p className="text-gray-400 mb-6 leading-relaxed">

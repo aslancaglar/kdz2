@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdminSession } from "./lib/auth";
 
 export const listToppingCategories = query({
   args: {},
@@ -22,6 +23,7 @@ export const getToppingCategory = query({
 
 export const createToppingCategory = mutation({
   args: {
+    adminToken: v.string(),
     categoryId: v.string(),
     name: v.string(),
     minSelection: v.number(),
@@ -30,6 +32,7 @@ export const createToppingCategory = mutation({
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const id = await ctx.db.insert("toppingCategories", {
       categoryId: args.categoryId,
       name: args.name,
@@ -44,6 +47,7 @@ export const createToppingCategory = mutation({
 
 export const updateToppingCategory = mutation({
   args: {
+    adminToken: v.string(),
     id: v.id("toppingCategories"),
     categoryId: v.string(),
     name: v.string(),
@@ -53,6 +57,7 @@ export const updateToppingCategory = mutation({
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.patch(args.id, {
       categoryId: args.categoryId,
       name: args.name,
@@ -66,8 +71,12 @@ export const updateToppingCategory = mutation({
 });
 
 export const removeToppingCategory = mutation({
-  args: { id: v.id("toppingCategories") },
+  args: {
+    id: v.id("toppingCategories"),
+    adminToken: v.string(),
+  },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.delete(args.id);
   },
 });
@@ -93,6 +102,7 @@ export const listToppingsByCategory = query({
 
 export const createTopping = mutation({
   args: {
+    adminToken: v.string(),
     toppingId: v.string(),
     name: v.string(),
     price: v.optional(v.number()),
@@ -101,6 +111,7 @@ export const createTopping = mutation({
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     const id = await ctx.db.insert("toppings", {
       toppingId: args.toppingId,
       name: args.name,
@@ -115,6 +126,7 @@ export const createTopping = mutation({
 
 export const updateTopping = mutation({
   args: {
+    adminToken: v.string(),
     id: v.id("toppings"),
     toppingId: v.string(),
     name: v.string(),
@@ -124,6 +136,7 @@ export const updateTopping = mutation({
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.patch(args.id, {
       toppingId: args.toppingId,
       name: args.name,
@@ -137,8 +150,12 @@ export const updateTopping = mutation({
 });
 
 export const removeTopping = mutation({
-  args: { id: v.id("toppings") },
+  args: {
+    id: v.id("toppings"),
+    adminToken: v.string(),
+  },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     await ctx.db.delete(args.id);
   },
 });
@@ -159,10 +176,12 @@ export const getMenuItemToppingCategories = query({
 
 export const setMenuItemToppingCategories = mutation({
   args: {
+    adminToken: v.string(),
     menuItemId: v.id("menuItems"),
     categoryIds: v.array(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     // Remove all existing assignments
     const existing = await ctx.db
       .query("menuItemToppings")

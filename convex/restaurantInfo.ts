@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdminSession } from "./lib/auth";
 
 export const get = query({
   args: {},
@@ -14,6 +15,7 @@ export const get = query({
 
 export const upsert = mutation({
   args: {
+    adminToken: v.string(),
     address: v.optional(v.string()),
     phone: v.optional(v.string()),
     email: v.optional(v.string()),
@@ -43,6 +45,8 @@ export const upsert = mutation({
     defaultDeliveryFee: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
+
     const existing = await ctx.db
       .query("restaurantInfo")
       .withIndex("by_key", (q) => q.eq("key", "main"))

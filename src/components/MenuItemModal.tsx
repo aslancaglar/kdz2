@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { X, Check } from 'lucide-react';
+"use client";
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { X } from 'lucide-react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
@@ -8,6 +9,8 @@ import { useOrder } from '../context/OrderContext';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { getBasePrice, calculateTotalPrice } from '../utils/priceCalculator';
 import { formatPrice } from '../utils/formatters';
+import FormuleOptions from './FormuleOptions';
+import ToppingCategory from './ToppingCategory';
 
 interface MenuItemModalProps {
   item: {
@@ -53,13 +56,13 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  // MEMOIZATION: Calculate complex pricing fields only when dependencies change
+  const allSelectedToppings = useMemo(() => Object.values(selectedToppings).flat(), [selectedToppings]);
+  const currentPrice = useMemo(() => getBasePrice(item, priceOption), [item, priceOption]);
+  const totalPrice = useMemo(() => calculateTotalPrice(item, priceOption, allSelectedToppings), [item, priceOption, allSelectedToppings]);
 
-  const allSelectedToppings = Object.values(selectedToppings).flat();
-  const currentPrice = getBasePrice(item, priceOption);
-  const totalPrice = calculateTotalPrice(item, priceOption, allSelectedToppings);
-
-  const handleToppingToggle = (categoryId: string, toppingId: string, name: string, price: number | undefined) => {
+  // MEMOIZATION: Wrap heavy callback toggles
+  const handleToppingToggle = useCallback((categoryId: string, toppingId: string, name: string, price: number | undefined) => {
     const category = availableCategories?.find((cat: any) => cat.id === categoryId);
     if (!category) return;
 
@@ -88,9 +91,9 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
       delete newErrors[categoryId];
       return newErrors;
     });
-  };
+  }, [availableCategories]);
 
-  const validateSelections = () => {
+  const validateSelections = useCallback(() => {
     const errors: Record<string, string> = {};
 
     availableCategories?.forEach((category: any) => {
@@ -104,9 +107,9 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
-  };
+  }, [availableCategories, selectedToppings]);
 
-  const handleAddToOrder = () => {
+  const handleAddToOrder = useCallback(() => {
     if (!validateSelections()) {
       return;
     }
@@ -124,9 +127,9 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
     addToOrder(orderItem);
     onClose();
-  };
+  }, [item, priceOption, currentPrice, allSelectedToppings, totalPrice, validateSelections, addToOrder, onClose]);
 
-  const getSelectionStatus = (categoryId: string) => {
+  const getSelectionStatus = useCallback((categoryId: string) => {
     const category = availableCategories?.find((cat: any) => cat.id === categoryId);
     if (!category) return '';
 
@@ -136,9 +139,9 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
       return `${count}/${category.maxSelection}`;
     }
     return `${count}`;
-  };
+  }, [availableCategories, selectedToppings]);
 
-  const isToppingDisabled = (categoryId: string, toppingId: string) => {
+  const isToppingDisabled = useCallback((categoryId: string, toppingId: string) => {
     const category = availableCategories?.find((cat: any) => cat.id === categoryId);
     if (!category || !category.maxSelection) return false;
 
@@ -146,7 +149,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
     const isSelected = categoryToppings.some(t => t.toppingId === toppingId);
 
     return !isSelected && categoryToppings.length >= category.maxSelection;
-  };
+  }, [availableCategories, selectedToppings]);
 
   const hasPriceOptions = item.priceWithFries || item.priceMenu;
 
@@ -169,116 +172,27 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
           <p className="text-gray-600 mb-6">{item.description}</p>
 
           {hasPriceOptions && (
-            <div className="mb-6">
-              <h3 className="text-sm font-extrabold text-gray-900 mb-3 font-display">Formule</h3>
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  onClick={() => setPriceOption('seul')}
-                  className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'seul'
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                >
-                  <div className="text-sm font-medium">Seul</div>
-                  <div className="text-lg font-bold font-display">{formatPrice(item.price)}</div>
-                </button>
-
-                {item.priceWithFries && (
-                  <button
-                    onClick={() => setPriceOption('frites')}
-                    className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'frites'
-                      ? 'border-primary-500 bg-primary-50 text-primary-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                  >
-                    <div className="text-sm font-medium">Frites</div>
-                    <div className="text-lg font-bold font-display">{formatPrice(item.priceWithFries)}</div>
-                  </button>
-                )}
-
-                {item.priceMenu && (
-                  <button
-                    onClick={() => setPriceOption('menu')}
-                    className={`p-3 rounded-lg border-2 transition-all ${priceOption === 'menu'
-                      ? 'border-primary-500 bg-primary-50 text-primary-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                  >
-                    <div className="text-sm font-medium">Menu</div>
-                    <div className="text-lg font-bold font-display">{formatPrice(item.priceMenu)}</div>
-                  </button>
-                )}
-              </div>
-            </div>
+            <FormuleOptions
+              price={item.price}
+              priceWithFries={item.priceWithFries}
+              priceMenu={item.priceMenu}
+              selectedOption={priceOption}
+              onSelect={setPriceOption}
+            />
           )}
 
           {availableCategories && availableCategories.length > 0 && (
             <div className="space-y-6">
               {availableCategories.map((category: any) => (
-                <div key={category.id} className="border-t pt-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-extrabold text-gray-900 font-display bg-primary-50 px-3 py-2 rounded-lg">
-                      {category.name}
-                      {category.minSelection > 0 && (
-                        <span className="text-primary-500 ml-1">*</span>
-                      )}
-                    </h3>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                      {getSelectionStatus(category.id)}
-                      {category.maxSelection && ` max`}
-                    </span>
-                  </div>
-
-                  {validationErrors[category.id] && (
-                    <div className="mb-3 text-sm text-primary-600 bg-primary-50 p-2 rounded">
-                      {validationErrors[category.id]}
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {category.toppings.map((topping: any) => {
-                      const isSelected = (selectedToppings[category.id] || []).some(
-                        t => t.toppingId === topping.id
-                      );
-                      const isDisabled = isToppingDisabled(category.id, topping.id);
-
-                      return (
-                        <button
-                          key={topping.id}
-                          onClick={() => handleToppingToggle(
-                            category.id,
-                            topping.id,
-                            topping.name,
-                            topping.price
-                          )}
-                          disabled={isDisabled}
-                          className={`p-3 rounded-lg border-2 text-left transition-all ${isSelected
-                            ? 'border-primary-500 bg-primary-50'
-                            : isDisabled
-                              ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                              : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="text-sm font-medium text-gray-900">
-                                {topping.name}
-                              </div>
-                              <div className="text-xs text-gray-500 mt-1">
-                                {topping.price !== undefined && topping.price > 0
-                                  ? `+${formatPrice(topping.price)}`
-                                  : 'Gratuit'}
-                              </div>
-                            </div>
-                            {isSelected && (
-                              <Check className="w-5 h-5 text-primary-500 flex-shrink-0" />
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                <ToppingCategory
+                  key={category.id}
+                  category={category}
+                  selectedToppings={selectedToppings}
+                  validationError={validationErrors[category.id]}
+                  onToggleTopping={handleToppingToggle}
+                  getSelectionStatus={getSelectionStatus}
+                  isToppingDisabled={isToppingDisabled}
+                />
               ))}
             </div>
           )}

@@ -1,4 +1,6 @@
+"use client";
 import { useQuery } from 'convex/react';
+import Image from 'next/image';
 import { api } from '../../convex/_generated/api';
 import Skeleton from './Skeleton';
 import FadeIn from './FadeIn';
@@ -34,11 +36,12 @@ export default function Gallery() {
                 key={image._id}
                 className="group relative overflow-hidden rounded-2xl aspect-square shadow-md hover:shadow-lg transition-all duration-500"
               >
-                <img
+                <Image
                   src={image.url || ''}
                   alt={image.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">

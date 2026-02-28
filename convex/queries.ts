@@ -1,5 +1,6 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdminSession } from "./lib/auth";
 
 // Re-export menu item queries from menuItems.ts for backwards compatibility
 // Note: Prefer using api.menuItems.* directly in new code
@@ -26,7 +27,7 @@ export const getToppingsForMenuItem = query({
 
     const sortedAssignments = assignments.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
     // Deduplicate category IDs to prevent duplicate categories from being displayed
-    const categoryIds = [...new Set(sortedAssignments.map((a) => a.toppingCategoryId))];
+    const categoryIds = Array.from(new Set(sortedAssignments.map((a) => a.toppingCategoryId)));
 
     const allCategories = await ctx.db.query("toppingCategories").collect();
 
@@ -73,8 +74,11 @@ export const getOrder = query({
 });
 
 export const getAllOrders = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    adminToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
     return await ctx.db
       .query("orders")
       .withIndex("by_created")

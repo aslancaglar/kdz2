@@ -8,6 +8,14 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_username", ["username"]),
 
+  adminSessions: defineTable({
+    adminId: v.id("adminUsers"),
+    tokenHash: v.string(),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  }).index("by_admin", ["adminId"])
+    .index("by_token_hash", ["tokenHash"]),
+
   menuCategories: defineTable({
     name: v.string(),
     slug: v.string(),
@@ -103,6 +111,14 @@ export default defineSchema({
     passwordHash: v.string(),
     createdAt: v.number(),
   }).index("by_email", ["email"]),
+
+  userSessions: defineTable({
+    userId: v.id("users"),
+    tokenHash: v.string(),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  }).index("by_user", ["userId"])
+    .index("by_token_hash", ["tokenHash"]),
 
   orders: defineTable({
     userId: v.optional(v.id("users")),

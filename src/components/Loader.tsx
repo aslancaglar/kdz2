@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 export default function Loader({ onFinished }: { onFinished: () => void }) {
     const [progress, setProgress] = useState(0);
@@ -34,11 +35,15 @@ export default function Loader({ onFinished }: { onFinished: () => void }) {
             <div className="loader-content">
                 {/* Logo */}
                 <div className={`loader-logo ${progress > 0 ? 'loader-logo-visible' : ''}`}>
-                    <img
-                        src="/logo_karadeniz.png.webp"
-                        alt="Karadeniz"
-                        className="loader-logo-img"
-                    />
+                    <div className="relative w-32 md:w-40 h-32 md:h-40 mb-8 animate-pulse">
+                        <Image
+                            src="/logo_karadeniz.png.webp"
+                            alt="Karadeniz"
+                            fill
+                            priority
+                            className="object-contain"
+                        />
+                    </div>
                 </div>
 
                 {/* Tagline */}

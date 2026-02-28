@@ -2,6 +2,7 @@ import { CheckCircle } from 'lucide-react';
 import { highlights } from '../data/about-data';
 import aboutImage from '../assets/images/happy-couple-eating-doner-kebab-shawarma-in-camd-2021-08-26-20-00-25-utc.png';
 import FadeIn from './FadeIn';
+import Image from 'next/image';
 
 export default function About() {
   return (
@@ -38,12 +39,13 @@ export default function About() {
           </FadeIn>
 
           <FadeIn delay={300} direction="up" className="relative flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-md">
-              <img
+            <div className="relative w-full max-w-md aspect-[4/5] min-h-[360px]">
+              <Image
                 src={aboutImage}
                 alt="Notre cuisine"
-                loading="lazy"
-                className="w-full h-full object-cover rounded-3xl"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover rounded-3xl"
               />
               <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-primary-500/20 rounded-3xl -z-10" />
               <div className="absolute -top-6 -left-6 w-32 h-32 bg-secondary-500/20 rounded-3xl -z-10" />

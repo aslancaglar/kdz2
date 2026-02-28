@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -9,7 +10,7 @@ interface OpenStatusProps {
     variant?: 'desktop' | 'mobile';
 }
 
-export default function OpenStatus({ isScrolled = false, variant = 'desktop' }: OpenStatusProps) {
+export default function OpenStatus({ variant = 'desktop' }: OpenStatusProps) {
     const restaurantInfo = useQuery(api.restaurantInfo.get);
     const [currentStatus, setCurrentStatus] = useState({ isOpen: false });
 
@@ -49,13 +50,10 @@ export default function OpenStatus({ isScrolled = false, variant = 'desktop' }: 
     // Desktop variant
     return (
         <div
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full transition-all ${isScrolled
-                ? 'bg-white/10 backdrop-blur-sm'
-                : 'bg-white/20 backdrop-blur-sm'
-                }`}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/10 hover:bg-black/20 transition-all cursor-default"
         >
-            <Clock className={`w-4 h-4 ${currentStatus.isOpen ? 'text-green-400' : 'text-red-400'}`} />
-            <span className="text-white font-semibold text-sm">
+            <Clock className={`w-3.5 h-3.5 ${currentStatus.isOpen ? 'text-green-400' : 'text-red-400'}`} />
+            <span className="text-white font-black uppercase tracking-widest text-[10px]">
                 {statusMessage}
             </span>
         </div>

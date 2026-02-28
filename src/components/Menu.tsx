@@ -1,11 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+"use client";
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import Skeleton from './Skeleton';
 import MenuItem from './MenuItem';
-import MenuItemModal from './MenuItemModal';
 import FadeIn from './FadeIn';
+import MenuCategoryTabs from './MenuCategoryTabs';
+
+// Lazy-load the heavy modal component because it is rarely viewed on initial page load
+const MenuItemModal = dynamic(() => import('./MenuItemModal'), { ssr: false });
+
 
 interface MenuProps {
   showHeader?: boolean;
@@ -14,7 +20,6 @@ interface MenuProps {
 }
 
 export default function Menu({ showHeader = false, reducedTopPadding = false, reducedHeaderSpacing = false }: MenuProps) {
-  const categoryRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const hasUserInteracted = useRef(false);
 
   const menuCategories = useQuery(api.queries.getMenuCategories);
@@ -24,68 +29,46 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
   const [showRightGradient, setShowRightGradient] = useState(true);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleOpenModal = (item: any) => {
+  // Prevent Modal handlers from re-rendering the entire grid when invoked
+  const handleOpenModal = useCallback((item: any) => {
     setSelectedItem(item);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
-    // Optional delay to wipe state so it animates gracefully
+    // Delay wiping state to allow modal closing animation
     setTimeout(() => setSelectedItem(null), 300);
-  };
+  }, []);
 
-  const checkScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+  const checkScroll = useCallback((scrollContainer: HTMLDivElement | null) => {
+    if (scrollContainer) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
       setShowRightGradient(scrollLeft < scrollWidth - clientWidth - 5);
     }
-  };
+  }, []);
 
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-    return () => window.removeEventListener('resize', checkScroll);
-  }, [menuCategories]);
-
+  // When categories load, default to the first one
   useEffect(() => {
     if (menuCategories && menuCategories.length > 0 && !activeCategory) {
       setActiveCategory(menuCategories[0].slug);
     }
   }, [menuCategories, activeCategory]);
 
-  const filteredItems = (allMenuItems || [])
-    .filter(item => item.categories?.includes(activeCategory) && item.active)
-    .sort((a, b) => {
-      const orderA = a.categoryOrders?.find(o => o.category === activeCategory)?.order ?? (a.displayOrder || 0);
-      const orderB = b.categoryOrders?.find(o => o.category === activeCategory)?.order ?? (b.displayOrder || 0);
-      return orderA - orderB;
-    });
+  // MEMOIZATION: Prevent this heavy array filtering/sorting from running on EVERY render
+  const filteredItems = useMemo(() => {
+    if (!allMenuItems || !activeCategory) return [];
 
-  useEffect(() => {
-    if (!hasUserInteracted.current) {
-      return;
-    }
-
-    const activeButton = categoryRefs.current.get(activeCategory);
-    if (activeButton) {
-      activeButton.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center'
+    return allMenuItems
+      .filter(item => item.categories?.includes(activeCategory) && item.active)
+      .sort((a, b) => {
+        const orderA = a.categoryOrders?.find(o => o.category === activeCategory)?.order ?? (a.displayOrder || 0);
+        const orderB = b.categoryOrders?.find(o => o.category === activeCategory)?.order ?? (b.displayOrder || 0);
+        return orderA - orderB;
       });
-    }
-  }, [activeCategory]);
+  }, [allMenuItems, activeCategory]);
 
-  const setCategoryRef = (id: string) => (element: HTMLButtonElement | null) => {
-    if (element) {
-      categoryRefs.current.set(id, element);
-    } else {
-      categoryRefs.current.delete(id);
-    }
-  };
 
   return (
     <section id="menu" className={`pb-20 bg-white ${reducedTopPadding ? 'pt-[42px]' : 'pt-20'}`}>
@@ -110,36 +93,20 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
             ))}
           </div>
         ) : (
-          <FadeIn delay={200} direction="up" className="relative mb-12 -mx-4 px-4 sm:mx-0 sm:px-4">
-            <div
-              ref={scrollContainerRef}
-              onScroll={checkScroll}
-              className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-            >
-              <div className="flex gap-3 justify-start sm:justify-center min-w-max sm:min-w-0 sm:flex-wrap p-2">
-                {menuCategories.map((category) => (
-                  <button
-                    key={category.slug}
-                    ref={setCategoryRef(category.slug)}
-                    onClick={() => {
-                      hasUserInteracted.current = true;
-                      setActiveCategory(category.slug);
-                    }}
-                    className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm ${activeCategory === category.slug
-                      ? 'bg-primary-600 text-white shadow-md scale-105'
-                      : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-primary-600'
-                      }`}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {showRightGradient && (
-              <div className="absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden z-10" />
-            )}
-          </FadeIn>
+          <MenuCategoryTabs
+            categories={menuCategories.map(c => ({ slug: c.slug, name: c.name }))}
+            activeCategory={activeCategory}
+            onSelectCategory={setActiveCategory}
+            showRightGradient={showRightGradient}
+            onScroll={() => {
+              // The child ref is isolated, so we'll let the child manage its own gradient logic,
+              // or handle it by passing a callback. For now, since the child runs onScroll,
+              // we can update parent state via an event.
+              const el = document.querySelector('.overflow-x-auto') as HTMLDivElement;
+              checkScroll(el);
+            }}
+            hasInteractedRef={hasUserInteracted}
+          />
         )}
 
         {!allMenuItems ? (
@@ -184,7 +151,7 @@ export default function Menu({ showHeader = false, reducedTopPadding = false, re
 
         <div className="text-center mt-12">
           <Link
-            to="/checkout"
+            href="/checkout"
             className="font-display text-xl tracking-wide inline-flex items-center px-8 py-4 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-105 uppercase"
           >
             Commander Maintenant

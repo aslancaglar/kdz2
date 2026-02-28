@@ -1,5 +1,54 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import {
+  createAdminSession,
+  createUserSession,
+  hashPassword,
+  maybeGetAdminFromSession,
+  maybeGetUserFromSession,
+  requireAdminSession,
+  requireUserSession,
+  revokeAdminSession,
+  revokeUserSession,
+  verifyPassword,
+} from "./lib/auth";
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+async function findUserByEmail(ctx: any, email: string) {
+  const exact = await ctx.db
+    .query("users")
+    .withIndex("by_email", (q: any) => q.eq("email", email))
+    .first();
+
+  if (exact) {
+    return exact;
+  }
+
+  const allUsers = await ctx.db.query("users").collect();
+  return allUsers.find((user: any) => normalizeEmail(user.email) === email) ?? null;
+}
+
+async function assertAdminOrSelf(
+  ctx: any,
+  args: { id: any; adminToken?: string; sessionToken?: string },
+) {
+  if (args.adminToken) {
+    await requireAdminSession(ctx, args.adminToken);
+    return;
+  }
+
+  if (!args.sessionToken) {
+    throw new Error("Unauthorized");
+  }
+
+  const { user } = await requireUserSession(ctx, args.sessionToken);
+  if (user._id !== args.id) {
+    throw new Error("Unauthorized");
+  }
+}
 
 export const createAdmin = mutation({
   args: {
@@ -7,17 +56,12 @@ export const createAdmin = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("adminUsers")
-      .withIndex("by_username", (q) => q.eq("username", args.username))
-      .first();
-
-    if (existing) {
-      throw new Error("Admin user already exists");
+    const existingAdmins = await ctx.db.query("adminUsers").collect();
+    if (existingAdmins.length > 0) {
+      throw new Error("Admin user is already initialized");
     }
 
     const passwordHash = await hashPassword(args.password);
-
     const adminId = await ctx.db.insert("adminUsers", {
       username: args.username,
       passwordHash,
@@ -28,7 +72,7 @@ export const createAdmin = mutation({
   },
 });
 
-export const verifyAdmin = query({
+export const verifyAdmin = mutation({
   args: {
     username: v.string(),
     password: v.string(),
@@ -43,16 +87,51 @@ export const verifyAdmin = query({
       return null;
     }
 
-    const isValid = await verifyPassword(args.password, admin.passwordHash);
-
-    if (isValid) {
-      return {
-        id: admin._id,
-        username: admin.username,
-      };
+    const passwordState = await verifyPassword(args.password, admin.passwordHash);
+    if (!passwordState.valid) {
+      return null;
     }
 
-    return null;
+    if (passwordState.upgradedHash) {
+      await ctx.db.patch(admin._id, {
+        passwordHash: passwordState.upgradedHash,
+      });
+    }
+
+    const sessionToken = await createAdminSession(ctx, admin._id);
+
+    return {
+      id: admin._id,
+      username: admin.username,
+      sessionToken,
+    };
+  },
+});
+
+export const logoutAdmin = mutation({
+  args: {
+    sessionToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await revokeAdminSession(ctx, args.sessionToken);
+    return true;
+  },
+});
+
+export const getCurrentAdmin = query({
+  args: {
+    sessionToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const admin = await maybeGetAdminFromSession(ctx, args.sessionToken);
+    if (!admin) {
+      return null;
+    }
+
+    return {
+      id: admin._id,
+      username: admin.username,
+    };
   },
 });
 
@@ -68,10 +147,9 @@ export const signupUser = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", args.email))
-      .first();
+    const email = normalizeEmail(args.email);
+
+    const existing = await findUserByEmail(ctx, email);
 
     if (existing) {
       throw new Error("User with this email already exists");
@@ -82,7 +160,7 @@ export const signupUser = mutation({
     const userId = await ctx.db.insert("users", {
       firstName: args.firstName,
       lastName: args.lastName,
-      email: args.email,
+      email,
       phone: args.phone,
       street: args.street,
       city: args.city,
@@ -91,76 +169,164 @@ export const signupUser = mutation({
       createdAt: Date.now(),
     });
 
+    const sessionToken = await createUserSession(ctx, userId);
+
     return {
       id: userId,
       firstName: args.firstName,
       lastName: args.lastName,
-      email: args.email,
+      email,
+      phone: args.phone,
       street: args.street,
       city: args.city,
-      zipCode: args.zipCode
+      zipCode: args.zipCode,
+      sessionToken,
     };
   },
 });
 
-export const verifyUser = query({
+export const verifyUser = mutation({
   args: {
     email: v.string(),
     password: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", args.email))
-      .first();
+    const email = normalizeEmail(args.email);
+
+    const user = await findUserByEmail(ctx, email);
 
     if (!user) {
       return null;
     }
 
-    const isValid = await verifyPassword(args.password, user.passwordHash);
-
-    if (isValid) {
-      return {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: user.phone,
-        street: user.street,
-        city: user.city,
-        zipCode: user.zipCode
-      };
+    const passwordState = await verifyPassword(args.password, user.passwordHash);
+    if (!passwordState.valid) {
+      return null;
     }
 
-    return null;
+    if (passwordState.upgradedHash) {
+      await ctx.db.patch(user._id, {
+        passwordHash: passwordState.upgradedHash,
+      });
+    }
+
+    const sessionToken = await createUserSession(ctx, user._id);
+
+    return {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      street: user.street,
+      city: user.city,
+      zipCode: user.zipCode,
+      sessionToken,
+    };
+  },
+});
+
+export const logoutUser = mutation({
+  args: {
+    sessionToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await revokeUserSession(ctx, args.sessionToken);
+    return true;
+  },
+});
+
+export const getCurrentUser = query({
+  args: {
+    sessionToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await maybeGetUserFromSession(ctx, args.sessionToken);
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      street: user.street,
+      city: user.city,
+      zipCode: user.zipCode,
+    };
   },
 });
 
 export const getUserById = query({
-  args: { userId: v.id("users") },
+  args: {
+    userId: v.id("users"),
+    adminToken: v.optional(v.string()),
+    sessionToken: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.userId);
+    if (args.adminToken) {
+      await requireAdminSession(ctx, args.adminToken);
+    } else if (args.sessionToken) {
+      const { user } = await requireUserSession(ctx, args.sessionToken);
+      if (user._id !== args.userId) {
+        throw new Error("Unauthorized");
+      }
+    } else {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      return null;
+    }
+
+    return {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      street: user.street,
+      city: user.city,
+      zipCode: user.zipCode,
+      createdAt: user.createdAt,
+    };
   },
 });
 
 export const listAllUsers = query({
-  args: {},
-  handler: async (ctx) => {
-    const users = await ctx.db
-      .query("users")
-      .order("desc")
-      .collect();
+  args: {
+    adminToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
 
-    // Fetch order counts for each user
+    const users = await ctx.db.query("users").order("desc").collect();
+
     const usersWithOrderCounts = await Promise.all(
       users.map(async (user) => {
-        const orderCount = (await ctx.db
-          .query("orders")
-          .filter((q) => q.eq(q.field("userId"), user._id))
-          .collect()).length;
-        return { ...user, orderCount };
-      })
+        const orderCount = (
+          await ctx.db
+            .query("orders")
+            .filter((q) => q.eq(q.field("userId"), user._id))
+            .collect()
+        ).length;
+
+        return {
+          _id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          street: user.street,
+          city: user.city,
+          zipCode: user.zipCode,
+          createdAt: user.createdAt,
+          orderCount,
+        };
+      }),
     );
 
     return usersWithOrderCounts;
@@ -168,8 +334,23 @@ export const listAllUsers = query({
 });
 
 export const listUserOrders = query({
-  args: { userId: v.id("users") },
+  args: {
+    userId: v.id("users"),
+    adminToken: v.optional(v.string()),
+    sessionToken: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
+    if (args.adminToken) {
+      await requireAdminSession(ctx, args.adminToken);
+    } else if (args.sessionToken) {
+      const { user } = await requireUserSession(ctx, args.sessionToken);
+      if (user._id !== args.userId) {
+        throw new Error("Unauthorized");
+      }
+    } else {
+      throw new Error("Unauthorized");
+    }
+
     return await ctx.db
       .query("orders")
       .filter((q) => q.eq(q.field("userId"), args.userId))
@@ -188,30 +369,44 @@ export const updateUser = mutation({
     street: v.optional(v.string()),
     city: v.optional(v.string()),
     zipCode: v.optional(v.string()),
+    adminToken: v.optional(v.string()),
+    sessionToken: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { id, ...data } = args;
-    await ctx.db.patch(id, data);
+    await assertAdminOrSelf(ctx, args);
+
+    const email = normalizeEmail(args.email);
+    const existingByEmail = await findUserByEmail(ctx, email);
+
+    if (existingByEmail && existingByEmail._id !== args.id) {
+      throw new Error("User with this email already exists");
+    }
+
+    const { id, adminToken, sessionToken, ...rest } = args;
+    await ctx.db.patch(id, {
+      ...rest,
+      email,
+    });
   },
 });
 
 export const removeUser = mutation({
-  args: { id: v.id("users") },
+  args: {
+    id: v.id("users"),
+    adminToken: v.string(),
+  },
   handler: async (ctx, args) => {
+    await requireAdminSession(ctx, args.adminToken);
+
+    const sessions = await ctx.db
+      .query("userSessions")
+      .withIndex("by_user", (q) => q.eq("userId", args.id))
+      .collect();
+
+    for (const session of sessions) {
+      await ctx.db.delete(session._id);
+    }
+
     await ctx.db.delete(args.id);
   },
 });
-
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  return hashHex;
-}
-
-async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  const passwordHash = await hashPassword(password);
-  return passwordHash === hash;
-}

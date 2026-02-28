@@ -1,10 +1,12 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+"use client";
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
 import { OrderItem } from '../types/order';
 
 const STORAGE_KEY = 'karadeniz_order_items';
 
 interface OrderContextType {
   orderItems: OrderItem[];
+  isInitialized: boolean;
   addToOrder: (item: OrderItem) => void;
   removeFromOrder: (itemId: string) => void;
   clearOrder: () => void;
@@ -35,43 +37,58 @@ function saveOrderItems(items: OrderItem[]): void {
 }
 
 export function OrderProvider({ children }: { children: ReactNode }) {
-  const [orderItems, setOrderItems] = useState<OrderItem[]>(loadOrderItems);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  // Initialize from localStorage ONLY on client
   useEffect(() => {
-    saveOrderItems(orderItems);
+    const items = loadOrderItems();
+    if (items.length > 0) {
+      setOrderItems(items);
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save to localStorage only after initialization
+  useEffect(() => {
+    if (isInitialized) {
+      saveOrderItems(orderItems);
+    }
+  }, [orderItems, isInitialized]);
+
+  const addToOrder = useCallback((item: OrderItem) => {
+    setOrderItems(prev => [...prev, item]);
+  }, []);
+
+  const removeFromOrder = useCallback((itemId: string) => {
+    setOrderItems(prev => prev.filter(item => item.id !== itemId));
+  }, []);
+
+  const clearOrder = useCallback(() => {
+    setOrderItems([]);
+  }, []);
+
+  const getTotalPrice = useCallback(() => {
+    return orderItems.reduce((total, item) => total + item.totalPrice, 0);
   }, [orderItems]);
 
-  const addToOrder = (item: OrderItem) => {
-    setOrderItems(prev => [...prev, item]);
-  };
-
-  const removeFromOrder = (itemId: string) => {
-    setOrderItems(prev => prev.filter(item => item.id !== itemId));
-  };
-
-  const clearOrder = () => {
-    setOrderItems([]);
-  };
-
-  const getTotalPrice = () => {
-    return orderItems.reduce((total, item) => total + item.totalPrice, 0);
-  };
-
-  const getItemCount = () => {
+  const getItemCount = useCallback(() => {
     return orderItems.length;
-  };
+  }, [orderItems]);
+
+  // MEMOIZATION: Prevent all components consuming useOrder() from re-rendering just because the parent re-rendered
+  const contextValue = useMemo(() => ({
+    orderItems,
+    isInitialized,
+    addToOrder,
+    removeFromOrder,
+    clearOrder,
+    getTotalPrice,
+    getItemCount,
+  }), [orderItems, isInitialized, addToOrder, removeFromOrder, clearOrder, getTotalPrice, getItemCount]);
 
   return (
-    <OrderContext.Provider
-      value={{
-        orderItems,
-        addToOrder,
-        removeFromOrder,
-        clearOrder,
-        getTotalPrice,
-        getItemCount,
-      }}
-    >
+    <OrderContext.Provider value={contextValue}>
       {children}
     </OrderContext.Provider>
   );

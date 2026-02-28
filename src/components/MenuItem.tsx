@@ -1,4 +1,6 @@
+"use client";
 import { useQuery } from 'convex/react';
+import Image from 'next/image';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
 
@@ -45,11 +47,12 @@ export default function MenuItem({ item, onOpenModal }: MenuItemProps) {
       >
         <div className="relative h-48 overflow-hidden bg-gray-100">
           {item?.image && (
-            <img
+            <Image
               src={item.image}
-              alt={item?.name || ''}
-              loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              alt={item?.name || 'Menu Kebab'}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover group-hover:scale-110 transition-transform duration-500"
             />
           )}
           {item?.popular && (

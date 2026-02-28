@@ -1,5 +1,7 @@
+"use client";
 import { ReactNode, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import {
   LayoutDashboard,
@@ -8,6 +10,7 @@ import {
   UtensilsCrossed,
   Settings,
   ShoppingCart,
+  Package,
   Menu as MenuIcon,
   X,
   LogOut,
@@ -25,8 +28,8 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { admin, logout } = useAdminAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const menuItems = [
     { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -37,6 +40,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/toppings', label: 'Toppings', icon: UtensilsCrossed },
     { path: '/admin/platform-prices', label: 'Platform Prices', icon: Globe },
     { path: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+    { path: '/admin/kds', label: 'KDS Kanban', icon: Package },
     { path: '/admin/reviews', label: 'Reviews', icon: Star },
     { path: '/admin/gallery', label: 'Gallery', icon: Image },
     { path: '/admin/settings', label: 'Settings', icon: Settings },
@@ -44,7 +48,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleLogout = () => {
     logout();
-    navigate('/admin/login');
+    router.push('/admin/login');
   };
 
   return (
@@ -66,12 +70,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <nav className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = pathname === item.path;
 
             return (
               <Link
                 key={item.path}
-                to={item.path}
+                href={item.path}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${isActive
                   ? 'bg-slate-700 text-white'

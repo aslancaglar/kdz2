@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdminSession } from "./lib/auth";
 
 export const list = query({
     args: {},
@@ -37,6 +38,7 @@ export const listActive = query({
 
 export const create = mutation({
     args: {
+        adminToken: v.string(),
         title: v.string(),
         image: v.optional(v.string()),
         imageStorageId: v.optional(v.id("_storage")),
@@ -44,26 +46,42 @@ export const create = mutation({
         active: v.boolean(),
     },
     handler: async (ctx, args) => {
-        return await ctx.db.insert("gallery", args);
+        await requireAdminSession(ctx, args.adminToken);
+
+        return await ctx.db.insert("gallery", {
+            title: args.title,
+            image: args.image,
+            imageStorageId: args.imageStorageId,
+            displayOrder: args.displayOrder,
+            active: args.active,
+        });
     },
 });
 
 export const update = mutation({
     args: {
+        adminToken: v.string(),
         id: v.id("gallery"),
         title: v.optional(v.string()),
         displayOrder: v.optional(v.number()),
         active: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
-        const { id, ...updates } = args;
+        await requireAdminSession(ctx, args.adminToken);
+
+        const { id, adminToken, ...updates } = args;
         await ctx.db.patch(id, updates);
     },
 });
 
 export const remove = mutation({
-    args: { id: v.id("gallery") },
+    args: {
+        id: v.id("gallery"),
+        adminToken: v.string(),
+    },
     handler: async (ctx, args) => {
+        await requireAdminSession(ctx, args.adminToken);
+
         const item = await ctx.db.get(args.id);
         if (item?.imageStorageId) {
             // Clean up storage if exists
