@@ -40,6 +40,7 @@ export default function CheckoutPage() {
     const [stripeError, setStripeError] = useState<string | null>(null);
     const [showStripeForm, setShowStripeForm] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error'; show: boolean } | null>(null);
+    const [isRedirecting, setIsRedirecting] = useState(false);
 
     const updateUser = useMutation(api.auth.updateUser);
 
@@ -127,6 +128,7 @@ export default function CheckoutPage() {
                     finalPrice: item.totalPrice
                 }))
             });
+            setIsRedirecting(true);
             clearOrder();
             router.push(`/order-success/${orderId}`);
         } catch (error) {
@@ -136,7 +138,7 @@ export default function CheckoutPage() {
         }
     };
 
-    if (!isInitialized) return (
+    if (!isInitialized || isRedirecting) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-20">
             <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
         </div>
