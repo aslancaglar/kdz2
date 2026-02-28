@@ -46,3 +46,6 @@ lerna-debug.log*
 .temp
 .tmp
 .next/
+
+# Local Netlify folder
+.netlify
