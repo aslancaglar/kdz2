@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     title: 'Karadeniz - Le vrai goût du kebab',
     description: 'Restaurant de kebab authentique à Florange. Savourez nos kebabs frais et faits maison avec des ingrédients de qualité. Commandez en ligne ou sur place.',
     icons: {
-        icon: '/favicon.png',
-        shortcut: '/favicon.png',
-        apple: '/favicon.png',
+        icon: '/logo_karadeniz.png.webp',
+        shortcut: '/logo_karadeniz.png.webp',
+        apple: '/logo_karadeniz.png.webp',
     },
     openGraph: {
         title: 'Karadeniz - Le vrai goût du kebab',
