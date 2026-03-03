@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /account/
+Disallow: /checkout/
+Disallow: /order-success/
+Disallow: /login
+Disallow: /signup
 
 Sitemap: https://karadeniz-kebab.netlify.app/sitemap.xml
