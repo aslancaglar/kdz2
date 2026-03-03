@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://karadeniz-kebab.netlify.app'),
+    metadataBase: new URL('https://karadeniz.fr'),
     title: 'Karadeniz - Le vrai goût du kebab',
     description: 'Restaurant de kebab authentique à Florange. Savourez nos kebabs frais et faits maison avec des ingrédients de qualité. Commandez en ligne ou sur place.',
     icons: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'Karadeniz - Le vrai goût du kebab',
         description: 'Restaurant de kebab authentique à Florange. Savourez nos kebabs frais et faits maison avec des ingrédients de qualité.',
-        url: 'https://karadeniz-kebab.netlify.app/',
+        url: 'https://karadeniz.fr/',
         siteName: 'Karadeniz',
         images: [{ url: '/logo_karadeniz.png.webp' }],
         locale: 'fr_FR',
