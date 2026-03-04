@@ -151,6 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         setSessionToken(null);
         localStorage.removeItem(USER_STORAGE_KEY);
+        window.location.href = '/'; // Native browser redirect for full cleanup support
     }, [sessionToken, convex]);
 
     const updateUser = useCallback((data: Partial<User>) => {
