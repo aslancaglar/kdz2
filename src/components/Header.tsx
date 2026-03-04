@@ -182,39 +182,41 @@ export default function Header() {
       {isMenuOpen && (
         <div className="lg:hidden mt-2 bg-primary-600 rounded-2xl shadow-xl">
           <nav className="flex flex-col px-4 py-4">
-            {navLinks.map((link) => {
-              const isActive = link.type === 'route'
-                ? pathname === link.href
-                : pathname === '/' && typeof window !== 'undefined' && window.location.hash === link.href;
+            <div className="flex flex-col">
+              {navLinks.map((link) => {
+                const isActive = link.type === 'route'
+                  ? pathname === link.href
+                  : pathname === '/' && typeof window !== 'undefined' && window.location.hash === link.href;
 
-              if (link.type === 'route') {
+                if (link.type === 'route') {
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`py-3 font-display text-lg tracking-wide transition-colors border-b border-white/20 last:border-0 uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
+                        }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                }
                 return (
-                  <Link
+                  <a
                     key={link.href}
                     href={link.href}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={(e) => {
+                      setIsMenuOpen(false);
+                      handleHashNavigation(e, link.href);
+                    }}
                     className={`py-3 font-display text-lg tracking-wide transition-colors border-b border-white/20 last:border-0 uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
                       }`}
                   >
                     {link.label}
-                  </Link>
+                  </a>
                 );
-              }
-              return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => {
-                    setIsMenuOpen(false);
-                    handleHashNavigation(e, link.href);
-                  }}
-                  className={`py-3 font-display text-lg tracking-wide transition-colors border-b border-white/20 last:border-0 uppercase ${isActive ? 'text-secondary-400 font-bold' : 'text-white hover:text-white/70'
-                    }`}
-                >
-                  {link.label}
-                </a>
-              );
-            })}
+              })}
+            </div>
 
             {/* Removed OpenStatus from mobile hamburger menu */}
 
