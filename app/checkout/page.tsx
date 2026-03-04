@@ -155,10 +155,12 @@ export default function CheckoutPage() {
     return (
         <div className="bg-gray-50 min-h-screen flex flex-col">
             <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+                <div className="mb-8">
+                    <CheckoutStepper currentStep={step} />
+                </div>
                 <div className={`flex ${step === 'payment' ? 'flex-col-reverse' : 'flex-col'} lg:flex-row gap-8 items-start`}>
                     {/* Left Column: Flow */}
                     <div className="w-full lg:flex-1 space-y-6">
-                        <CheckoutStepper currentStep={step} />
 
                         <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 md:p-12 transition-all">
                             {step === 'details' ? (
