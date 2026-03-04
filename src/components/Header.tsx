@@ -159,9 +159,11 @@ export default function Header() {
             </a>
           </div>
 
-          {/* Mobile Status - Always Visible */}
-          <div className="lg:hidden flex-1 flex justify-center px-2">
-            <OpenStatus isScrolled={isScrolled} variant="mobile" />
+          {/* Mobile Status - Always Visible - Absolutely Centered */}
+          <div className="lg:hidden absolute left-1/2 -translate-x-1/2 pointer-events-none">
+            <div className="pointer-events-auto">
+              <OpenStatus isScrolled={isScrolled} variant="mobile" />
+            </div>
           </div>
 
           {/* Mobile Menu Button Only - Cart removed (handled by MobileStickyCart) */}
