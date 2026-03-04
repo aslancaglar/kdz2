@@ -216,7 +216,7 @@ export default function Header() {
               );
             })}
 
-            <OpenStatus variant="mobile" />
+            {/* Removed OpenStatus from mobile hamburger menu */}
 
             {user ? (
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-white/20">
