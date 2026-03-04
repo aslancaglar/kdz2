@@ -110,7 +110,6 @@ export default function AuthModal() {
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-bold">Karadeniz</p>
             <h2 className="font-display text-2xl font-extrabold text-gray-900">
               {mode === "login" ? "Connexion" : "Inscription"}
             </h2>
@@ -236,29 +235,38 @@ export default function AuthModal() {
               </div>
 
               <div className="space-y-2">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-red-500" />
-                  Adresse (Optionnel)
+                <p className="text-xs font-bold text-gray-700 uppercase tracking-widest flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-gray-400" />
+                  Adresse
                 </p>
-                <input
-                  value={signupForm.street}
-                  onChange={(e) => setSignupForm((prev) => ({ ...prev, street: e.target.value }))}
-                  className="w-full bg-gray-50 border-none rounded-2xl p-3 focus:ring-2 focus:ring-red-500 text-gray-900 text-sm"
-                  placeholder="Numéro et nom de rue"
-                />
+                <div className="relative">
+                  <input
+                    required
+                    value={signupForm.street}
+                    onChange={(e) => setSignupForm((prev) => ({ ...prev, street: e.target.value }))}
+                    className="w-full bg-gray-50 border-none rounded-2xl p-3 focus:ring-2 focus:ring-red-500 text-gray-900 text-sm"
+                    placeholder="Numéro et nom de rue"
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <input
-                    value={signupForm.city}
-                    onChange={(e) => setSignupForm((prev) => ({ ...prev, city: e.target.value }))}
-                    className="w-full bg-gray-50 border-none rounded-2xl p-3 focus:ring-2 focus:ring-red-500 text-gray-900 text-sm"
-                    placeholder="Ville"
-                  />
-                  <input
-                    value={signupForm.zipCode}
-                    onChange={(e) => setSignupForm((prev) => ({ ...prev, zipCode: e.target.value }))}
-                    className="w-full bg-gray-50 border-none rounded-2xl p-3 focus:ring-2 focus:ring-red-500 text-gray-900 text-sm"
-                    placeholder="Code Postal"
-                  />
+                  <div className="relative">
+                    <input
+                      required
+                      value={signupForm.city}
+                      onChange={(e) => setSignupForm((prev) => ({ ...prev, city: e.target.value }))}
+                      className="w-full bg-gray-50 border-none rounded-2xl p-3 focus:ring-2 focus:ring-red-500 text-gray-900 text-sm"
+                      placeholder="Ville"
+                    />
+                  </div>
+                  <div className="relative">
+                    <input
+                      required
+                      value={signupForm.zipCode}
+                      onChange={(e) => setSignupForm((prev) => ({ ...prev, zipCode: e.target.value }))}
+                      className="w-full bg-gray-50 border-none rounded-2xl p-3 focus:ring-2 focus:ring-red-500 text-gray-900 text-sm"
+                      placeholder="Code Postal"
+                    />
+                  </div>
                 </div>
               </div>
 
