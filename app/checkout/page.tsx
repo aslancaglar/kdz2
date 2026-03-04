@@ -155,7 +155,7 @@ export default function CheckoutPage() {
     return (
         <div className="bg-gray-50 min-h-screen flex flex-col">
             <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-32 pb-20">
-                <div className="flex flex-col lg:flex-row gap-8 items-start">
+                <div className="flex flex-col-reverse lg:flex-row gap-8 items-start">
                     {/* Left Column: Flow */}
                     <div className="w-full lg:flex-1 space-y-6">
                         <CheckoutStepper currentStep={step} />
