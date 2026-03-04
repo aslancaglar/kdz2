@@ -50,16 +50,16 @@ export default function OpenStatus({ variant = 'desktop' }: OpenStatusProps) {
                             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                         />
                         <div
-                            className="relative w-full max-w-sm bg-white dark:bg-dark-900 rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-white/10 animate-in zoom-in-95 duration-200"
+                            className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200"
                         >
-                            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/10">
-                                <h3 className="text-xl font-display font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                                <h3 className="text-xl font-display font-bold text-gray-900 flex items-center gap-2">
                                     <Calendar className="w-5 h-5 text-primary-600" />
                                     Horaires d'ouverture
                                 </h3>
                                 <button
                                     onClick={() => setIsModalOpen(false)}
-                                    className="p-2 -mr-2 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-white/10"
+                                    className="p-2 -mr-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -67,11 +67,11 @@ export default function OpenStatus({ variant = 'desktop' }: OpenStatusProps) {
                             <div className="p-5">
                                 <div className="space-y-3">
                                     {restaurantInfo.hours?.map((schedule, i) => (
-                                        <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 dark:border-white/5 last:border-0 last:pb-0">
-                                            <span className="font-medium text-gray-700 dark:text-gray-300 capitalize">
+                                        <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0 last:pb-0">
+                                            <span className="font-medium text-gray-700 capitalize">
                                                 {schedule.day}
                                             </span>
-                                            <span className="text-gray-600 dark:text-gray-400 font-mono text-sm">
+                                            <span className="text-gray-600 font-mono text-sm">
                                                 {schedule.time || "Fermé"}
                                             </span>
                                         </div>
