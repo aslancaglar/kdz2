@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Package } from 'lucide-react';
@@ -29,6 +29,19 @@ export default function OrdersPage() {
     orders?.find(o => o._id === selectedOrderId),
     [orders, selectedOrderId]
   );
+
+  const prevOrderCountRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (orders) {
+      if (prevOrderCountRef.current > 0 && orders.length > prevOrderCountRef.current) {
+        // Play notification sound if the number of orders increased (and it's not the first load)
+        const audio = new Audio('/sounds/new-order.ogg');
+        audio.play().catch(e => console.error("Could not play notification sound:", e));
+      }
+      prevOrderCountRef.current = orders.length;
+    }
+  }, [orders]);
 
   const handleStatusChange = useCallback(async (orderId: Id<'orders'>, newStatus: string) => {
     if (!adminToken) return;
