@@ -168,9 +168,27 @@ export default function Header() {
 
           {/* Mobile Menu Button Only - Cart removed (handled by MobileStickyCart) */}
           <div className="lg:hidden flex items-center gap-2">
+            {user ? (
+              <Link
+                href="/account"
+                className="p-2 rounded-lg transition-colors text-white hover:bg-white/10"
+                aria-label="Mon Compte"
+              >
+                <User className="w-6 h-6" />
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openLoginModal(pathname || '/')}
+                className="p-2 rounded-lg transition-colors text-white hover:bg-white/10"
+                aria-label="Se connecter"
+              >
+                <User className="w-6 h-6" />
+              </button>
+            )}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg transition-colors text-white"
+              className="p-2 rounded-lg transition-colors text-white hover:bg-white/10"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
