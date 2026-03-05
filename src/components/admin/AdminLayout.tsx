@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAdminAuth } from '../../context/AdminAuthContext';
@@ -27,6 +27,21 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    const savedState = localStorage.getItem('admin-sidebar-collapsed');
+    if (savedState) {
+      setDesktopSidebarCollapsed(JSON.parse(savedState));
+    }
+  }, []);
+
+  const toggleDesktopSidebar = () => {
+    const newState = !desktopSidebarCollapsed;
+    setDesktopSidebarCollapsed(newState);
+    localStorage.setItem('admin-sidebar-collapsed', JSON.stringify(newState));
+  };
+
   const { admin, logout } = useAdminAuth();
   const pathname = usePathname();
   const router = useRouter();
@@ -55,7 +70,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <div className="min-h-screen bg-slate-50">
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0`}
+          } ${desktopSidebarCollapsed ? 'lg:-translate-x-full' : 'lg:translate-x-0'}`}
       >
         <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-slate-700">
           <h1 className="text-xl font-bold">Admin Panel</h1>
@@ -106,15 +121,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
       </aside>
 
-      <div className="lg:ml-64">
+      <div className={`transition-all duration-300 ease-in-out ${desktopSidebarCollapsed ? 'lg:ml-0' : 'lg:ml-64'}`}>
         <header className="bg-white shadow-sm border-b border-slate-200">
           <div className="flex items-center justify-between px-6 py-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-slate-600 hover:text-slate-900"
-            >
-              <MenuIcon className="w-6 h-6" />
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden text-slate-600 hover:text-slate-900"
+              >
+                <MenuIcon className="w-6 h-6" />
+              </button>
+
+              <button
+                onClick={toggleDesktopSidebar}
+                className="hidden lg:block text-slate-600 hover:text-slate-900"
+              >
+                <MenuIcon className="w-6 h-6" />
+              </button>
+            </div>
 
             <div className="flex items-center gap-4">
               <span className="text-sm text-slate-600">
