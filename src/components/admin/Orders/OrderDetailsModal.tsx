@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import { X, Clock, Package, CheckCircle, XCircle, User, Phone, Mail, MapPin, AlertCircle, Trash2 } from 'lucide-react';
 import { Id } from '../../../../convex/_generated/dataModel';
 
@@ -22,6 +24,14 @@ export default function OrderDetailsModal({
     toppings,
     toppingCategories
 }: OrderDetailsModalProps) {
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setIsConfirmingDelete(false);
+        }
+    }, [isOpen]);
+
     if (!isOpen || !order) return null;
 
     const getStatusColor = (status: string) => {
@@ -199,20 +209,34 @@ export default function OrderDetailsModal({
                 </div>
 
                 {/* Footer Total */}
-                <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-                    <button
-                        onClick={() => {
-                            if (window.confirm("Êtes-vous sûr de vouloir supprimer cette commande définitivement ?")) {
-                                onDeleteOrder(order._id);
-                            }
-                        }}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors focus:ring-2 focus:ring-red-500 focus:outline-none"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                        <span className="hidden sm:inline">Supprimer</span>
-                    </button>
-                    <div className="flex items-center gap-4">
-                        <span className="text-lg text-slate-500 font-medium">Total Commande</span>
+                <div className="p-6 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                    {isConfirmingDelete ? (
+                        <div className="flex items-center gap-2 w-full sm:w-auto p-2 bg-red-50 rounded-xl border border-red-100">
+                            <span className="text-sm font-bold text-red-700 mr-2 ml-2">Sûr ?</span>
+                            <button
+                                onClick={() => onDeleteOrder(order._id)}
+                                className="flex-1 sm:flex-none px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors shadow-sm"
+                            >
+                                Oui, supprimer
+                            </button>
+                            <button
+                                onClick={() => setIsConfirmingDelete(false)}
+                                className="flex-1 sm:flex-none px-4 py-2 text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors shadow-sm"
+                            >
+                                Annuler
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setIsConfirmingDelete(true)}
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-red-600 bg-white border border-red-200 hover:bg-red-50 rounded-xl transition-all focus:ring-2 focus:ring-red-500 focus:outline-none shadow-sm"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                            <span>Supprimer</span>
+                        </button>
+                    )}
+                    <div className="flex items-center gap-4 justify-end w-full sm:w-auto">
+                        <span className="text-lg text-slate-500 font-medium">Total</span>
                         <span className="text-3xl font-black text-slate-900">{order.totalPrice.toFixed(2)}€</span>
                     </div>
                 </div>
