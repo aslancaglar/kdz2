@@ -47,9 +47,7 @@ export default function AdminKdsPage() {
   const [updatingOrderId, setUpdatingOrderId] = useState<Id<"orders"> | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
 
-  const hasBootstrappedOrdersRef = useRef(false);
-  const previousOrderIdsRef = useRef<Set<string>>(new Set());
-  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const toppingNameById = useMemo(() => {
     const map = new Map<string, string>();
@@ -82,53 +80,6 @@ export default function AdminKdsPage() {
   }, [orders]);
 
   const activeCount = (groupedOrders.pending?.length || 0) + (groupedOrders.preparing?.length || 0) + (groupedOrders.ready?.length || 0);
-
-  const getAudioContext = useCallback(() => {
-    if (typeof window === "undefined") return null;
-    if (audioContextRef.current) return audioContextRef.current;
-
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtx) return null;
-
-    audioContextRef.current = new AudioCtx();
-    return audioContextRef.current;
-  }, []);
-
-  const playNotificationSound = useCallback(async () => {
-    const context = getAudioContext();
-    if (!context) return;
-
-    try {
-      if (context.state === "suspended") {
-        await context.resume();
-      }
-
-      const now = context.currentTime;
-      const osc1 = context.createOscillator();
-      const osc2 = context.createOscillator();
-      const gain = context.createGain();
-
-      osc1.type = "sine";
-      osc2.type = "triangle";
-      osc1.frequency.setValueAtTime(880, now);
-      osc2.frequency.setValueAtTime(1320, now + 0.08);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
-
-      osc1.connect(gain);
-      osc2.connect(gain);
-      gain.connect(context.destination);
-
-      osc1.start(now);
-      osc1.stop(now + 0.16);
-      osc2.start(now + 0.08);
-      osc2.stop(now + 0.26);
-    } catch (error) {
-      console.error("Failed to play KDS notification sound:", error);
-    }
-  }, [getAudioContext]);
 
   const toggleOrderDetails = useCallback((orderId: string) => {
     setExpandedOrders((previous) => {
@@ -164,23 +115,25 @@ export default function AdminKdsPage() {
   );
 
   useEffect(() => {
-    if (!orders) return;
-
-    const currentIds = new Set<string>(orders.map((order) => order._id));
-    if (!hasBootstrappedOrdersRef.current) {
-      previousOrderIdsRef.current = currentIds;
-      hasBootstrappedOrdersRef.current = true;
-      return;
+    if (typeof window !== 'undefined' && !audioRef.current) {
+      const audio = new Audio('/sounds/new-order.ogg');
+      audio.loop = true;
+      audioRef.current = audio;
     }
 
-    const newOrders = orders.filter((order) => !previousOrderIdsRef.current.has(order._id));
-    const hasNewPendingOrder = newOrders.some((order) => order.status === "pending");
-    if (soundEnabled && hasNewPendingOrder) {
-      void playNotificationSound();
+    if (orders) {
+      const hasPending = orders.some((order) => order.status === "pending");
+      if (soundEnabled && hasPending && audioRef.current) {
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(e => console.log("Audio autoplay prevented by browser. User interaction needed."));
+        }
+      } else if ((!soundEnabled || !hasPending) && audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     }
-
-    previousOrderIdsRef.current = currentIds;
-  }, [orders, soundEnabled, playNotificationSound]);
+  }, [orders, soundEnabled]);
 
   return (
     <div className="space-y-6">
@@ -193,8 +146,12 @@ export default function AdminKdsPage() {
           <button
             type="button"
             onClick={() => {
-              if (!soundEnabled) {
-                void playNotificationSound();
+              if (!soundEnabled && audioRef.current) {
+                // If turning on and there are pending orders, try to play immediately to bypass autoplay blocking
+                const hasPending = orders?.some(o => o.status === 'pending');
+                if (hasPending) {
+                  audioRef.current.play().catch(e => console.log(e));
+                }
               }
               setSoundEnabled((previous) => !previous);
             }}
