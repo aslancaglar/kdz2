@@ -28,19 +28,7 @@ export default function OrdersPage() {
     }
   }, []);
 
-  const toggleSound = useCallback(() => {
-    const nextState = !soundEnabled;
-    setSoundEnabled(nextState);
-    localStorage.setItem('admin-orders-sound-enabled', String(nextState));
 
-    // If enabling sound and there are pending orders, try to play immediately to "unlock" audio for Safari
-    if (nextState && orders && audioRef.current) {
-      const hasPending = orders.some(o => o.status === 'pending');
-      if (hasPending) {
-        audioRef.current.play().catch(e => console.log("Unlock play failed:", e));
-      }
-    }
-  }, [soundEnabled, orders]);
 
   const filteredOrders = useMemo(() =>
     orders?.filter((order) => selectedStatus === 'all' || order.status === selectedStatus),
@@ -53,26 +41,56 @@ export default function OrdersPage() {
   );
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const soundEnabledRef = useRef(false);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !audioRef.current) {
-      // Append timestamp to prevent browser caching of the old sound file
-      const audio = new Audio('/sounds/new-order.mp3?v=' + Date.now());
-      audio.loop = true;
-      audioRef.current = audio;
-    }
+  const toggleSound = useCallback(() => {
+    const nextState = !soundEnabled;
+    setSoundEnabled(nextState);
+    soundEnabledRef.current = nextState;
+    localStorage.setItem('admin-orders-sound-enabled', String(nextState));
 
-    if (orders) {
-      const hasPending = orders.some(o => o.status === 'pending');
-      if (soundEnabled && hasPending && audioRef.current) {
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(e => console.log("Audio autoplay prevented by browser. User interaction needed."));
-        }
-      } else if ((!soundEnabled || !hasPending) && audioRef.current) {
+    if (nextState) {
+      // iOS Safari REQUIRES that Audio is created AND play() is called synchronously
+      // within a user gesture handler. This is the only reliable way to unlock audio on iOS.
+      if (!audioRef.current) {
+        const audio = new Audio('/sounds/new-order.mp3?v=2');
+        audio.loop = true;
+        audioRef.current = audio;
+      }
+
+      // Always call play() during the click event to unlock iOS audio context
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          // If no pending orders, immediately pause after unlocking
+          const hasPending = orders?.some(o => o.status === 'pending');
+          if (!hasPending && audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
+        }).catch(e => console.log('iOS audio unlock failed:', e));
+      }
+    } else {
+      // Disable: stop audio
+      if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
+    }
+  }, [soundEnabled, orders]);
+
+  // Monitor pending orders and play/stop sound accordingly
+  useEffect(() => {
+    if (!orders || !audioRef.current) return;
+
+    const hasPending = orders.some(o => o.status === 'pending');
+    if (soundEnabledRef.current && hasPending) {
+      audioRef.current.play().catch(() => {
+        // Silent fail — will be retried on next order change
+      });
+    } else {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
   }, [orders, soundEnabled]);
 
@@ -106,8 +124,8 @@ export default function OrdersPage() {
           <button
             onClick={toggleSound}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition group ${soundEnabled
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
           >
             {soundEnabled ? (
