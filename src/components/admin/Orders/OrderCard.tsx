@@ -6,11 +6,15 @@ import { Id } from '../../../../convex/_generated/dataModel';
 interface OrderCardProps {
     order: any;
     onClick: (orderId: string) => void;
+    onAccept?: (orderId: string) => void;
+    onDecline?: (orderId: string) => void;
 }
 
 export default function OrderCard({
     order,
-    onClick
+    onClick,
+    onAccept,
+    onDecline
 }: OrderCardProps) {
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -66,13 +70,32 @@ export default function OrderCard({
                 </div>
             </div>
 
-            <div className="flex flex-row md:flex-col items-center justify-between md:items-end w-full md:w-auto pt-4 md:pt-0 border-t border-slate-100 md:border-none">
-                <div className="text-2xl font-black text-slate-900 tabular-nums">
-                    {order.totalPrice.toFixed(2)}€
+            <div className="flex flex-col items-end w-full md:w-auto pt-4 md:pt-0 border-t border-slate-100 md:border-none gap-3">
+                <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto">
+                    <div className="text-2xl font-black text-slate-900 tabular-nums">
+                        {order.totalPrice.toFixed(2)}€
+                    </div>
+                    <span className={`inline-flex items-center justify-center px-3 py-1 text-[11px] font-bold rounded-full border md:mt-1 ${getStatusColor(order.status)} uppercase tracking-widest min-w-[100px]`}>
+                        {order.status}
+                    </span>
                 </div>
-                <span className={`inline-flex items-center justify-center px-3 py-1 text-[11px] font-bold rounded-full border ${getStatusColor(order.status)} uppercase tracking-widest min-w-[100px]`}>
-                    {order.status}
-                </span>
+
+                {order.status === 'pending' && onAccept && onDecline && (
+                    <div className="flex items-center gap-2 w-full sm:w-auto mt-2 md:mt-0">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onAccept(order._id); }}
+                            className="flex-1 sm:flex-none px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                        >
+                            Accepter
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onDecline(order._id); }}
+                            className="flex-1 sm:flex-none px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                        >
+                            Refuser
+                        </button>
+                    </div>
+                )}
             </div>
         </button>
     );

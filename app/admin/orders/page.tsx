@@ -30,16 +30,26 @@ export default function OrdersPage() {
     [orders, selectedOrderId]
   );
 
-  const prevOrderCountRef = useRef<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && !audioRef.current) {
+      const audio = new Audio('/sounds/new-order.ogg');
+      audio.loop = true;
+      audioRef.current = audio;
+    }
+
     if (orders) {
-      if (prevOrderCountRef.current > 0 && orders.length > prevOrderCountRef.current) {
-        // Play notification sound if the number of orders increased (and it's not the first load)
-        const audio = new Audio('/sounds/new-order.ogg');
-        audio.play().catch(e => console.error("Could not play notification sound:", e));
+      const hasPending = orders.some(o => o.status === 'pending');
+      if (hasPending && audioRef.current) {
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(e => console.log("Audio autoplay prevented by browser. User interaction needed."));
+        }
+      } else if (!hasPending && audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
       }
-      prevOrderCountRef.current = orders.length;
     }
   }, [orders]);
 
@@ -95,6 +105,8 @@ export default function OrdersPage() {
                 key={order._id}
                 order={order}
                 onClick={setSelectedOrderId}
+                onAccept={(id) => handleStatusChange(id as Id<'orders'>, 'preparing')}
+                onDecline={(id) => handleStatusChange(id as Id<'orders'>, 'cancelled')}
               />
             ))
           ) : (
