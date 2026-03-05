@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Clock, Package, CheckCircle, XCircle, User, Phone, Mail, MapPin, AlertCircle } from 'lucide-react';
+import { X, Clock, Package, CheckCircle, XCircle, User, Phone, Mail, MapPin, AlertCircle, Trash2 } from 'lucide-react';
 import { Id } from '../../../../convex/_generated/dataModel';
 
 interface OrderDetailsModalProps {
@@ -8,6 +8,7 @@ interface OrderDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     onStatusChange: (orderId: Id<'orders'>, newStatus: string) => Promise<void>;
+    onDeleteOrder: (orderId: Id<'orders'>) => Promise<void>;
     toppings: any[] | undefined;
     toppingCategories: any[] | undefined;
 }
@@ -17,6 +18,7 @@ export default function OrderDetailsModal({
     isOpen,
     onClose,
     onStatusChange,
+    onDeleteOrder,
     toppings,
     toppingCategories
 }: OrderDetailsModalProps) {
@@ -198,8 +200,21 @@ export default function OrderDetailsModal({
 
                 {/* Footer Total */}
                 <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-                    <span className="text-lg text-slate-500 font-medium">Total Commande</span>
-                    <span className="text-3xl font-black text-slate-900">{order.totalPrice.toFixed(2)}€</span>
+                    <button
+                        onClick={() => {
+                            if (window.confirm("Êtes-vous sûr de vouloir supprimer cette commande définitivement ?")) {
+                                onDeleteOrder(order._id);
+                            }
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors focus:ring-2 focus:ring-red-500 focus:outline-none"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="hidden sm:inline">Supprimer</span>
+                    </button>
+                    <div className="flex items-center gap-4">
+                        <span className="text-lg text-slate-500 font-medium">Total Commande</span>
+                        <span className="text-3xl font-black text-slate-900">{order.totalPrice.toFixed(2)}€</span>
+                    </div>
                 </div>
             </div>
         </div>

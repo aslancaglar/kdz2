@@ -15,6 +15,7 @@ export default function OrdersPage() {
   const toppingCategories = useQuery(api.toppingsAdmin.listToppingCategories);
   const toppings = useQuery(api.toppingsAdmin.listToppings);
   const updateOrderStatus = useMutation(api.mutations.updateOrderStatus);
+  const deleteOrderMutation = useMutation(api.mutations.deleteOrder);
 
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
@@ -37,6 +38,16 @@ export default function OrdersPage() {
       console.error('Error updating order status:', error);
     }
   }, [updateOrderStatus, adminToken]);
+
+  const handleDeleteOrder = useCallback(async (orderId: Id<'orders'>) => {
+    if (!adminToken) return;
+    try {
+      await deleteOrderMutation({ orderId, adminToken });
+      setSelectedOrderId(null);
+    } catch (error) {
+      console.error('Error deleting order:', error);
+    }
+  }, [deleteOrderMutation, adminToken]);
 
   return (
     <>
@@ -88,6 +99,7 @@ export default function OrdersPage() {
         onClose={() => setSelectedOrderId(null)}
         order={selectedOrder}
         onStatusChange={handleStatusChange}
+        onDeleteOrder={handleDeleteOrder}
         toppings={toppings}
         toppingCategories={toppingCategories}
       />
