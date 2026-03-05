@@ -34,7 +34,8 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !audioRef.current) {
-      const audio = new Audio('/sounds/new-order.mp3');
+      // Append timestamp to prevent browser caching of the old sound file
+      const audio = new Audio('/sounds/new-order.mp3?v=' + Date.now());
       audio.loop = true;
       audioRef.current = audio;
     }
