@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Package } from 'lucide-react';
+import { Package, Bell, BellOff } from 'lucide-react';
 import OrderCard from '../../../src/components/admin/Orders/OrderCard';
 import OrderDetailsModal from '../../../src/components/admin/Orders/OrderDetailsModal';
 import type { Id } from '../../../convex/_generated/dataModel';
@@ -19,6 +19,28 @@ export default function OrdersPage() {
 
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('admin-orders-sound-enabled');
+    if (saved === 'true') {
+      setSoundEnabled(true);
+    }
+  }, []);
+
+  const toggleSound = useCallback(() => {
+    const nextState = !soundEnabled;
+    setSoundEnabled(nextState);
+    localStorage.setItem('admin-orders-sound-enabled', String(nextState));
+
+    // If enabling sound and there are pending orders, try to play immediately to "unlock" audio for Safari
+    if (nextState && orders && audioRef.current) {
+      const hasPending = orders.some(o => o.status === 'pending');
+      if (hasPending) {
+        audioRef.current.play().catch(e => console.log("Unlock play failed:", e));
+      }
+    }
+  }, [soundEnabled, orders]);
 
   const filteredOrders = useMemo(() =>
     orders?.filter((order) => selectedStatus === 'all' || order.status === selectedStatus),
@@ -42,17 +64,17 @@ export default function OrdersPage() {
 
     if (orders) {
       const hasPending = orders.some(o => o.status === 'pending');
-      if (hasPending && audioRef.current) {
+      if (soundEnabled && hasPending && audioRef.current) {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
           playPromise.catch(e => console.log("Audio autoplay prevented by browser. User interaction needed."));
         }
-      } else if (!hasPending && audioRef.current) {
+      } else if ((!soundEnabled || !hasPending) && audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
     }
-  }, [orders]);
+  }, [orders, soundEnabled]);
 
   const handleStatusChange = useCallback(async (orderId: Id<'orders'>, newStatus: string) => {
     if (!adminToken) return;
@@ -76,9 +98,27 @@ export default function OrdersPage() {
   return (
     <>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Orders Management</h1>
-          <p className="text-slate-600 mt-2">View and manage customer orders</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Orders Management</h1>
+            <p className="text-slate-600 mt-2">View and manage customer orders</p>
+          </div>
+          <button
+            onClick={toggleSound}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition group ${soundEnabled
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+          >
+            {soundEnabled ? (
+              <Bell className="w-4 h-4 text-emerald-600 active:scale-95 transition-transform" />
+            ) : (
+              <BellOff className="w-4 h-4 text-slate-400 group-hover:text-slate-500" />
+            )}
+            <span className="font-semibold text-sm">
+              {soundEnabled ? 'Son Activé' : 'Son Désactivé'}
+            </span>
+          </button>
         </div>
 
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">

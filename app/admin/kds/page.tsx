@@ -47,6 +47,13 @@ export default function AdminKdsPage() {
   const [updatingOrderId, setUpdatingOrderId] = useState<Id<"orders"> | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
 
+  useEffect(() => {
+    const saved = localStorage.getItem('admin-kds-sound-enabled');
+    if (saved === 'true') {
+      setSoundEnabled(true);
+    }
+  }, []);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const toppingNameById = useMemo(() => {
@@ -147,14 +154,16 @@ export default function AdminKdsPage() {
           <button
             type="button"
             onClick={() => {
-              if (!soundEnabled && audioRef.current) {
+              const nextState = !soundEnabled;
+              if (nextState && audioRef.current) {
                 // If turning on and there are pending orders, try to play immediately to bypass autoplay blocking
                 const hasPending = orders?.some(o => o.status === 'pending');
                 if (hasPending) {
                   audioRef.current.play().catch(e => console.log(e));
                 }
               }
-              setSoundEnabled((previous) => !previous);
+              setSoundEnabled(nextState);
+              localStorage.setItem('admin-kds-sound-enabled', String(nextState));
             }}
             className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition ${soundEnabled
               ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
