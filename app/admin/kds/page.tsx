@@ -116,7 +116,7 @@ export default function AdminKdsPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !audioRef.current) {
-      const audio = new Audio('/sounds/new-order.ogg');
+      const audio = new Audio('/sounds/new-order.mp3');
       audio.loop = true;
       audioRef.current = audio;
     }
