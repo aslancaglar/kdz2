@@ -17,33 +17,6 @@ export default function Contact() {
     );
   }
 
-  const contactInfo = [
-    {
-      icon: MapPin,
-      title: 'Adresse',
-      content: restaurantInfo.address || '',
-    },
-    {
-      icon: Phone,
-      title: 'Téléphone',
-      content: restaurantInfo.phone || '',
-      href: restaurantInfo.phone ? `tel:${restaurantInfo.phone.replace(/\s/g, '')}` : undefined,
-    },
-    {
-      icon: Mail,
-      title: 'Email',
-      content: restaurantInfo.email || '',
-      href: restaurantInfo.email ? `mailto:${restaurantInfo.email}` : undefined,
-    },
-    {
-      icon: Clock,
-      title: 'Horaires',
-      content: restaurantInfo.hours
-        ? restaurantInfo.hours.map(h => `${h.day}: ${h.time}`).join('\n')
-        : '',
-    },
-  ];
-
   return (
     <section id="contact" className="py-20 bg-warm-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -61,29 +34,58 @@ export default function Contact() {
 
         <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           <FadeIn delay={200} className="grid sm:grid-cols-2 gap-6">
-            {contactInfo.map((item, index) => (
-              <div
-                key={index}
-                className="bg-gray-50 rounded-3xl p-6 shadow-md hover:bg-white hover:shadow-lg transition-all"
-              >
-                <div className="w-14 h-14 bg-primary-500 rounded-full flex items-center justify-center mb-4">
-                  <item.icon className="w-7 h-7 text-white" />
+            {/* Box 1 : Coordonnées */}
+            <div className="bg-white rounded-3xl p-8 shadow-md hover:shadow-lg transition-all flex flex-col gap-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-primary-500 flex-shrink-0 rounded-full flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                  {item.title}
-                </h3>
-                {item.href ? (
-                  <a
-                    href={item.href}
-                    className="text-gray-600 hover:text-primary-500 transition-colors"
-                  >
-                    {item.content}
-                  </a>
-                ) : (
-                  <p className="text-gray-600 whitespace-pre-line">{item.content}</p>
-                )}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Adresse</h3>
+                  <p className="text-gray-600 whitespace-pre-line mt-1">{restaurantInfo.address}</p>
+                </div>
               </div>
-            ))}
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-primary-500 flex-shrink-0 rounded-full flex items-center justify-center">
+                  <Phone className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Téléphone</h3>
+                  <a href={`tel:${restaurantInfo.phone?.replace(/\s/g, '')}`} className="text-gray-600 hover:text-primary-500 transition-colors mt-1 block">
+                    {restaurantInfo.phone}
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-primary-500 flex-shrink-0 rounded-full flex items-center justify-center">
+                  <Mail className="w-6 h-6 text-white" />
+                </div>
+                <div className="break-all">
+                  <h3 className="text-lg font-bold text-gray-900">Email</h3>
+                  <a href={`mailto:${restaurantInfo.email}`} className="text-gray-600 hover:text-primary-500 transition-colors mt-1 block">
+                    {restaurantInfo.email}
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Box 2 : Horaires */}
+            <div className="bg-white rounded-3xl p-8 shadow-md hover:shadow-lg transition-all h-full">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-primary-500 flex-shrink-0 rounded-full flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">Horaires</h3>
+              </div>
+              <div className="space-y-3">
+                {restaurantInfo.hours?.map((h, index) => (
+                  <div key={index} className="flex justify-between items-center text-sm py-2 border-b border-gray-100 last:border-0">
+                    <span className="font-semibold text-gray-800">{h.day}</span>
+                    <span className="text-gray-600 text-right">{h.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </FadeIn>
 
           <FadeIn delay={400} className="relative h-full min-h-[400px] lg:min-h-[500px]">
