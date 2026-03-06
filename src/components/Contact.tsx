@@ -32,8 +32,8 @@ export default function Contact() {
           </div>
         </FadeIn>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-stretch">
-          <FadeIn delay={200} className="grid sm:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-12">
+          <FadeIn delay={200} className="grid md:grid-cols-2 gap-8">
             {/* Box 1 : Coordonnées */}
             <div className="bg-white rounded-3xl p-8 shadow-md hover:shadow-lg transition-all flex flex-col gap-6">
               <div className="flex items-start gap-4">
@@ -88,7 +88,7 @@ export default function Contact() {
             </div>
           </FadeIn>
 
-          <FadeIn delay={400} className="relative h-full min-h-[400px] lg:min-h-[500px]">
+          <FadeIn delay={400} className="relative w-full h-[400px] lg:h-[500px]">
             <div className="absolute inset-0 bg-gray-200 rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-shadow">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2600.8052602173807!2d6.1141143!3d49.317971500000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4795258664a86ccf%3A0x8db9ac174343560f!2sSnack%20Karadeniz%20Florange!5e0!3m2!1sfr!2sfr!4v1770294381690!5m2!1sfr!2sfr"
