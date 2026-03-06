@@ -20,11 +20,14 @@ export default function OrdersPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const soundEnabledRef = useRef(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('admin-orders-sound-enabled');
     if (saved === 'true') {
       setSoundEnabled(true);
+      soundEnabledRef.current = true;
     }
   }, []);
 
@@ -40,8 +43,6 @@ export default function OrdersPage() {
     [orders, selectedOrderId]
   );
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const soundEnabledRef = useRef(false);
 
   const toggleSound = useCallback(() => {
     const nextState = !soundEnabled;
