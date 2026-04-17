@@ -236,8 +236,8 @@ export default function SettingsPage() {
     <>
       <div className="space-y-6 max-w-4xl pb-20">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Restaurant Settings</h1>
-          <p className="text-slate-600 mt-2">Manage your restaurant information</p>
+          <h1 className="text-3xl font-bold text-slate-900">Paramètres du Restaurant</h1>
+          <p className="text-slate-600 mt-2">Gérez les informations de votre restaurant</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -247,14 +247,14 @@ export default function SettingsPage() {
               onClick={() => toggleSection('contact')}
               className="w-full flex items-center justify-between p-6 hover:bg-slate-50 transition-colors"
             >
-              <h2 className="text-xl font-bold text-slate-900">Contact Information</h2>
+              <h2 className="text-xl font-bold text-slate-900">Informations de Contact</h2>
               {expandedSections.contact ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
             </button>
 
             {expandedSections.contact && (
               <div className="p-6 pt-0 border-t border-slate-100 mt-0 space-y-4">
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Adresse</label>
                   <input
                     type="text"
                     value={formData.address}
@@ -266,7 +266,7 @@ export default function SettingsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Téléphone</label>
                     <input
                       type="tel"
                       value={formData.phone}
@@ -297,7 +297,7 @@ export default function SettingsPage() {
               onClick={() => toggleSection('ordering')}
               className="w-full flex items-center justify-between p-6 hover:bg-slate-50 transition-colors"
             >
-              <h2 className="text-xl font-bold text-slate-900">Ordering Options</h2>
+              <h2 className="text-xl font-bold text-slate-900">Options de Commande</h2>
               {expandedSections.ordering ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
             </button>
 
@@ -306,8 +306,8 @@ export default function SettingsPage() {
                 <div className="mt-4 space-y-4">
                   <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                     <div>
-                      <h3 className="font-medium text-slate-900">Pickup Orders</h3>
-                      <p className="text-sm text-slate-500">Allow customers to order for pickup</p>
+                      <h3 className="font-medium text-slate-900">Commandes à Emporter</h3>
+                      <p className="text-sm text-slate-500">Permettre aux clients de commander à emporter</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -322,8 +322,8 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                     <div>
-                      <h3 className="font-medium text-slate-900">Delivery Orders</h3>
-                      <p className="text-sm text-slate-500">Allow customers to order for delivery</p>
+                      <h3 className="font-medium text-slate-900">Commandes en Livraison</h3>
+                      <p className="text-sm text-slate-500">Permettre aux clients de commander en livraison</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -339,7 +339,7 @@ export default function SettingsPage() {
                   {!formData.pickupEnabled && !formData.deliveryEnabled && (
                     <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
                       <p className="text-sm text-amber-800">
-                        <strong>⚠️ Warning:</strong> Both pickup and delivery are disabled. Customers will not be able to place orders.
+                        <strong>⚠️ Attention:</strong> Le retrait et la livraison sont désactivés. Les clients ne pourront pas passer de commandes.
                       </p>
                     </div>
                   )}
@@ -494,7 +494,7 @@ export default function SettingsPage() {
               onClick={() => toggleSection('hours')}
               className="w-full flex items-center justify-between p-6 hover:bg-slate-50 transition-colors"
             >
-              <h2 className="text-xl font-bold text-slate-900">Business Hours</h2>
+              <h2 className="text-xl font-bold text-slate-900">Heures d'Ouverture</h2>
               {expandedSections.hours ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
             </button>
 
@@ -507,7 +507,7 @@ export default function SettingsPage() {
                     className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
                   >
                     <Plus className="w-4 h-4" />
-                    Add Day
+                    Ajouter un Jour
                   </button>
                 </div>
 
@@ -518,13 +518,13 @@ export default function SettingsPage() {
                         type="button"
                         onClick={() => removeDay(dayIndex)}
                         className="absolute top-2 right-2 p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                        title="Remove Day"
+                        title="Supprimer le jour"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
 
                       <div className="mb-4 pr-8">
-                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Day(s)</label>
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Jour(s)</label>
                         <input
                           type="text"
                           value={day.day}
@@ -535,7 +535,7 @@ export default function SettingsPage() {
                       </div>
 
                       <div className="space-y-3">
-                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Opening Hours</label>
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Heures d'Ouverture</label>
                         {day.slots.map((slot, slotIndex) => (
                           <div key={slotIndex} className="flex items-center gap-2">
                             <div className="flex-1 grid grid-cols-2 gap-2 items-center">
@@ -563,7 +563,7 @@ export default function SettingsPage() {
                               type="button"
                               onClick={() => removeSlot(dayIndex, slotIndex)}
                               className="p-2 text-slate-400 hover:text-red-500"
-                              title="Remove Slot"
+                              title="Supprimer le créneau"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -576,7 +576,7 @@ export default function SettingsPage() {
                           className="text-xs flex items-center gap-1 text-primary-600 hover:text-primary-700 font-medium mt-2"
                         >
                           <Plus className="w-3 h-3" />
-                          Add Slot
+                          Ajouter un créneau
                         </button>
                       </div>
                     </div>
@@ -584,7 +584,7 @@ export default function SettingsPage() {
 
                   {schedule.length === 0 && (
                     <div className="text-center py-8 text-slate-500 italic">
-                      No business hours configured. Click "Add Day" to start.
+                      Aucune heure d'ouverture configurée. Cliquez sur "Ajouter un Jour" pour commencer.
                     </div>
                   )}
                 </div>
@@ -598,7 +598,7 @@ export default function SettingsPage() {
               onClick={() => toggleSection('holidays')}
               className="w-full flex items-center justify-between p-6 hover:bg-slate-50 transition-colors"
             >
-              <h2 className="text-xl font-bold text-slate-900">Holiday Closures</h2>
+              <h2 className="text-xl font-bold text-slate-900">Fermetures Exceptionnelles</h2>
               {expandedSections.holidays ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
             </button>
 
@@ -611,7 +611,7 @@ export default function SettingsPage() {
                     className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
                   >
                     <Plus className="w-4 h-4" />
-                    Add Holiday
+                    Ajouter une période
                   </button>
                 </div>
 
@@ -622,14 +622,14 @@ export default function SettingsPage() {
                         type="button"
                         onClick={() => removeHoliday(index)}
                         className="absolute top-2 right-2 p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                        title="Remove Holiday"
+                        title="Supprimer la période"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
-                          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Holiday Name</label>
+                          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Nom de la période</label>
                           <input
                             type="text"
                             value={holiday.name || ''}
@@ -639,7 +639,7 @@ export default function SettingsPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Start Date</label>
+                          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Date de début</label>
                           <input
                             type="date"
                             value={holiday.startDate}
@@ -649,7 +649,7 @@ export default function SettingsPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">End Date</label>
+                          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Date de fin</label>
                           <input
                             type="date"
                             value={holiday.endDate}
@@ -666,7 +666,7 @@ export default function SettingsPage() {
                             onChange={(e) => updateHoliday(index, 'active', e.target.checked)}
                             className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500"
                           />
-                          <label htmlFor={`active-${index}`} className="text-sm text-slate-700">Active</label>
+                          <label htmlFor={`active-${index}`} className="text-sm text-slate-700">Actif</label>
                         </div>
                       </div>
                     </div>
@@ -674,7 +674,7 @@ export default function SettingsPage() {
 
                   {holidays.length === 0 && (
                     <div className="text-center py-8 text-slate-500 italic">
-                      No holiday closures configured. Click "Add Holiday" to start.
+                      Aucune fermeture exceptionnelle configurée. Cliquez sur "Ajouter une période" pour commencer.
                     </div>
                   )}
                 </div>
@@ -688,14 +688,14 @@ export default function SettingsPage() {
               onClick={() => toggleSection('social')}
               className="w-full flex items-center justify-between p-6 hover:bg-slate-50 transition-colors"
             >
-              <h2 className="text-xl font-bold text-slate-900">Social Media</h2>
+              <h2 className="text-xl font-bold text-slate-900">Réseaux Sociaux</h2>
               {expandedSections.social ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
             </button>
 
             {expandedSections.social && (
               <div className="p-6 pt-0 border-t border-slate-100 mt-0 space-y-4">
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Facebook URL</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">URL Facebook</label>
                   <input
                     type="url"
                     value={formData.socialLinks.facebook}
@@ -711,7 +711,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Instagram URL</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">URL Instagram</label>
                   <input
                     type="url"
                     value={formData.socialLinks.instagram}
@@ -727,7 +727,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Twitter URL</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">URL Twitter</label>
                   <input
                     type="url"
                     value={formData.socialLinks.twitter}
@@ -752,18 +752,18 @@ export default function SettingsPage() {
               className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-lg hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
             >
               <Save className="w-5 h-5" />
-              {saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
+              {saveStatus === 'saving' ? 'Enregistrement...' : 'Enregistrer les modifications'}
             </button>
 
             {saveStatus === 'success' && (
               <span className="text-green-600 font-medium flex items-center gap-2 animate-fade-in">
                 <div className="w-2 h-2 bg-green-500 rounded-full" />
-                Changes saved successfully!
+                Modifications enregistrées avec succès !
               </span>
             )}
 
             {saveStatus === 'error' && (
-              <span className="text-red-600 font-medium">Error saving changes. Please try again.</span>
+              <span className="text-red-600 font-medium">Erreur lors de l'enregistrement. Veuillez réessayer.</span>
             )}
           </div>
         </form>

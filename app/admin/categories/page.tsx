@@ -92,7 +92,7 @@ export default function CategoriesPage() {
         await deleteCategory({ id: confirmModal.id, adminToken });
       } catch (error) {
         console.error('Error deleting category:', error);
-        alert('Failed to delete category. See console for details.');
+        alert('Échec de la suppression de la catégorie. Voir la console pour plus de détails.');
       }
     }
   };
@@ -102,15 +102,15 @@ export default function CategoriesPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Menu Categories</h1>
-            <p className="text-slate-600 mt-2">Manage your restaurant menu categories</p>
+            <h1 className="text-3xl font-bold text-slate-900">Catégories du Menu</h1>
+            <p className="text-slate-600 mt-2">Gérez les catégories de votre menu</p>
           </div>
           <button
             onClick={handleCreate}
             className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition"
           >
             <Plus className="w-5 h-5" />
-            Add Category
+            Ajouter une Catégorie
           </button>
         </div>
 
@@ -120,16 +120,16 @@ export default function CategoriesPage() {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Name
+                    Nom
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     Slug
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Display Order
+                    Ordre d'affichage
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Status
+                    Statut
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
                     Actions
@@ -155,7 +155,7 @@ export default function CategoriesPage() {
                           : 'bg-gray-100 text-gray-700'
                           }`}
                       >
-                        {category.active ? 'Active' : 'Inactive'}
+                        {category.active ? 'Actif' : 'Inactif'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -193,7 +193,7 @@ export default function CategoriesPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-6 border-b border-slate-200">
               <h2 className="text-xl font-bold text-slate-900">
-                {editingId ? 'Edit Category' : 'Add Category'}
+                {editingId ? 'Modifier la Catégorie' : 'Ajouter une Catégorie'}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -205,7 +205,7 @@ export default function CategoriesPage() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nom</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -228,7 +228,7 @@ export default function CategoriesPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Display Order
+                  Ordre d'affichage
                 </label>
                 <input
                   type="number"
@@ -250,7 +250,7 @@ export default function CategoriesPage() {
                   className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-500"
                 />
                 <label htmlFor="active" className="ml-2 text-sm font-medium text-slate-700">
-                  Active
+                  Actif
                 </label>
               </div>
 
@@ -260,13 +260,13 @@ export default function CategoriesPage() {
                   onClick={() => setIsModalOpen(false)}
                   className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition"
                 >
-                  Cancel
+                  Annuler
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition"
                 >
-                  {editingId ? 'Update' : 'Create'}
+                  {editingId ? 'Mettre à jour' : 'Créer'}
                 </button>
               </div>
             </form>
@@ -278,8 +278,8 @@ export default function CategoriesPage() {
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
         onConfirm={handleConfirmDelete}
-        title="Delete Category"
-        message="Are you sure you want to delete this category? This action cannot be undone."
+        title="Supprimer la Catégorie"
+        message="Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette action est irréversible."
       />
     </>
   );

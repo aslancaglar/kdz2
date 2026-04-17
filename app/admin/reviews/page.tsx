@@ -65,15 +65,15 @@ export default function ReviewsPage() {
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Reviews Application</h1>
-                        <p className="text-slate-600 mt-2">Manage customer reviews</p>
+                        <h1 className="text-3xl font-bold text-slate-900">Gestion des Avis</h1>
+                        <p className="text-slate-600 mt-2">Gérez les avis clients</p>
                     </div>
                     <button
                         onClick={() => setIsAddModalOpen(true)}
                         className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition"
                     >
                         <Plus className="w-5 h-5" />
-                        Add Review
+                        Ajouter un Avis
                     </button>
                 </div>
 
@@ -82,11 +82,11 @@ export default function ReviewsPage() {
                         <table className="w-full text-left text-sm text-slate-600">
                             <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase font-semibold text-slate-500">
                                 <tr>
-                                    <th className="px-6 py-4">Customer</th>
-                                    <th className="px-6 py-4">Rating</th>
-                                    <th className="px-6 py-4">Comment</th>
+                                    <th className="px-6 py-4">Client</th>
+                                    <th className="px-6 py-4">Note</th>
+                                    <th className="px-6 py-4">Commentaire</th>
                                     <th className="px-6 py-4">Date</th>
-                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-6 py-4">Statut</th>
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -106,11 +106,11 @@ export default function ReviewsPage() {
                                         <td className="px-6 py-4">
                                             {review.active ? (
                                                 <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
-                                                    Active
+                                                    Actif
                                                 </span>
                                             ) : (
                                                 <span className="px-2 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-700">
-                                                    Hidden
+                                                    Masqué
                                                 </span>
                                             )}
                                         </td>
@@ -122,14 +122,14 @@ export default function ReviewsPage() {
                                                         ? 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                                         : 'bg-green-100 text-green-600 hover:bg-green-200'
                                                         }`}
-                                                    title={review.active ? "Hide Review" : "Show Review"}
+                                                    title={review.active ? "Masquer l'avis" : "Afficher l'avis"}
                                                 >
                                                     {review.active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteClick(review._id)}
                                                     className="p-2 rounded-lg transition bg-red-50 text-red-600 hover:bg-red-100"
-                                                    title="Delete Review"
+                                                    title="Supprimer l'avis"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -140,7 +140,7 @@ export default function ReviewsPage() {
                                 {reviews?.length === 0 && (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-8 text-center text-slate-400 italic">
-                                            No reviews found.
+                                            Aucun avis trouvé.
                                         </td>
                                     </tr>
                                 )}
@@ -155,7 +155,7 @@ export default function ReviewsPage() {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-xl max-w-lg w-full p-6">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-slate-900">Add New Review</h2>
+                            <h2 className="text-xl font-bold text-slate-900">Ajouter un Nouvel Avis</h2>
                             <button
                                 onClick={() => setIsAddModalOpen(false)}
                                 className="text-slate-400 hover:text-slate-600"
@@ -166,7 +166,7 @@ export default function ReviewsPage() {
 
                         <form onSubmit={handleAddItem} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Customer Name</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Nom du Client</label>
                                 <input
                                     type="text"
                                     value={newItem.name}
@@ -178,7 +178,7 @@ export default function ReviewsPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Rating</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Note</label>
                                     <div className="flex gap-2">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <button
@@ -199,14 +199,14 @@ export default function ReviewsPage() {
                                         value={newItem.date}
                                         onChange={(e) => setNewItem({ ...newItem, date: e.target.value })}
                                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                                        placeholder="e.g. 15 Janvier 2025"
+                                        placeholder="ex. 15 Janvier 2025"
                                         required
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Comment</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Commentaire</label>
                                 <textarea
                                     value={newItem.comment}
                                     onChange={(e) => setNewItem({ ...newItem, comment: e.target.value })}
@@ -222,13 +222,13 @@ export default function ReviewsPage() {
                                     onClick={() => setIsAddModalOpen(false)}
                                     className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition"
                                 >
-                                    Cancel
+                                    Annuler
                                 </button>
                                 <button
                                     type="submit"
                                     className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition"
                                 >
-                                    Add Review
+                                    Ajouter l'Avis
                                 </button>
                             </div>
                         </form>
@@ -240,8 +240,8 @@ export default function ReviewsPage() {
                 isOpen={confirmModal.isOpen}
                 onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
                 onConfirm={handleConfirmDelete}
-                title="Delete Review"
-                message="Are you sure you want to delete this review? This action cannot be undone."
+                title="Supprimer l'Avis"
+                message="Êtes-vous sûr de vouloir supprimer cet avis ? Cette action est irréversible."
             />
         </>
     );

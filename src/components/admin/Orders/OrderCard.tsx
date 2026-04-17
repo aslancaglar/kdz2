@@ -76,7 +76,10 @@ export default function OrderCard({
                         {order.totalPrice.toFixed(2)}€
                     </div>
                     <span className={`inline-flex items-center justify-center px-3 py-1 text-[11px] font-bold rounded-full border md:mt-1 ${getStatusColor(order.status)} uppercase tracking-widest min-w-[100px]`}>
-                        {order.status}
+                        {order.status === 'pending' ? 'En attente' :
+                          order.status === 'preparing' ? 'Préparation' :
+                          order.status === 'completed' ? 'Terminée' :
+                          order.status === 'cancelled' ? 'Annulée' : order.status}
                     </span>
                 </div>
 

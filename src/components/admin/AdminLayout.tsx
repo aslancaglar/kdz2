@@ -47,18 +47,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
 
   const menuItems = [
-    { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/users', label: 'Users', icon: User },
-    { path: '/admin/categories', label: 'Categories', icon: Tag },
-    { path: '/admin/menu-items', label: 'Menu Items', icon: Pizza },
-    { path: '/admin/topping-categories', label: 'Topping Categories', icon: Layers },
-    { path: '/admin/toppings', label: 'Toppings', icon: UtensilsCrossed },
-    { path: '/admin/platform-prices', label: 'Platform Prices', icon: Globe },
-    { path: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+    { path: '/admin', label: 'Tableau de bord', icon: LayoutDashboard },
+    { path: '/admin/users', label: 'Utilisateurs', icon: User },
+    { path: '/admin/categories', label: 'Catégories', icon: Tag },
+    { path: '/admin/menu-items', label: 'Articles', icon: Pizza },
+    { path: '/admin/topping-categories', label: 'Catégories (Garnitures)', icon: Layers },
+    { path: '/admin/toppings', label: 'Garnitures', icon: UtensilsCrossed },
+    { path: '/admin/platform-prices', label: 'Prix des Plateformes', icon: Globe },
+    { path: '/admin/orders', label: 'Commandes', icon: ShoppingCart },
     { path: '/admin/kds', label: 'KDS Kanban', icon: Package },
-    { path: '/admin/reviews', label: 'Reviews', icon: Star },
-    { path: '/admin/gallery', label: 'Gallery', icon: Image },
-    { path: '/admin/settings', label: 'Settings', icon: Settings },
+    { path: '/admin/reviews', label: 'Avis', icon: Star },
+    { path: '/admin/gallery', label: 'Galerie', icon: Image },
+    { path: '/admin/settings', label: 'Paramètres', icon: Settings },
   ];
 
   const handleLogout = () => {
@@ -73,7 +73,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           } ${desktopSidebarCollapsed ? 'lg:-translate-x-full' : 'lg:translate-x-0'}`}
       >
         <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-slate-700">
-          <h1 className="text-xl font-bold">Admin Panel</h1>
+          <h1 className="text-xl font-bold">Administration</h1>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-white hover:text-slate-300"
@@ -108,7 +108,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-sm font-medium text-white">{admin?.username}</p>
-              <p className="text-xs text-slate-400">Administrator</p>
+              <p className="text-xs text-slate-400">Administrateur</p>
             </div>
           </div>
           <button
@@ -116,7 +116,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition"
           >
             <LogOut className="w-4 h-4" />
-            Logout
+            Déconnexion
           </button>
         </div>
       </aside>
@@ -142,7 +142,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
             <div className="flex items-center gap-4">
               <span className="text-sm text-slate-600">
-                Welcome back, <span className="font-semibold text-slate-900">{admin?.username}</span>
+                Bonjour, <span className="font-semibold text-slate-900">{admin?.username}</span>
               </span>
             </div>
           </div>

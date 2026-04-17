@@ -86,8 +86,8 @@ export default function PlatformPricesPage() {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Platform Prices</h1>
-                        <p className="text-slate-600 mt-1">Manage menu prices for online ordering platforms (UberEats, Deliveroo, etc.)</p>
+                        <h1 className="text-3xl font-bold text-slate-900">Prix Plateformes</h1>
+                        <p className="text-slate-600 mt-1">Gérez les prix du menu pour les plateformes de commande en ligne (UberEats, Deliveroo, etc.)</p>
                     </div>
                     <button
                         onClick={handleSave}
@@ -95,14 +95,14 @@ export default function PlatformPricesPage() {
                         className="flex items-center justify-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-lg hover:bg-slate-800 transition disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
                     >
                         <Save className="w-5 h-5" />
-                        {isSaving ? 'Saving...' : 'Apply & Save All'}
+                        {isSaving ? 'Enregistrement...' : 'Appliquer & Enregistrer tout'}
                     </button>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="space-y-4">
-                            <label className="block text-sm font-semibold text-slate-700">Bulk Price Increase (%)</label>
+                            <label className="block text-sm font-semibold text-slate-700">Augmentation de prix en masse (%)</label>
                             <div className="flex gap-2">
                                 <div className="relative flex-1">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -113,7 +113,7 @@ export default function PlatformPricesPage() {
                                         value={markupPercent}
                                         onChange={(e) => setMarkupPercent(e.target.value)}
                                         className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                                        placeholder="e.g. 35"
+                                        placeholder="ex. 35"
                                     />
                                 </div>
                                 <button
@@ -121,19 +121,19 @@ export default function PlatformPricesPage() {
                                     className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition font-medium"
                                 >
                                     <Calculator className="w-4 h-4" />
-                                    Apply Preview
+                                    Aperçu
                                 </button>
                             </div>
-                            <p className="text-xs text-slate-500 italic">This will update the "Platform Price" in the table below for all items.</p>
+                            <p className="text-xs text-slate-500 italic">Cela mettra à jour le "Prix Plateforme" dans le tableau ci-dessous pour tous les articles.</p>
                         </div>
 
                         <div className="space-y-4">
-                            <label className="block text-sm font-semibold text-slate-700">Search Items</label>
+                            <label className="block text-sm font-semibold text-slate-700">Rechercher des articles</label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                                 <input
                                     type="text"
-                                    placeholder="Filter by name..."
+                                    placeholder="Filtrer par nom..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
@@ -142,7 +142,7 @@ export default function PlatformPricesPage() {
                         </div>
 
                         <div className="space-y-4">
-                            <label className="block text-sm font-semibold text-slate-700">Filter by Category</label>
+                            <label className="block text-sm font-semibold text-slate-700">Filtrer par catégorie</label>
                             <div className="relative">
                                 <Filter className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                                 <select
@@ -150,7 +150,7 @@ export default function PlatformPricesPage() {
                                     onChange={(e) => setSelectedCategory(e.target.value)}
                                     className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                                 >
-                                    <option value="all">All Categories</option>
+                                    <option value="all">Toutes les catégories</option>
                                     {categories.map((cat: any) => (
                                         <option key={cat.slug} value={cat.slug}>{cat.name}</option>
                                     ))}
@@ -163,7 +163,7 @@ export default function PlatformPricesPage() {
                 {saveStatus === 'success' && (
                     <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 animate-fade-in text-sm font-medium">
                         <div className="w-2 h-2 bg-green-500 rounded-full" />
-                        Prices updated successfully!
+                        Prix mis à jour avec succès !
                     </div>
                 )}
 
@@ -172,11 +172,11 @@ export default function PlatformPricesPage() {
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-200">
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900">Item Name</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900">Category</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900 text-right">Standard Price</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900 text-right">Platform Price</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900 text-right">Markup</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900">Nom de l'article</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900">Catégorie</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900 text-right">Prix Standard</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900 text-right">Prix Plateforme</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-slate-900 text-right">Marge</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -222,7 +222,7 @@ export default function PlatformPricesPage() {
                     </div>
                     {filteredItems.length === 0 && (
                         <div className="p-12 text-center text-slate-500 italic">
-                            No items found matching your filters.
+                            Aucun article trouvé correspondant à vos filtres.
                         </div>
                     )}
                 </div>

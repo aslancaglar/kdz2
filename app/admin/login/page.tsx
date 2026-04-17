@@ -24,11 +24,11 @@ export default function LoginPage() {
             if (success) {
                 router.push('/admin');
             } else {
-                setError('Invalid username or password. Make sure you have run seed:createAdminUser in the Convex dashboard.');
+                setError('Nom d\'utilisateur ou mot de passe invalide. Assurez-vous d\'avoir exécuté seed:createAdminUser.');
             }
         } catch (err) {
             console.error('Login error:', err);
-            setError('Connection error. Please check that Convex is running and the database is seeded.');
+            setError('Erreur de connexion. Veuillez vérifier que Convex est en cours d\'exécution.');
         }
 
         setIsLoading(false);
@@ -44,22 +44,22 @@ export default function LoginPage() {
                 </div>
 
                 <h1 className="text-3xl font-bold text-center text-slate-900 mb-2">
-                    Admin Login
+                    Connexion Admin
                 </h1>
                 <p className="text-center text-slate-600 mb-4">
-                    Enter your credentials to access the dashboard
+                    Entrez vos identifiants pour accéder au tableau de bord
                 </p>
 
                 <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg text-sm mb-6">
-                    <p className="font-semibold mb-1">First time setup?</p>
-                    <p>Run <code className="bg-blue-100 px-1 rounded">seed:createAdminUser</code> in Convex dashboard, then use:</p>
-                    <p className="mt-1">Username: <strong>admin</strong> | Password: <strong>admin123</strong></p>
+                    <p className="font-semibold mb-1">Première configuration ?</p>
+                    <p>Exécutez <code className="bg-blue-100 px-1 rounded">seed:createAdminUser</code> dans le tableau de bord Convex, puis utilisez :</p>
+                    <p className="mt-1">Nom d'utilisateur : <strong>admin</strong> | Mot de passe : <strong>admin123</strong></p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
-                            Username
+                            Nom d'utilisateur
                         </label>
                         <input
                             id="username"
@@ -67,14 +67,14 @@ export default function LoginPage() {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition"
-                            placeholder="Enter your username"
+                            placeholder="Entrez votre nom d'utilisateur"
                             required
                         />
                     </div>
 
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                            Password
+                            Mot de passe
                         </label>
                         <input
                             id="password"
@@ -82,7 +82,7 @@ export default function LoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition"
-                            placeholder="Enter your password"
+                            placeholder="Entrez votre mot de passe"
                             required
                         />
                     </div>
@@ -98,7 +98,7 @@ export default function LoginPage() {
                         disabled={isLoading}
                         className="w-full bg-slate-900 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isLoading ? 'Logging in...' : 'Login'}
+                        {isLoading ? 'Connexion en cours...' : 'Se connecter'}
                     </button>
                 </form>
             </div>

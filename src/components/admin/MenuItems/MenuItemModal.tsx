@@ -124,7 +124,7 @@ export default function MenuItemModal({
             <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full my-8 mt-16">
                 <div className="flex items-center justify-between p-6 border-b border-slate-200">
                     <h2 className="text-xl font-bold text-slate-900">
-                        {editingItem ? 'Edit Menu Item' : 'Add Menu Item'}
+                        {editingItem ? 'Modifier l\'Article' : 'Ajouter un Article'}
                     </h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
                         <X className="w-6 h-6" />
@@ -134,7 +134,7 @@ export default function MenuItemModal({
                 <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="col-span-2">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Nom</label>
                             <input
                                 type="text"
                                 value={formData.name}
@@ -151,12 +151,12 @@ export default function MenuItemModal({
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows={3}
                                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                                placeholder="Optional description"
+                                placeholder="Description (facultative)"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Price</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Prix</label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -168,7 +168,7 @@ export default function MenuItemModal({
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Price with Fries</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Prix avec Frites</label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -179,7 +179,7 @@ export default function MenuItemModal({
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Menu Price</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Prix Menu</label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -190,7 +190,7 @@ export default function MenuItemModal({
                         </div>
 
                         <div className="col-span-2">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Category Orders</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Ordre d'affichage (par catégorie)</label>
                             <div className="space-y-2 bg-slate-50 p-3 rounded-lg border border-slate-200">
                                 {formData.categories.map((categorySlug) => {
                                     const categoryName = categories?.find(c => c.slug === categorySlug)?.name || categorySlug;
@@ -226,7 +226,7 @@ export default function MenuItemModal({
                             <div className="space-y-3">
                                 {previewUrl && (
                                     <div className="relative w-full aspect-video bg-slate-100 rounded-lg overflow-hidden">
-                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        <img src={previewUrl} alt="Aperçu" className="w-full h-full object-cover" />
                                         {editingItem && (
                                             <button
                                                 type="button"
@@ -245,7 +245,7 @@ export default function MenuItemModal({
                                                 className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded-lg hover:bg-red-700 transition disabled:opacity-50"
                                             >
                                                 <Trash2 className="w-3 h-3" />
-                                                {isDeletingImage ? 'Deleting...' : 'Delete Image'}
+                                                {isDeletingImage ? 'Suppression...' : 'Supprimer l\'Image'}
                                             </button>
                                         )}
                                     </div>
@@ -258,7 +258,7 @@ export default function MenuItemModal({
                                         className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition"
                                     >
                                         <Upload className="w-5 h-5 text-slate-500" />
-                                        <span className="text-slate-600">{selectedFile ? selectedFile.name : 'Upload Image'}</span>
+                                        <span className="text-slate-600">{selectedFile ? selectedFile.name : 'Télécharger une Image'}</span>
                                     </button>
                                 </div>
                                 <input
@@ -275,7 +275,7 @@ export default function MenuItemModal({
                         </div>
 
                         <div className="col-span-2">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Categories</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Catégories</label>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
                                 {categories?.map((cat) => (
                                     <label key={cat._id} className="flex items-center gap-2 cursor-pointer group">
@@ -304,7 +304,7 @@ export default function MenuItemModal({
                                 onChange={(e) => setFormData({ ...formData, popular: e.target.checked })}
                                 className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-500"
                             />
-                            <label htmlFor="popular" className="ml-2 text-sm font-medium text-slate-700">Popular</label>
+                            <label htmlFor="popular" className="ml-2 text-sm font-medium text-slate-700">Populaire</label>
                         </div>
 
                         <div className="flex items-center">
@@ -315,13 +315,13 @@ export default function MenuItemModal({
                                 onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
                                 className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-500"
                             />
-                            <label htmlFor="active" className="ml-2 text-sm font-medium text-slate-700">Active</label>
+                            <label htmlFor="active" className="ml-2 text-sm font-medium text-slate-700">Actif</label>
                         </div>
 
                         {/* Topping Categories selection logic omitted for brevity, should be restored if needed */}
                         {toppingCategories && toppingCategories.length > 0 && (
                             <div className="col-span-2 border-t border-slate-200 pt-4 mt-2">
-                                <label className="block text-sm font-medium text-slate-700 mb-3">Topping Categories</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-3">Catégories de Garnitures</label>
                                 {/* ... existing topping categories logic ... */}
                                 <div className="grid grid-cols-2 gap-2">
                                     {toppingCategories.map((cat) => (
@@ -352,9 +352,9 @@ export default function MenuItemModal({
                     </div>
 
                     <div className="flex gap-3 pt-4">
-                        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg">Cancel</button>
+                        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg">Annuler</button>
                         <button type="submit" disabled={isUploading} className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg disabled:opacity-50">
-                            {isUploading ? 'Uploading...' : editingItem ? 'Update' : 'Create'}
+                            {isUploading ? 'Téléchargement...' : editingItem ? 'Mettre à jour' : 'Créer'}
                         </button>
                     </div>
                 </form>

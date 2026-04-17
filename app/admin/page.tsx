@@ -36,14 +36,14 @@ export default function DashboardPage() {
     <>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-600 mt-2">Welcome to your restaurant admin panel</p>
+          <h1 className="text-3xl font-bold text-slate-900">Tableau de bord</h1>
+          <p className="text-slate-600 mt-2">Bienvenue dans l'interface d'administration de votre restaurant</p>
           <Link
             href="/admin/kds"
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition"
           >
             <Package className="w-4 h-4" />
-            Open KDS Kanban
+            Ouvrir KDS Kanban
           </Link>
         </div>
 

@@ -29,7 +29,7 @@ export default function MenuItemCard({
                 />
                 {!item.active && (
                     <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-                        <span className="bg-gray-900/80 text-white text-xs px-2 py-1 rounded-full">Inactive</span>
+                        <span className="bg-gray-900/80 text-white text-xs px-2 py-1 rounded-full">Inactif</span>
                     </div>
                 )}
                 {categoryFilter !== 'all' && (
@@ -43,7 +43,7 @@ export default function MenuItemCard({
                     <h3 className="text-sm font-bold text-slate-900 line-clamp-1" title={item.name}>{item.name}</h3>
                     {item.popular && (
                         <span className="flex-shrink-0 text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full">
-                            Popular
+                            Populaire
                         </span>
                     )}
                 </div>
@@ -59,14 +59,14 @@ export default function MenuItemCard({
                             className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-xs font-medium"
                         >
                             <Edit className="w-3.5 h-3.5" />
-                            Edit
+                            Modifier
                         </button>
                         <button
                             onClick={() => onDelete(item._id)}
                             className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-xs font-medium"
                         >
                             <Trash2 className="w-3.5 h-3.5" />
-                            Delete
+                            Supprimer
                         </button>
                     </div>
                 </div>

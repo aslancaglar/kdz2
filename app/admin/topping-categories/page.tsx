@@ -111,15 +111,15 @@ export default function ToppingCategoriesPage() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Topping Categories</h1>
-                        <p className="text-slate-600 mt-2">Manage topping categories (Sauces, Crudités, etc.)</p>
+                        <h1 className="text-3xl font-bold text-slate-900">Catégories de Garnitures</h1>
+                        <p className="text-slate-600 mt-2">Gérez les catégories de garnitures (Sauces, Crudités, etc.)</p>
                     </div>
                     <button
                         onClick={handleCreate}
                         className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition"
                     >
                         <Plus className="w-5 h-5" />
-                        Add Category
+                        Ajouter une Catégorie
                     </button>
                 </div>
 
@@ -129,19 +129,19 @@ export default function ToppingCategoriesPage() {
                             <thead className="bg-slate-50 border-b border-slate-200">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                        Order
+                                        Ordre
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                        Name
+                                        Nom
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                                         ID
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                        Selection Rules
+                                        Règles de Sélection
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                        Status
+                                        Statut
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
                                         Actions
@@ -175,7 +175,7 @@ export default function ToppingCategoriesPage() {
                                                     : 'bg-gray-100 text-gray-700'
                                                     }`}
                                             >
-                                                {category.active !== false ? 'Active' : 'Inactive'}
+                                                {category.active !== false ? 'Actif' : 'Inactif'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -205,7 +205,7 @@ export default function ToppingCategoriesPage() {
                                 {(!categories || categories.length === 0) && (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
-                                            No topping categories found. Click "Add Category" to create one.
+                                            Aucune catégorie trouvée. Cliquez sur "Ajouter une Catégorie" pour en créer une.
                                         </td>
                                     </tr>
                                 )}
@@ -220,7 +220,7 @@ export default function ToppingCategoriesPage() {
                     <div className="bg-white rounded-xl shadow-xl max-w-md w-full my-8 mt-16">
                         <div className="flex items-center justify-between p-6 border-b border-slate-200">
                             <h2 className="text-xl font-bold text-slate-900">
-                                {editingId ? 'Edit Category' : 'Add Category'}
+                                {editingId ? 'Modifier la Catégorie' : 'Ajouter une Catégorie'}
                             </h2>
                             <button
                                 onClick={() => setIsModalOpen(false)}
@@ -232,34 +232,34 @@ export default function ToppingCategoriesPage() {
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Nom</label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                                    placeholder="e.g., Sauces, Crudités"
+                                    placeholder="ex: Sauces, Crudités"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Category ID</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">ID de la Catégorie</label>
                                 <input
                                     type="text"
                                     value={formData.categoryId}
                                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent font-mono"
-                                    placeholder="e.g., sauces"
+                                    placeholder="ex: sauces"
                                     required
                                 />
-                                <p className="text-xs text-slate-500 mt-1">Unique identifier for this category</p>
+                                <p className="text-xs text-slate-500 mt-1">Identifiant unique pour cette catégorie</p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Min Selection
+                                        Sélection minimum
                                     </label>
                                     <input
                                         type="number"
@@ -269,12 +269,12 @@ export default function ToppingCategoriesPage() {
                                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                                         required
                                     />
-                                    <p className="text-xs text-slate-500 mt-1">0 = optional</p>
+                                    <p className="text-xs text-slate-500 mt-1">0 = facultatif</p>
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Max Selection
+                                        Sélection maximum
                                     </label>
                                     <input
                                         type="number"
@@ -287,13 +287,13 @@ export default function ToppingCategoriesPage() {
                                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                                         placeholder="∞"
                                     />
-                                    <p className="text-xs text-slate-500 mt-1">Empty = unlimited</p>
+                                    <p className="text-xs text-slate-500 mt-1">Vide = illimité</p>
                                 </div>
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Display Order
+                                    Ordre d'affichage
                                 </label>
                                 <input
                                     type="number"
@@ -313,7 +313,7 @@ export default function ToppingCategoriesPage() {
                                     className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-500"
                                 />
                                 <label htmlFor="active" className="ml-2 text-sm font-medium text-slate-700">
-                                    Active
+                                    Actif
                                 </label>
                             </div>
 
@@ -323,13 +323,13 @@ export default function ToppingCategoriesPage() {
                                     onClick={() => setIsModalOpen(false)}
                                     className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition"
                                 >
-                                    Cancel
+                                    Annuler
                                 </button>
                                 <button
                                     type="submit"
                                     className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition"
                                 >
-                                    {editingId ? 'Update' : 'Create'}
+                                    {editingId ? 'Mettre à jour' : 'Créer'}
                                 </button>
                             </div>
                         </form>
@@ -341,8 +341,8 @@ export default function ToppingCategoriesPage() {
                 isOpen={confirmModal.isOpen}
                 onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
                 onConfirm={handleConfirmDelete}
-                title="Delete Topping Category"
-                message="Are you sure you want to delete this category? All toppings in this category will remain but will be unassigned."
+                title="Supprimer la Catégorie de Garnitures"
+                message="Êtes-vous sûr de vouloir supprimer cette catégorie ? Toutes les garnitures de cette catégorie seront conservées mais non assignées."
             />
         </>
     );

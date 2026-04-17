@@ -17,11 +17,11 @@ type StatusColumn = {
 };
 
 const STATUS_COLUMNS: StatusColumn[] = [
-  { status: "pending", title: "Pending", subtitle: "New orders", badgeClass: "bg-amber-100 text-amber-700" },
-  { status: "preparing", title: "Preparing", subtitle: "In kitchen", badgeClass: "bg-blue-100 text-blue-700" },
-  { status: "ready", title: "Ready", subtitle: "Awaiting pickup", badgeClass: "bg-emerald-100 text-emerald-700" },
-  { status: "completed", title: "Completed", subtitle: "Finished", badgeClass: "bg-slate-200 text-slate-700" },
-  { status: "cancelled", title: "Cancelled", subtitle: "Stopped", badgeClass: "bg-rose-100 text-rose-700" },
+  { status: "pending", title: "En attente", subtitle: "Nouvelles commandes", badgeClass: "bg-amber-100 text-amber-700" },
+  { status: "preparing", title: "Préparation", subtitle: "En cuisine", badgeClass: "bg-blue-100 text-blue-700" },
+  { status: "ready", title: "Prête", subtitle: "En attente de retrait", badgeClass: "bg-emerald-100 text-emerald-700" },
+  { status: "completed", title: "Terminée", subtitle: "Fini", badgeClass: "bg-slate-200 text-slate-700" },
+  { status: "cancelled", title: "Annulée", subtitle: "Arrêtée", badgeClass: "bg-rose-100 text-rose-700" },
 ];
 
 function formatSchedule(value: string) {
@@ -148,7 +148,7 @@ export default function AdminKdsPage() {
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">KDS Kanban</h1>
-          <p className="mt-2 text-slate-600">Drag orders between columns to update kitchen status in real time.</p>
+          <p className="mt-2 text-slate-600">Faites glisser les commandes entre les colonnes pour mettre à jour le statut en cuisine en temps réel.</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -169,21 +169,21 @@ export default function AdminKdsPage() {
               ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
               : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
               }`}
-            title={soundEnabled ? "Disable new order sound" : "Enable new order sound"}
+            title={soundEnabled ? "Désactiver le son" : "Activer le son"}
           >
             {soundEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
-            {soundEnabled ? "Sound On" : "Sound Off"}
+            {soundEnabled ? "Son Activé" : "Son Désactivé"}
           </button>
 
           <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Active Orders</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Commandes Actives</p>
             <p className="text-2xl font-black text-slate-900">{activeCount}</p>
           </div>
         </div>
       </div>
 
       {orders === undefined ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500">Loading KDS board...</div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500">Chargement du tableau KDS...</div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-5">
           {STATUS_COLUMNS.map((column) => {
@@ -221,7 +221,7 @@ export default function AdminKdsPage() {
                 <div className="space-y-3">
                   {items.length === 0 ? (
                     <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-xs text-slate-500">
-                      No orders
+                      Aucune commande
                     </div>
                   ) : (
                     items.map((order) => {
@@ -265,14 +265,14 @@ export default function AdminKdsPage() {
                             </div>
                             <div className="rounded-lg bg-slate-50 px-2 py-1.5 text-slate-600">
                               <span className="font-semibold text-slate-900">{formatSchedule(order.scheduledTime)}</span>
-                              <span className="ml-1">Schedule</span>
+                              <span className="ml-1">Heure</span>
                             </div>
                             <div className="rounded-lg bg-slate-50 px-2 py-1.5 text-slate-600">
                               <span className="font-semibold text-slate-900">{order.items.length}</span>
                               <span className="ml-1">Items</span>
                             </div>
                             <div className="rounded-lg bg-slate-50 px-2 py-1.5 text-slate-600">
-                              <span className="font-semibold text-slate-900">{order.type === "delivery" ? "Delivery" : "Pickup"}</span>
+                              <span className="font-semibold text-slate-900">{order.type === "delivery" ? "Livraison" : "Emporter"}</span>
                             </div>
                           </div>
 
@@ -288,7 +288,7 @@ export default function AdminKdsPage() {
                             onClick={() => toggleOrderDetails(order._id)}
                             className="mb-3 text-xs font-bold uppercase tracking-wider text-indigo-600 hover:text-indigo-700"
                           >
-                            {isExpanded ? "Hide Details" : "Show Details"}
+                            {isExpanded ? "Masquer les détails" : "Afficher les détails"}
                           </button>
 
                           {isExpanded && (
@@ -299,10 +299,10 @@ export default function AdminKdsPage() {
                                     <p className="text-xs font-semibold text-slate-900">{item.name}</p>
                                     <p className="text-xs font-bold text-slate-700">{item.finalPrice.toFixed(2)}€</p>
                                   </div>
-                                  {item.selectedSize && <p className="text-[11px] text-slate-500">Size: {item.selectedSize}</p>}
+                                  {item.selectedSize && <p className="text-[11px] text-slate-500">Taille : {item.selectedSize}</p>}
                                   {item.selectedToppings?.length > 0 && (
                                     <p className="mt-1 text-[11px] text-slate-500">
-                                      Toppings:{" "}
+                                      Garnitures :{" "}
                                       {item.selectedToppings
                                         .flatMap((group: any) => group.toppingIds || [])
                                         .map((toppingId: string) => toppingNameById.get(toppingId) || toppingId)
@@ -315,14 +315,14 @@ export default function AdminKdsPage() {
                               {order.type === "delivery" && order.address && (
                                 <div className="rounded-md border border-purple-100 bg-purple-50 p-2 text-[11px] text-purple-900">
                                   <p className="mb-1 flex items-center gap-1 font-semibold">
-                                    <Truck className="h-3.5 w-3.5" /> Delivery Address
+                                    <Truck className="h-3.5 w-3.5" /> Adresse de livraison
                                   </p>
                                   <p className="leading-tight">
                                     <MapPin className="mr-1 inline h-3 w-3" />
                                     {order.address.street}, {order.address.zipCode} {order.address.city}
                                   </p>
                                   {order.address.instructions && (
-                                    <p className="mt-1 rounded bg-white/70 p-1 text-[10px]">Note: {order.address.instructions}</p>
+                                    <p className="mt-1 rounded bg-white/70 p-1 text-[10px]">Note : {order.address.instructions}</p>
                                   )}
                                 </div>
                               )}

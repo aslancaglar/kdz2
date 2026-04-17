@@ -119,8 +119,8 @@ export default function OrdersPage() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Orders Management</h1>
-            <p className="text-slate-600 mt-2">View and manage customer orders</p>
+            <h1 className="text-3xl font-bold text-slate-900">Gestion des Commandes</h1>
+            <p className="text-slate-600 mt-2">Affichez et gérez les commandes des clients</p>
           </div>
           <button
             onClick={toggleSound}

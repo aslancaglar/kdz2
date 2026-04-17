@@ -98,15 +98,15 @@ export default function ToppingsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Toppings Management</h1>
-            <p className="text-slate-600 mt-2">Manage toppings and their categories</p>
+            <h1 className="text-3xl font-bold text-slate-900">Gestion des Garnitures</h1>
+            <p className="text-slate-600 mt-2">Gérez les garnitures et leurs catégories</p>
           </div>
           <button
             onClick={handleCreate}
             className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition"
           >
             <Plus className="w-5 h-5" />
-            Add Topping
+            Ajouter une Garniture
           </button>
         </div>
 
@@ -119,7 +119,7 @@ export default function ToppingsPage() {
                 <div className="border-b border-slate-200 p-4 bg-slate-50">
                   <h2 className="text-lg font-bold text-slate-900">{category.name}</h2>
                   <p className="text-sm text-slate-600">
-                    Min: {category.minSelection} | Max: {category.maxSelection || 'Unlimited'}
+                    Min: {category.minSelection} | Max: {category.maxSelection || 'Illimité'}
                   </p>
                 </div>
 
@@ -134,7 +134,7 @@ export default function ToppingsPage() {
                           <div>
                             <p className="font-medium text-slate-900">{topping.name}</p>
                             <p className="text-sm text-slate-600">
-                              {topping.price ? `+${topping.price.toFixed(2)}€` : 'Free'}
+                              {topping.price ? `+${topping.price.toFixed(2)}€` : 'Gratuit'}
                             </p>
                           </div>
                           <div className="flex gap-2">
@@ -155,7 +155,7 @@ export default function ToppingsPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-slate-500 text-center py-4">No toppings in this category</p>
+                    <p className="text-slate-500 text-center py-4">Aucune garniture dans cette catégorie</p>
                   )}
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default function ToppingsPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-6 border-b border-slate-200">
               <h2 className="text-xl font-bold text-slate-900">
-                {editingId ? 'Edit Topping' : 'Add Topping'}
+                {editingId ? 'Modifier la Garniture' : 'Ajouter une Garniture'}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -181,7 +181,7 @@ export default function ToppingsPage() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nom</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -192,7 +192,7 @@ export default function ToppingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Price</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Prix</label>
                 <input
                   type="number"
                   step="0.01"
@@ -204,7 +204,7 @@ export default function ToppingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Catégorie</label>
                 <select
                   value={formData.categoryId}
                   onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
@@ -221,7 +221,7 @@ export default function ToppingsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Display Order
+                  Ordre d'affichage
                 </label>
                 <input
                   type="number"
@@ -243,7 +243,7 @@ export default function ToppingsPage() {
                   className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-500"
                 />
                 <label htmlFor="active" className="ml-2 text-sm font-medium text-slate-700">
-                  Active
+                  Actif
                 </label>
               </div>
 
@@ -253,13 +253,13 @@ export default function ToppingsPage() {
                   onClick={() => setIsModalOpen(false)}
                   className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition"
                 >
-                  Cancel
+                  Annuler
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition"
                 >
-                  {editingId ? 'Update' : 'Create'}
+                  {editingId ? 'Mettre à jour' : 'Créer'}
                 </button>
               </div>
             </form>
@@ -271,8 +271,8 @@ export default function ToppingsPage() {
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
         onConfirm={handleConfirmDelete}
-        title="Delete Topping"
-        message="Are you sure you want to delete this topping? This action cannot be undone."
+        title="Supprimer la Garniture"
+        message="Êtes-vous sûr de vouloir supprimer cette garniture ? Cette action est irréversible."
       />
     </>
   );

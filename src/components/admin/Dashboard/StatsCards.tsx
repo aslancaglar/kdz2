@@ -40,25 +40,25 @@ export default function StatsCards({
 }: StatsCardsProps) {
     const stats = [
         {
-            label: 'Total Categories',
+            label: 'Total des Catégories',
             value: categoriesCount,
             icon: Tag,
             color: 'bg-blue-500',
         },
         {
-            label: 'Total Menu Items',
+            label: 'Total des Articles',
             value: menuItemsCount,
             icon: Pizza,
             color: 'bg-green-500',
         },
         {
-            label: 'Topping Categories',
+            label: 'Catégories (Garnitures)',
             value: toppingCategoriesCount,
             icon: UtensilsCrossed,
             color: 'bg-yellow-500',
         },
         {
-            label: 'Total Orders',
+            label: 'Total des Commandes',
             value: ordersCount,
             icon: ShoppingCart,
             color: 'bg-red-500',

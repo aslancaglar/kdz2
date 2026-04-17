@@ -34,7 +34,7 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
                         onClick={onClose}
                         className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition font-medium"
                     >
-                        Cancel
+                        Annuler
                     </button>
                     <button
                         onClick={() => {
@@ -43,7 +43,7 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
                         }}
                         className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium shadow-sm hover:shadow"
                     >
-                        Delete
+                        Supprimer
                     </button>
                 </div>
             </div>

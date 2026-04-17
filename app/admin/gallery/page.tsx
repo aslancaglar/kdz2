@@ -80,8 +80,8 @@ export default function GalleryPage() {
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Gallery</h1>
-                        <p className="text-slate-600 mt-2">Manage photo gallery</p>
+                        <h1 className="text-3xl font-bold text-slate-900">Galerie</h1>
+                        <p className="text-slate-600 mt-2">Gérez la galerie de photos</p>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -98,11 +98,11 @@ export default function GalleryPage() {
                             className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition disabled:opacity-50"
                         >
                             {isUploading ? (
-                                <span className="animate-pulse">Uploading...</span>
+                                <span className="animate-pulse">Téléchargement...</span>
                             ) : (
                                 <>
                                     <Upload className="w-5 h-5" />
-                                    Upload Photo
+                                    Télécharger une Photo
                                 </>
                             )}
                         </button>
@@ -124,7 +124,7 @@ export default function GalleryPage() {
                                     <button
                                         onClick={() => toggleActive(item._id, item.active)}
                                         className="p-1.5 bg-white/20 hover:bg-white/40 rounded-lg text-white backdrop-blur-sm"
-                                        title={item.active ? "Hide" : "Show"}
+                                        title={item.active ? "Masquer" : "Afficher"}
                                     >
                                         {item.active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
@@ -142,12 +142,12 @@ export default function GalleryPage() {
 
                 {images?.length === 0 && (
                     <div className="text-center py-20 bg-white rounded-xl border border-dashed border-slate-300">
-                        <p className="text-slate-500">No images in gallery yet.</p>
+                        <p className="text-slate-500">Aucune image dans la galerie pour le moment.</p>
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             className="mt-4 text-primary-600 font-medium hover:text-primary-700 hover:underline"
                         >
-                            Upload your first photo
+                            Télécharger votre première photo
                         </button>
                     </div>
                 )}
@@ -156,8 +156,8 @@ export default function GalleryPage() {
                     isOpen={confirmModal.isOpen}
                     onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
                     onConfirm={handleConfirmDelete}
-                    title="Delete Image"
-                    message="Are you sure you want to delete this image? This action cannot be undone."
+                    title="Supprimer l'Image"
+                    message="Êtes-vous sûr de vouloir supprimer cette image ? Cette action est irréversible."
                 />
             </div>
         </>

@@ -146,27 +146,27 @@ export default function MenuItemsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Menu Items</h1>
-            <p className="text-slate-600 mt-2">Manage your restaurant menu items</p>
+            <h1 className="text-3xl font-bold text-slate-900">Articles du Menu</h1>
+            <p className="text-slate-600 mt-2">Gérez les articles du menu de votre restaurant</p>
           </div>
           <button
             onClick={handleCreate}
             className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition"
           >
             <Plus className="w-5 h-5" />
-            Add Menu Item
+            Ajouter un Article
           </button>
         </div>
 
         {/* Category Filter */}
         <div className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-          <label className="text-sm font-medium text-slate-700">Filter by category:</label>
+          <label className="text-sm font-medium text-slate-700">Filtrer par catégorie :</label>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
           >
-            <option value="all">All Categories</option>
+            <option value="all">Toutes les Catégories</option>
             {categories?.map((cat) => (
               <option key={cat._id} value={cat.slug}>
                 {cat.name}
@@ -174,7 +174,7 @@ export default function MenuItemsPage() {
             ))}
           </select>
           <span className="text-sm text-slate-500">
-            {filteredMenuItems?.length ?? 0} item{(filteredMenuItems?.length ?? 0) !== 1 ? 's' : ''}
+            {filteredMenuItems?.length ?? 0} article{(filteredMenuItems?.length ?? 0) !== 1 ? 's' : ''}
           </span>
         </div>
 
@@ -205,8 +205,8 @@ export default function MenuItemsPage() {
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
         onConfirm={handleConfirmDelete}
-        title="Delete Menu Item"
-        message="Are you sure you want to delete this menu item? This action cannot be undone."
+        title="Supprimer l'Article"
+        message="Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible."
       />
     </>
   );
