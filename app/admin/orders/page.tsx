@@ -82,13 +82,22 @@ export default function OrdersPage() {
 
   // Monitor pending orders and play/stop sound accordingly
   useEffect(() => {
+    if (typeof window !== 'undefined' && !audioRef.current) {
+      const audio = new Audio('/sounds/new-order.mp3?v=' + Date.now());
+      audio.loop = true;
+      audioRef.current = audio;
+    }
+
     if (!orders || !audioRef.current) return;
 
     const hasPending = orders.some(o => o.status === 'pending');
     if (soundEnabledRef.current && hasPending) {
-      audioRef.current.play().catch(() => {
-        // Silent fail — will be retried on next order change
-      });
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Silent fail — will be retried on next order change
+        });
+      }
     } else {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
