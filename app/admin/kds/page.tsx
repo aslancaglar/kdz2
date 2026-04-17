@@ -129,18 +129,42 @@ export default function AdminKdsPage() {
       audioRef.current = audio;
     }
 
-    if (orders) {
-      const hasPending = orders.some((order) => order.status === "pending");
+    if (!orders || !audioRef.current) return;
+
+    const hasPending = orders.some((order) => order.status === "pending");
+
+    const tryPlay = () => {
       if (soundEnabled && hasPending && audioRef.current) {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
-          playPromise.catch(e => console.log("Audio autoplay prevented by browser. User interaction needed."));
+          playPromise.catch(e => console.log("Audio autoplay prevented. Awaiting interaction."));
         }
-      } else if ((!soundEnabled || !hasPending) && audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
       }
+    };
+
+    if (soundEnabled && hasPending) {
+      tryPlay();
+    } else {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
+
+    // Attempt to play on any user interaction if it was blocked
+    const unlockAudio = () => {
+      if (soundEnabled && hasPending && audioRef.current?.paused) {
+        tryPlay();
+      }
+    };
+
+    document.addEventListener('click', unlockAudio, { passive: true });
+    document.addEventListener('touchstart', unlockAudio, { passive: true });
+    document.addEventListener('keydown', unlockAudio, { passive: true });
+
+    return () => {
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+    };
   }, [orders, soundEnabled]);
 
   return (

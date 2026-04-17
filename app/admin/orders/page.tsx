@@ -91,17 +91,41 @@ export default function OrdersPage() {
     if (!orders || !audioRef.current) return;
 
     const hasPending = orders.some(o => o.status === 'pending');
-    if (soundEnabledRef.current && hasPending) {
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // Silent fail — will be retried on next order change
-        });
+    
+    const tryPlay = () => {
+      if (soundEnabledRef.current && hasPending && audioRef.current) {
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Browser blocked autoplay. Will retry on next interaction.
+          });
+        }
       }
+    };
+
+    if (soundEnabledRef.current && hasPending) {
+      tryPlay();
     } else {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
+
+    // Add global listener to retry playback after DOM exception (like on page refresh)
+    const unlockAudio = () => {
+      if (soundEnabledRef.current && hasPending && audioRef.current?.paused) {
+        tryPlay();
+      }
+    };
+
+    document.addEventListener('click', unlockAudio, { passive: true });
+    document.addEventListener('touchstart', unlockAudio, { passive: true });
+    document.addEventListener('keydown', unlockAudio, { passive: true });
+    
+    return () => {
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+    };
   }, [orders, soundEnabled]);
 
   const handleStatusChange = useCallback(async (orderId: Id<'orders'>, newStatus: string) => {
