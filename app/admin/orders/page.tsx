@@ -110,21 +110,37 @@ export default function OrdersPage() {
       audioRef.current.currentTime = 0;
     }
 
-    // Add global listener to retry playback after DOM exception (like on page refresh)
-    const unlockAudio = () => {
-      if (soundEnabledRef.current && hasPending && audioRef.current?.paused) {
-        tryPlay();
+    // Add global listener to robustly unlock the audio context on ANY user interaction
+    const unlockAudioContext = () => {
+      if (audioRef.current && audioRef.current.dataset.unlocked !== 'true') {
+        const p = audioRef.current.play();
+        if (p !== undefined) {
+          p.then(() => {
+            audioRef.current!.dataset.unlocked = 'true';
+            // Only keep playing if we actually have pending orders and sound is enabled
+            const stillPending = orders?.some(o => o.status === 'pending');
+            if (!soundEnabledRef.current || !stillPending) {
+              audioRef.current!.pause();
+              audioRef.current!.currentTime = 0;
+            }
+          }).catch(() => {
+            // Failed to unlock (e.g., simulated click), will retry on next click
+          });
+        }
+      } else if (soundEnabledRef.current && hasPending && audioRef.current?.paused) {
+        // Already unlocked but currently paused when it should be playing
+        audioRef.current.play().catch(() => {});
       }
     };
 
-    document.addEventListener('click', unlockAudio, { passive: true });
-    document.addEventListener('touchstart', unlockAudio, { passive: true });
-    document.addEventListener('keydown', unlockAudio, { passive: true });
+    document.addEventListener('click', unlockAudioContext, { passive: true });
+    document.addEventListener('touchstart', unlockAudioContext, { passive: true });
+    document.addEventListener('keydown', unlockAudioContext, { passive: true });
     
     return () => {
-      document.removeEventListener('click', unlockAudio);
-      document.removeEventListener('touchstart', unlockAudio);
-      document.removeEventListener('keydown', unlockAudio);
+      document.removeEventListener('click', unlockAudioContext);
+      document.removeEventListener('touchstart', unlockAudioContext);
+      document.removeEventListener('keydown', unlockAudioContext);
     };
   }, [orders, soundEnabled]);
 
